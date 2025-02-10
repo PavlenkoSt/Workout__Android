@@ -20,7 +20,7 @@ fun App() {
     Scaffold(
         bottomBar = {
             BottomNavBar(navState)
-        }
+        },
     ) { paddingValues ->
         Navigator(
             navState = navState,
