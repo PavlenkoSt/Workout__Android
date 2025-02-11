@@ -1,12 +1,10 @@
 [versions]
 agp = "8.7.3"
-composecalendar = "1.3.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-kotlinxDatetime = "1.3.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
@@ -16,8 +14,6 @@ reorderable = "2.4.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-composecalendar-kotlinx-datetime = { module = "io.github.boguszpawlowski.composecalendar:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-github-composecalendar = { module = "io.github.boguszpawlowski.composecalendar:composecalendar", version.ref = "composecalendar" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
