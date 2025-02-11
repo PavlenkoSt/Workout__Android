@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.reorderable)
     implementation(libs.github.composecalendar)
     implementation(libs.composecalendar.kotlinx.datetime)
     implementation(libs.androidx.navigation.compose)
