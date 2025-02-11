@@ -5,11 +5,11 @@ import java.time.format.DateTimeFormatter
 
 data class CalendarUiModel(
     val selectedDate: Date,
-    val visibleDates: List<Date>
+    val week: List<Date>
 ) {
 
-    val startDate: Date = visibleDates.first()
-    val endDate: Date = visibleDates.last()
+    val startDate: Date = week.first()
+    val endDate: Date = week.last()
 
     data class Date(
         val date: LocalDate,

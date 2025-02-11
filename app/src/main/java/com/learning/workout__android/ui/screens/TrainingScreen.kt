@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.FloatingActionButton
@@ -39,36 +40,41 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatDate
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Composable
 fun TrainingScreen(modifier: Modifier = Modifier) {
     // TODO move to view model
-    var calendarUiModel by remember { mutableStateOf(CalendarDataSource.getData(lastSelectedDate = CalendarDataSource.today)) }
+    val initialWeekStart = CalendarDataSource.today.with(DayOfWeek.MONDAY)
+
+    // We simulate infinite pages by choosing a very high page count.
+    // The middle page corresponds to the current week.
+    val initialPage = Int.MAX_VALUE / 2
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
+
+    // Calculate the current week’s start date from the pager’s current page.
+    val currentWeekOffset = pagerState.currentPage - initialPage
+    val currentWeekStart = initialWeekStart.plusWeeks(currentWeekOffset.toLong())
+
+    // For simplicity, we mark today as the "selected" date if it lies in the week.
+    // (You might want to manage the selected date as additional state.)
+    var calendarUiModel by remember {
+        mutableStateOf(
+            CalendarDataSource.getData(
+                startDate = currentWeekStart,
+                lastSelectedDate = CalendarDataSource.today
+            )
+        )
+    }
 
     val days by remember { mutableStateOf(TrainingDaysMockData) }
     val currentDay = days.find { it.date == calendarUiModel.selectedDate.date.toString() }
 
-    fun onPrevWeekClick(startDate: LocalDate) {
-        val finalStartDate = startDate.minusDays(1)
-        calendarUiModel = CalendarDataSource.getData(
-            startDate = finalStartDate,
-            lastSelectedDate = calendarUiModel.selectedDate.date
-        )
-    }
-
-    fun onNextWeekClick(endDate: LocalDate) {
-        val finalStartDate = endDate.plusDays(2)
-        calendarUiModel = CalendarDataSource.getData(
-            startDate = finalStartDate,
-            lastSelectedDate = calendarUiModel.selectedDate.date
-        )
-    }
-
     fun onDateClick(date: CalendarUiModel.Date) {
         calendarUiModel = calendarUiModel.copy(
             selectedDate = date,
-            visibleDates = calendarUiModel.visibleDates.map {
+            week = calendarUiModel.week.map {
                 it.copy(
                     isSelected = it.date.isEqual(date.date)
                 )
@@ -80,10 +86,11 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         Column {
             Calendar(
                 modifier = Modifier.fillMaxWidth(),
+                onDateClick = ::onDateClick,
+                pagerState = pagerState,
                 calendarUiModel = calendarUiModel,
-                onPrevWeekClick = ::onPrevWeekClick,
-                onNextWeekClick = ::onNextWeekClick,
-                onDateClick = ::onDateClick
+                initialPage = initialPage,
+                initialWeekStart = initialWeekStart
             )
 
             Spacer(modifier = Modifier.height(16.dp))
