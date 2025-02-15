@@ -49,7 +49,8 @@ import java.time.LocalDate
 
 @Composable
 fun TrainingScreen(modifier: Modifier = Modifier) {
-    // TODO move to view model
+    val coroutineScope = rememberCoroutineScope()
+
     val initialWeekStart = CalendarDataSource.today.with(DayOfWeek.MONDAY)
 
     // We simulate infinite pages by choosing a very high page count.
@@ -72,7 +73,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         )
     }
 
-    val currentMonth = remember {
+    val currentMonth by remember {
         derivedStateOf {
             val weekStart =
                 initialWeekStart.plusWeeks((pagerState.currentPage - initialPage).toLong())
@@ -97,16 +98,10 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         val newWeekDates =
             CalendarDataSource.getData(newWeekStart, calendarUiModel.selectedDate.date)
 
-        val newSelectedDate = if (newWeekDates.week.any { it.isToday }) {
-            newWeekDates.week.first { it.isToday } // Select today if it exists in the week
-        } else {
-            newWeekDates.week.first() // Otherwise, select the first day of the week
-        }
-
+        val newSelectedDate =
+            newWeekDates.week.firstOrNull { it.isToday } ?: newWeekDates.week.first()
         calendarUiModel = newWeekDates.copy(selectedDate = newSelectedDate)
     }
-
-    val coroutineScope = rememberCoroutineScope()
 
     fun onDateClick(date: CalendarUiModel.Date) {
         calendarUiModel = calendarUiModel.copy(
@@ -128,7 +123,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 calendarUiModel = calendarUiModel,
                 initialPage = initialPage,
                 initialWeekStart = initialWeekStart,
-                title = "${currentMonth.value} ${calendarUiModel.selectedDate.date.year}"
+                title = "$currentMonth ${calendarUiModel.selectedDate.date.year}"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
