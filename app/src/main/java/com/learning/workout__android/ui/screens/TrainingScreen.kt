@@ -21,9 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +41,7 @@ import com.learning.workout__android.model.ExerciseModel
 import com.learning.workout__android.ui.components.Calendar
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatDate
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.DayOfWeek
@@ -68,8 +72,41 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         )
     }
 
+    val currentMonth = remember {
+        derivedStateOf {
+            val weekStart =
+                initialWeekStart.plusWeeks((pagerState.currentPage - initialPage).toLong())
+            val weekEnd = weekStart.plusDays(6)
+            if (weekStart.month == weekEnd.month) {
+                weekStart.month.toString().forceCapitalize()
+            } else {
+                "${weekStart.month.toString().forceCapitalize()} & ${
+                    weekEnd.month.toString().forceCapitalize()
+                }"
+            }
+        }
+    }
+
     val days by remember { mutableStateOf(TrainingDaysMockData) }
     val currentDay = days.find { it.date == calendarUiModel.selectedDate.date.toString() }
+
+    // Select day when change week
+    LaunchedEffect(pagerState.currentPage) {
+        val newWeekStart =
+            initialWeekStart.plusWeeks((pagerState.currentPage - initialPage).toLong())
+        val newWeekDates =
+            CalendarDataSource.getData(newWeekStart, calendarUiModel.selectedDate.date)
+
+        val newSelectedDate = if (newWeekDates.week.any { it.isToday }) {
+            newWeekDates.week.first { it.isToday } // Select today if it exists in the week
+        } else {
+            newWeekDates.week.first() // Otherwise, select the first day of the week
+        }
+
+        calendarUiModel = newWeekDates.copy(selectedDate = newSelectedDate)
+    }
+
+    val coroutineScope = rememberCoroutineScope()
 
     fun onDateClick(date: CalendarUiModel.Date) {
         calendarUiModel = calendarUiModel.copy(
@@ -90,7 +127,8 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 pagerState = pagerState,
                 calendarUiModel = calendarUiModel,
                 initialPage = initialPage,
-                initialWeekStart = initialWeekStart
+                initialWeekStart = initialWeekStart,
+                title = "${currentMonth.value} ${calendarUiModel.selectedDate.date.year}"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -108,13 +146,22 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         if (!calendarUiModel.selectedDate.isToday) {
             TodayFloatBtn(
                 onClick = {
-                    onDateClick(
-                        CalendarUiModel.Date(
-                            date = LocalDate.now(),
-                            isSelected = true,
-                            isToday = true
+                    val today = LocalDate.now()
+
+                    val todayWeekOffset =
+                        java.time.temporal.ChronoUnit.WEEKS.between(initialWeekStart, today)
+                    val todayPage = (initialPage + todayWeekOffset).toInt()
+
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(todayPage) // Scroll to the correct week
+                        onDateClick(
+                            CalendarUiModel.Date(
+                                today,
+                                isSelected = true,
+                                isToday = true
+                            )
                         )
-                    )
+                    }
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -203,4 +250,10 @@ fun TrainingScreenPreview() {
     Workout__AndroidTheme {
         TrainingScreen()
     }
+}
+
+fun String.forceCapitalize(): String {
+    return this
+        .lowercase()
+        .replaceFirstChar { it.uppercase() }
 }

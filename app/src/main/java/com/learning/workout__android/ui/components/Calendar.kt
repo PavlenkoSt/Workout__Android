@@ -2,6 +2,7 @@ package com.learning.workout__android.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +29,6 @@ import com.learning.workout__android.data.CalendarDataSource
 import com.learning.workout__android.model.CalendarUiModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -38,12 +38,14 @@ fun Calendar(
     pagerState: PagerState,
     calendarUiModel: CalendarUiModel,
     initialPage: Int,
-    initialWeekStart: LocalDate
+    initialWeekStart: LocalDate,
+    title: String
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = modifier) {
         Header(
+            title = title,
             data = calendarUiModel,
             onPrevClickListener = {
                 coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
@@ -82,6 +84,7 @@ fun Calendar(
 
 @Composable
 private fun Header(
+    title: String,
     modifier: Modifier = Modifier,
     data: CalendarUiModel,
     onPrevClickListener: (LocalDate) -> Unit,
@@ -89,9 +92,7 @@ private fun Header(
 ) {
     Row(modifier = modifier) {
         Text(
-            text = data.selectedDate.date.format(
-                DateTimeFormatter.ofPattern("MMMM, yyyy")
-            ),
+            text = title,
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically),
@@ -128,7 +129,7 @@ fun DaysRow(
                 date = date,
                 onClickListener = onDateClickListener,
                 modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 4.dp)
+                    .padding(vertical = 4.dp, horizontal = 2.dp)
                     .weight(1f),
                 isActive = activeDate.toString() == date.date.toString()
             )
@@ -146,7 +147,7 @@ fun Day(
     Card(
         modifier = modifier.clickable { onClickListener(date) },
         border = BorderStroke(
-            width = 2.dp,
+            width = 4.dp,
             color = if (isActive) {
                 MaterialTheme.colorScheme.scrim
             } else {
@@ -163,10 +164,10 @@ fun Day(
     ) {
         Column(
             modifier = Modifier
-                .height(48.dp)
-                .padding(4.dp)
+                .height(56.dp)
                 .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = date.day,
