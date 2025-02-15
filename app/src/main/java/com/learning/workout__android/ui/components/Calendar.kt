@@ -1,5 +1,6 @@
 package com.learning.workout__android.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -144,8 +145,16 @@ fun Day(
 ) {
     Card(
         modifier = modifier.clickable { onClickListener(date) },
+        border = BorderStroke(
+            width = 2.dp,
+            color = if (isActive) {
+                MaterialTheme.colorScheme.scrim
+            } else {
+                MaterialTheme.colorScheme.tertiary
+            }
+        ),
         colors = CardDefaults.cardColors(
-            containerColor = if (isActive) {
+            containerColor = if (date.isToday) {
                 MaterialTheme.colorScheme.primary
             } else {
                 MaterialTheme.colorScheme.secondary
