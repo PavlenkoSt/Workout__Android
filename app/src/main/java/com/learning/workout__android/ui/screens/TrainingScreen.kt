@@ -22,114 +22,63 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.learning.workout__android.data.CalendarDataSource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.TrainingDaysMockData
-import com.learning.workout__android.model.CalendarUiModel
 import com.learning.workout__android.model.ExerciseModel
 import com.learning.workout__android.ui.components.Calendar
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.ui.viewmodel.CalendarViewModel
+import com.learning.workout__android.ui.viewmodel.CalendarViewModelFactory
 import com.learning.workout__android.utils.formatDate
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Composable
 fun TrainingScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
 
-    val initialWeekStart = CalendarDataSource.today.with(DayOfWeek.MONDAY)
-
-    // We simulate infinite pages by choosing a very high page count.
-    // The middle page corresponds to the current week.
     val initialPage = Int.MAX_VALUE / 2
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
 
-    // Calculate the current week’s start date from the pager’s current page.
-    val currentWeekOffset = pagerState.currentPage - initialPage
-    val currentWeekStart = initialWeekStart.plusWeeks(currentWeekOffset.toLong())
-
-    // For simplicity, we mark today as the "selected" date if it lies in the week.
-    // (You might want to manage the selected date as additional state.)
-    var calendarUiModel by remember {
-        mutableStateOf(
-            CalendarDataSource.getData(
-                startDate = currentWeekStart,
-                lastSelectedDate = CalendarDataSource.today
-            )
-        )
-    }
-
-    val currentMonth by remember {
-        derivedStateOf {
-            val weekStart =
-                initialWeekStart.plusWeeks((pagerState.currentPage - initialPage).toLong())
-            val weekEnd = weekStart.plusDays(6)
-            if (weekStart.month == weekEnd.month) {
-                weekStart.month.toString().forceCapitalize()
-            } else {
-                "${weekStart.month.toString().forceCapitalize()} & ${
-                    weekEnd.month.toString().forceCapitalize()
-                }"
-            }
-        }
-    }
+    val calendarViewModel: CalendarViewModel =
+        viewModel(factory = CalendarViewModelFactory(pagerState, initialPage))
 
     val days by remember { mutableStateOf(TrainingDaysMockData) }
-    val currentDay = days.find { it.date == calendarUiModel.selectedDate.date.toString() }
+    val currentDay =
+        days.find { it.date == calendarViewModel.calendarUiModel.selectedDate.date.toString() }
 
-    // Select day when change week
     LaunchedEffect(pagerState.currentPage) {
-        val newWeekStart =
-            initialWeekStart.plusWeeks((pagerState.currentPage - initialPage).toLong())
-        val newWeekDates =
-            CalendarDataSource.getData(newWeekStart, calendarUiModel.selectedDate.date)
-
-        val newSelectedDate =
-            newWeekDates.week.firstOrNull { it.isToday } ?: newWeekDates.week.first()
-        calendarUiModel = newWeekDates.copy(selectedDate = newSelectedDate)
-    }
-
-    fun onDateClick(date: CalendarUiModel.Date) {
-        calendarUiModel = calendarUiModel.copy(
-            selectedDate = date,
-            week = calendarUiModel.week.map {
-                it.copy(
-                    isSelected = it.date.isEqual(date.date)
-                )
-            }
-        )
+        calendarViewModel.selectDayInWeek()
     }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column {
             Calendar(
                 modifier = Modifier.fillMaxWidth(),
-                onDateClick = ::onDateClick,
+                onDateClick = { calendarViewModel.onDateClick(it) },
                 pagerState = pagerState,
-                calendarUiModel = calendarUiModel,
+                calendarUiModel = calendarViewModel.calendarUiModel,
                 initialPage = initialPage,
-                initialWeekStart = initialWeekStart,
-                title = "$currentMonth ${calendarUiModel.selectedDate.date.year}"
+                initialWeekStart = calendarViewModel.initialWeekStart,
+                title = "${calendarViewModel.currentMonth} ${calendarViewModel.calendarUiModel.selectedDate.date.year}"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Header(
-                currentDate = calendarUiModel.selectedDate.date,
+                currentDate = calendarViewModel.calendarUiModel.selectedDate.date,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -138,24 +87,11 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        if (!calendarUiModel.selectedDate.isToday) {
+        if (!calendarViewModel.calendarUiModel.selectedDate.isToday) {
             TodayFloatBtn(
                 onClick = {
-                    val today = LocalDate.now()
-
-                    val todayWeekOffset =
-                        java.time.temporal.ChronoUnit.WEEKS.between(initialWeekStart, today)
-                    val todayPage = (initialPage + todayWeekOffset).toInt()
-
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(todayPage) // Scroll to the correct week
-                        onDateClick(
-                            CalendarUiModel.Date(
-                                today,
-                                isSelected = true,
-                                isToday = true
-                            )
-                        )
+                        calendarViewModel.scrollToToday()
                     }
                 },
                 modifier = Modifier
@@ -245,10 +181,4 @@ fun TrainingScreenPreview() {
     Workout__AndroidTheme {
         TrainingScreen()
     }
-}
-
-fun String.forceCapitalize(): String {
-    return this
-        .lowercase()
-        .replaceFirstChar { it.uppercase() }
 }

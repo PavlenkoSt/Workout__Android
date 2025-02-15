@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.reorderable)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
