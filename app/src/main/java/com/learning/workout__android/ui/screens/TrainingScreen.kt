@@ -22,6 +22,7 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,9 +56,12 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModelFactory(pagerState, initialPage))
 
+    val calendarUiModel by calendarViewModel.calendarUiModel.collectAsState()
+    val activeMonthStr by calendarViewModel.currentMonth.collectAsState()
+
     val days by remember { mutableStateOf(TrainingDaysMockData) }
     val currentDay =
-        days.find { it.date == calendarViewModel.calendarUiModel.selectedDate.date.toString() }
+        days.find { it.date == calendarUiModel.selectedDate.date.toString() }
 
     LaunchedEffect(pagerState.currentPage) {
         calendarViewModel.selectDayInWeek()
@@ -69,16 +73,16 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 onDateClick = { calendarViewModel.onDateClick(it) },
                 pagerState = pagerState,
-                calendarUiModel = calendarViewModel.calendarUiModel,
+                calendarUiModel = calendarUiModel,
                 initialPage = initialPage,
                 initialWeekStart = calendarViewModel.initialWeekStart,
-                title = "${calendarViewModel.currentMonth} ${calendarViewModel.calendarUiModel.selectedDate.date.year}"
+                title = "$activeMonthStr ${calendarUiModel.selectedDate.date.year}"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Header(
-                currentDate = calendarViewModel.calendarUiModel.selectedDate.date,
+                currentDate = calendarUiModel.selectedDate.date,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -87,7 +91,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        if (!calendarViewModel.calendarUiModel.selectedDate.isToday) {
+        if (!calendarUiModel.selectedDate.isToday) {
             TodayFloatBtn(
                 onClick = {
                     coroutineScope.launch {
