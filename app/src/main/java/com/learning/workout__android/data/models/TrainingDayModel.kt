@@ -7,8 +7,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import androidx.room.TypeConverter
 
-@Entity
 data class TrainingDayWithExercises (
     @Embedded val trainingDay: TrainingDay,
     @Relation(
@@ -18,13 +18,14 @@ data class TrainingDayWithExercises (
     val exercises: List<Exercise>
 )
 
-@Entity
+@Entity(tableName = "training_days")
 data class TrainingDay (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "date") val date: String,
+    @ColumnInfo(name = "date") val date: String
 )
 
 @Entity(
+    tableName = "exercises",
     foreignKeys = [
         ForeignKey(
             entity = TrainingDay::class,
@@ -35,7 +36,6 @@ data class TrainingDay (
     ],
     indices = [Index("trainingDayId")]
 )
-
 data class Exercise (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "trainingDayId") val trainingDayId: Int,
@@ -44,14 +44,20 @@ data class Exercise (
     @ColumnInfo(name = "sets") val sets: Int,
     @ColumnInfo(name = "rest") val rest: Int,
     @ColumnInfo(name = "type") val type: ExerciseType,
-    @ColumnInfo(name = "setsDone") val setsDone: Int,
+    @ColumnInfo(name = "setsDone") val setsDone: Int
 )
 
-enum class ExerciseType(label: String) {
+enum class ExerciseType(val label: String) {
     DYNAMIC("dynamic"),
     STATIC("static"),
     LADDER("ladder"),
     WARMUP("warmup"),
     FLEXIBILITY_SESSION("flexibility_session"),
-    HAND_BALANCE_SESSION("hand balance_session")
+    HAND_BALANCE_SESSION("hand_balance_session")
+}
+
+class Converters {
+    @TypeConverter
+    fun fromType(type: ExerciseType): String = type.name
+    @TypeConverter fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
 }

@@ -7,14 +7,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
-import com.learning.workout__android.data.models.TrainingDay
+import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -34,13 +33,12 @@ class TrainingViewModel(
 
     // Selected date lives here (authoritative)
     private val _selectedDate = MutableStateFlow(LocalDate.now())
-    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
     // All days for list; and current day for selected date
     private val allDaysFlow = trainingDayRepository.getAll() // Flow<List<TrainingDay>>
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val selectedDayFlow: Flow<TrainingDay?> =
+    private val selectedDayFlow: Flow<TrainingDayWithExercises?> =
         _selectedDate.flatMapLatest { date ->
             trainingDayRepository.getByDate(date.toString())
         }
@@ -147,8 +145,8 @@ data class TrainingUiState(
     val title: String = "",
     val calendar: CalendarUiModel = CalendarUiModel.empty(),
     val selectedDate: LocalDate = LocalDate.now(),
-    val trainingDays: List<TrainingDay> = emptyList(),
-    val currentDay: TrainingDay? = null
+    val trainingDays: List<TrainingDayWithExercises> = emptyList(),
+    val currentDay: TrainingDayWithExercises? = null
 )
 
 data class CalendarUiModel(

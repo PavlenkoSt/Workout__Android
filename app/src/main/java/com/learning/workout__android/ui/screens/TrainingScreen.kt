@@ -90,7 +90,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
             )
 
             ui.currentDay?.let { day ->
-                TrainingExerciseList(exercisesList = emptyList()) // TODO map day.exercises
+                TrainingExerciseList(exercisesList = ui.currentDay?.exercises ?: emptyList())
             }
         }
 
