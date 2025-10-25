@@ -3,7 +3,7 @@ package com.learning.workout__android.ui.viewmodel
 import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.learning.workout__android.data.CalendarDataSource
+import com.learning.workout__android.data.dataSources.CalendarDataSource
 import com.learning.workout__android.model.CalendarUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

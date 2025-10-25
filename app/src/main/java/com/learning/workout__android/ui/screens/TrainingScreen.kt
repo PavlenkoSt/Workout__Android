@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.ui.viewmodel.CalendarViewModel
 import com.learning.workout__android.ui.viewmodel.CalendarViewModelFactory
 import com.learning.workout__android.utils.formatDate
+import com.learning.workout__android.viewModel.TrainingViewModel
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -55,6 +57,8 @@ import java.time.LocalDate
 @Composable
 fun TrainingScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
+
+    // calendar state
 
     val initialPage = Int.MAX_VALUE / 2
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
@@ -68,6 +72,16 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     val days by remember { mutableStateOf(TrainingDaysMockData) }
     val currentDay =
         days.find { it.date == calendarUiModel.selectedDate.date.toString() }
+
+
+    // training state
+
+    val trainingViewModel: TrainingViewModel = viewModel(
+        factory = TrainingViewModel.provideFactory(LocalContext.current)
+    )
+    val uiState = trainingViewModel.uiState.collectAsState()
+    
+    // TODO use uiState here
 
     LaunchedEffect(pagerState.currentPage) {
         calendarViewModel.selectDayInWeek()

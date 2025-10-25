@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.CalendarDataSource
+import com.learning.workout__android.data.dataSources.CalendarDataSource
 import com.learning.workout__android.model.CalendarUiModel
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.ui.viewmodel.CalendarViewModel

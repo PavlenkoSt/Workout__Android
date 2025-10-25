@@ -1,4 +1,4 @@
-package com.learning.workout__android.data
+package com.learning.workout__android.data.dataSources
 
 import com.learning.workout__android.model.CalendarUiModel
 import java.time.DayOfWeek
