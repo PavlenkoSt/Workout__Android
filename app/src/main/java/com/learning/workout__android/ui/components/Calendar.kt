@@ -1,6 +1,8 @@
 package com.learning.workout__android.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -21,12 +24,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.CalendarDataSource
 import com.learning.workout__android.model.CalendarUiModel
+import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.ui.viewmodel.CalendarViewModel
+import com.learning.workout__android.ui.viewmodel.CalendarViewModelFactory
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -43,7 +54,7 @@ fun Calendar(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.animateContentSize()) {
         Header(
             title = title,
             data = calendarUiModel,
@@ -147,18 +158,14 @@ fun Day(
     Card(
         modifier = modifier.clickable { onClickListener(date) },
         border = BorderStroke(
-            width = 4.dp,
-            color = if (isActive) {
-                MaterialTheme.colorScheme.scrim
-            } else {
-                MaterialTheme.colorScheme.tertiary
-            }
+            width = 2.dp,
+            color =  MaterialTheme.colorScheme.scrim
         ),
         colors = CardDefaults.cardColors(
-            containerColor = if (date.isToday) {
-                MaterialTheme.colorScheme.primary
+            containerColor = if (isActive) {
+                MaterialTheme.colorScheme.surface
             } else {
-                MaterialTheme.colorScheme.secondary
+                MaterialTheme.colorScheme.primary
             }
         ),
     ) {
@@ -180,7 +187,45 @@ fun Day(
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
+
+        if(date.isToday) {
+            Text(
+                text = "Today",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
+                    .background( color = if (isActive) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.secondary
+                    })
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+        }
     }
 }
 
 
+@Preview()
+@Composable()
+fun DayPreview () {
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { Int.MAX_VALUE })
+    val calendarViewModel: CalendarViewModel =
+        viewModel(factory = CalendarViewModelFactory(pagerState, 0))
+
+    val calendarUiModel by calendarViewModel.calendarUiModel.collectAsState()
+
+    Workout__AndroidTheme {
+        Calendar(
+            onDateClick = {},
+            initialWeekStart = LocalDate.now(),
+            initialPage = 0,
+            pagerState = pagerState,
+            calendarUiModel = calendarUiModel,
+            title = "This is title"
+        )
+    }
+}
