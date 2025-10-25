@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -41,12 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.TrainingDaysMockData
-import com.learning.workout__android.model.ExerciseModel
+import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.ui.components.Calendar
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import com.learning.workout__android.ui.viewmodel.CalendarViewModel
-import com.learning.workout__android.ui.viewmodel.CalendarViewModelFactory
 import com.learning.workout__android.utils.formatDate
 import com.learning.workout__android.viewModel.TrainingViewModel
 import kotlinx.coroutines.launch
@@ -58,65 +54,58 @@ import java.time.LocalDate
 fun TrainingScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
 
-    // calendar state
-
-    val initialPage = Int.MAX_VALUE / 2
-    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
-
-    val calendarViewModel: CalendarViewModel =
-        viewModel(factory = CalendarViewModelFactory(pagerState, initialPage))
-
-    val calendarUiModel by calendarViewModel.calendarUiModel.collectAsState()
-    val activeMonthStr by calendarViewModel.currentMonth.collectAsState()
-
-    val days by remember { mutableStateOf(TrainingDaysMockData) }
-    val currentDay =
-        days.find { it.date == calendarUiModel.selectedDate.date.toString() }
-
-
-    // training state
-
-    val trainingViewModel: TrainingViewModel = viewModel(
+    val vm: TrainingViewModel = viewModel(
         factory = TrainingViewModel.provideFactory(LocalContext.current)
     )
-    val uiState = trainingViewModel.uiState.collectAsState()
-    
-    // TODO use uiState here
+    val ui by vm.uiState.collectAsState()
+
+    val initialPage = Int.MAX_VALUE / 2
+    val initialWeekStart = remember { LocalDate.now().with(java.time.DayOfWeek.MONDAY) }
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
 
     LaunchedEffect(pagerState.currentPage) {
-        calendarViewModel.selectDayInWeek()
+        val weeksFromStart = pagerState.currentPage - initialPage
+        val start =
+            LocalDate.now().with(java.time.DayOfWeek.MONDAY).plusWeeks(weeksFromStart.toLong())
+        vm.onWeekVisible(start)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column {
             Calendar(
                 modifier = Modifier.fillMaxWidth(),
-                onDateClick = { calendarViewModel.onDateClick(it) },
+                onDateClick = { date -> vm.onDateSelected(date.date) },
                 pagerState = pagerState,
-                calendarUiModel = calendarUiModel,
+                calendarUiModel = ui.calendar,
+                initialWeekStart = initialWeekStart,
                 initialPage = initialPage,
-                initialWeekStart = calendarViewModel.initialWeekStart,
-                title = "$activeMonthStr ${calendarUiModel.selectedDate.date.year}"
+                title = ui.title,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Header(
-                currentDate = calendarUiModel.selectedDate.date,
+                currentDate = ui.selectedDate,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (currentDay != null) {
-                TrainingExerciseList(currentDay.exercises)
+            ui.currentDay?.let { day ->
+                TrainingExerciseList(exercisesList = emptyList()) // TODO map day.exercises
             }
         }
 
-        if (!calendarUiModel.selectedDate.isToday) {
+        if (!ui.calendar.selectedDate.isToday) {
             TodayFloatBtn(
                 onClick = {
-                    coroutineScope.launch {
-                        calendarViewModel.scrollToToday()
-                    }
+                    val monday = vm.scrollToToday()
+                    // jump pager to that week
+                    val base = LocalDate.now().with(java.time.DayOfWeek.MONDAY)
+                    val deltaWeeks = java.time.temporal.ChronoUnit.WEEKS.between(
+                        base, monday
+                    ).toInt()
+                    val target = initialPage + deltaWeeks
+                    // animate
+                    coroutineScope.launch { pagerState.animateScrollToPage(target) }
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -170,7 +159,7 @@ private fun TodayFloatBtn(
 
 @Composable
 private fun TrainingExerciseList(
-    exercisesList: List<ExerciseModel>
+    exercisesList: List<Exercise>
 ) {
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -197,14 +186,14 @@ private fun TrainingExerciseList(
 
 @Composable
 private fun ExerciseItem(
-    exercise: ExerciseModel,
+    exercise: Exercise,
     idx: Int,
     modifier: Modifier = Modifier
 ) {
     Column {
         Card(modifier = modifier) {
             Text(
-                text = "${idx + 1}. ${exercise.exercise}",
+                text = "${idx + 1}. ${exercise.name}",
                 modifier = Modifier.padding(
                     top = 8.dp,
                     start = 8.dp,

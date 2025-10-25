@@ -1,6 +1,6 @@
 package com.learning.workout__android.data.dataSources
 
-import com.learning.workout__android.model.CalendarUiModel
+import com.learning.workout__android.viewModel.CalendarUiModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
