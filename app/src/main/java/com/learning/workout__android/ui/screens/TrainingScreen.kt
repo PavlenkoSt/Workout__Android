@@ -19,18 +19,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.ui.components.Calendar
+import com.learning.workout__android.ui.components.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatDate
 import com.learning.workout__android.viewModel.TrainingViewModel
@@ -50,6 +56,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
@@ -62,6 +69,9 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     val initialPage = Int.MAX_VALUE / 2
     val initialWeekStart = remember { LocalDate.now().with(java.time.DayOfWeek.MONDAY) }
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
+
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(pagerState.currentPage) {
         val weeksFromStart = pagerState.currentPage - initialPage
@@ -89,8 +99,20 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            ui.currentDay?.let { day ->
+            if(ui.currentDay != null) {
                 TrainingExerciseList(exercisesList = ui.currentDay?.exercises ?: emptyList())
+            }else {
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(onClick = {
+                        showBottomSheet = true
+                    }) {
+                        Text(text = "Create training")
+                    }
+                }
             }
         }
 
@@ -110,6 +132,26 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
+            )
+        }
+    }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {  showBottomSheet = false  },
+            sheetState = sheetState
+        ) {
+            ExerciseForm(
+                onDefaultExerciseSubmit = {
+                    showBottomSheet = false
+                },
+                onLadderExerciseSubmit = {
+                    showBottomSheet = false
+                },
+                onSimpleExerciseSubmit = {
+                    showBottomSheet = false
+                },
+                exerciseToEdit = null
             )
         }
     }
