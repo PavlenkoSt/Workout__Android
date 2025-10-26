@@ -16,7 +16,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -142,13 +142,13 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
             sheetState = sheetState
         ) {
             ExerciseForm(
-                onDefaultExerciseSubmit = {
+                onDefaultExerciseSubmit = { result ->
                     showBottomSheet = false
                 },
-                onLadderExerciseSubmit = {
+                onLadderExerciseSubmit = { result ->
                     showBottomSheet = false
                 },
-                onSimpleExerciseSubmit = {
+                onSimpleExerciseSubmit = { result ->
                     showBottomSheet = false
                 },
                 exerciseToEdit = null
@@ -190,7 +190,7 @@ private fun TodayFloatBtn(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Outlined.ArrowBack,
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                 contentDescription = null,
                 modifier = Modifier.rotate(90F)
             )
