@@ -10,7 +10,6 @@ import com.learning.workout__android.ui.components.BottomNavBar
 import com.learning.workout__android.ui.screens.GoalsScreen
 import com.learning.workout__android.ui.screens.PresetsScreen
 import com.learning.workout__android.ui.screens.RecordsScreen
-import com.learning.workout__android.ui.screens.SettingsScreen
 import com.learning.workout__android.ui.screens.TrainingScreen
 
 @Composable
@@ -41,11 +40,6 @@ fun App() {
             },
             presetsScreen = {
                 PresetsScreen(
-                    modifier = Modifier.padding(paddingValues)
-                )
-            },
-            settingsScreen = {
-                SettingsScreen(
                     modifier = Modifier.padding(paddingValues)
                 )
             },

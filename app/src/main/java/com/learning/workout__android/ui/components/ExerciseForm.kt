@@ -17,6 +17,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +31,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.viewModel.ExerciseDefaultFormEvent
+import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +65,7 @@ fun ExerciseForm(
             TextField(
                 value = formatExerciseType(selectedText),
                 onValueChange = {},
+                supportingText = {},
                 readOnly = true,
                 label = { Text("Exercise Type") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -82,8 +88,6 @@ fun ExerciseForm(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         val isEditing = exerciseToEdit != null
         when(selectedText) {
             ExerciseType.DYNAMIC.label -> { ExerciseFormDefault(isEditing = isEditing) }
@@ -97,30 +101,54 @@ fun ExerciseForm(
 @Composable
 fun ExerciseFormDefault(
     isStatic: Boolean? = false,
-    isEditing: Boolean
+    isEditing: Boolean, // TODO change to exercise to edit and propagate to form as initial values
+    vm: ExerciseFormDefaultViewModel = viewModel()
 ) {
     val focusManager = LocalFocusManager.current
+
+    val ui by vm.ui.collectAsState()
 
     val repsFocusRequester = remember { FocusRequester() }
     val setsFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            vm.reset()
+        }
+    }
+
     Column (modifier = Modifier.fillMaxWidth()) {
-        TextField(value = "", onValueChange = {},
+        TextField(
+            value = ui.name.value,
+            onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.NameChanged(it))},
             modifier = Modifier.fillMaxWidth(),
+            isError = ui.name.touched && ui.name.error != null,
+            supportingText = {
+                if (ui.name.touched && ui.name.error != null) Text(ui.name.error!!)
+            },
             label = {
                 Text(text = "Name")
             },
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
             ),
             keyboardActions = KeyboardActions(
-                onNext = { repsFocusRequester.requestFocus() }
+                onNext = {
+                    vm.onEvent(ExerciseDefaultFormEvent.NameBlur)
+                    repsFocusRequester.requestFocus()
+                }
             ),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Row (modifier = Modifier.fillMaxWidth()) {
-            TextField(value = "", onValueChange = {},
+            TextField(
+                value = ui.reps.value,
+                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.RepsChanged(it))},
+                isError = ui.reps.touched && ui.reps.error != null,
+                supportingText = {
+                    if (ui.reps.touched && ui.reps.error != null) Text(ui.reps.error!!)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(repsFocusRequester),
@@ -132,11 +160,20 @@ fun ExerciseFormDefault(
                     imeAction = ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = { setsFocusRequester.requestFocus() }
+                    onNext = {
+                        vm.onEvent(ExerciseDefaultFormEvent.RepsBlur)
+                        setsFocusRequester.requestFocus()
+                    }
                 ),
             )
             Spacer(modifier = Modifier.width(8.dp))
-            TextField(value = "", onValueChange = {},
+            TextField(
+                value = ui.sets.value,
+                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.SetsChanged(it))},
+                isError = ui.sets.touched && ui.sets.error != null,
+                supportingText = {
+                    if (ui.sets.touched && ui.sets.error != null) Text(ui.sets.error!!)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(setsFocusRequester),
@@ -148,11 +185,20 @@ fun ExerciseFormDefault(
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = { restFocusRequester.requestFocus() }
+                    onNext = {
+                        vm.onEvent(ExerciseDefaultFormEvent.SetsBlur)
+                        restFocusRequester.requestFocus()
+                    }
                 ),
             )
             Spacer(modifier = Modifier.width(8.dp))
-            TextField(value = "", onValueChange = {},
+            TextField(
+                value = ui.rest.value,
+                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.RestChanged(it))},
+                isError = ui.rest.touched && ui.rest.error != null,
+                supportingText = {
+                    if (ui.rest.touched && ui.rest.error != null) Text(ui.rest.error!!)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(restFocusRequester),
@@ -164,12 +210,19 @@ fun ExerciseFormDefault(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { focusManager.clearFocus() }
+                    onDone = {
+                        vm.onEvent(ExerciseDefaultFormEvent.RestBlur)
+                        focusManager.clearFocus()
+                    }
                 )
             )
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        SubmitBtn(onClick = {}, isEditing = isEditing)
+        Spacer(modifier = Modifier.height(4.dp))
+        SubmitBtn(onClick = {
+            val isValid = vm.submit()
+            if(!isValid) return@SubmitBtn
+            // TODO add exercise to db
+        }, isEditing = isEditing)
     }
 }
 

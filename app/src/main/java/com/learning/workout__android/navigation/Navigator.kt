@@ -11,7 +11,6 @@ fun Navigator(
     goalsScreen: @Composable () -> Unit,
     recordsScreen: @Composable () -> Unit,
     presetsScreen: @Composable () -> Unit,
-    settingsScreen: @Composable () -> Unit,
 ) {
 
     NavHost(
@@ -22,7 +21,6 @@ fun Navigator(
         composable(route = NavigationScreen.Goals.route) { goalsScreen() }
         composable(route = NavigationScreen.Records.route) { recordsScreen() }
         composable(route = NavigationScreen.Presets.route) { presetsScreen() }
-        composable(route = NavigationScreen.Settings.route) { settingsScreen() }
     }
 }
 
@@ -31,14 +29,12 @@ sealed class NavigationScreen(val route: String) {
     data object Goals : NavigationScreen(GOALS_SCREEN)
     data object Records : NavigationScreen(RECORDS_SCREEN)
     data object Presets : NavigationScreen(PRESETS_SCREEN)
-    data object Settings : NavigationScreen(SETTINGS_SCREEN)
 
     companion object {
         const val TRAINING_SCREEN = "training"
         const val GOALS_SCREEN = "goals"
         const val RECORDS_SCREEN = "records"
         const val PRESETS_SCREEN = "presets"
-        const val SETTINGS_SCREEN = "settings"
     }
 }
 
