@@ -84,29 +84,20 @@ fun ExerciseForm(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        val isEditing = exerciseToEdit != null
         when(selectedText) {
-            ExerciseType.DYNAMIC.label -> { ExerciseFormDefault() }
-            ExerciseType.STATIC.label -> { ExerciseFormDefault(isStatic = true) }
-            ExerciseType.LADDER.label -> { ExerciseFormLadder() }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = {
-            when(selectedText) {
-                ExerciseType.DYNAMIC.label, ExerciseType.STATIC.label -> { onDefaultExerciseSubmit() }
-                ExerciseType.LADDER.label -> { onLadderExerciseSubmit() }
-                else -> { onSimpleExerciseSubmit() }
-            }
-        }, modifier = Modifier.fillMaxWidth()) {
-            Text(text = if(exerciseToEdit == null) {"Add +"} else {"Update"})
+            ExerciseType.DYNAMIC.label -> { ExerciseFormDefault(isEditing = isEditing) }
+            ExerciseType.STATIC.label -> { ExerciseFormDefault(isStatic = true, isEditing = isEditing) }
+            ExerciseType.LADDER.label -> { ExerciseFormLadder(isEditing = isEditing) }
+            else -> { SubmitBtn(onClick = {}, isEditing = isEditing) }
         }
     }
 }
 
 @Composable
 fun ExerciseFormDefault(
-    isStatic: Boolean? = false
+    isStatic: Boolean? = false,
+    isEditing: Boolean
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -177,12 +168,16 @@ fun ExerciseFormDefault(
                 )
             )
         }
+        Spacer(modifier = Modifier.width(8.dp))
+        SubmitBtn(onClick = {}, isEditing = isEditing)
     }
 }
 
 
 @Composable
-fun ExerciseFormLadder() {
+fun ExerciseFormLadder(
+    isEditing: Boolean
+) {
     val focusManager = LocalFocusManager.current
 
     val fromFocusRequester = remember { FocusRequester() }
@@ -271,10 +266,22 @@ fun ExerciseFormLadder() {
                 )
             )
         }
+        Spacer(modifier = Modifier.width(8.dp))
+        SubmitBtn(onClick = {}, isEditing = isEditing)
     }
 }
 
-fun formatExerciseType(type: String): String {
+@Composable
+fun SubmitBtn(
+    onClick: () -> Unit,
+    isEditing: Boolean
+) {
+    Button(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Text(text =  if(isEditing) {"Update"} else {"Add +"})
+    }
+}
+
+private fun formatExerciseType(type: String): String {
     return type
         .lowercase()
         .replace("_", " ")
@@ -284,7 +291,6 @@ fun formatExerciseType(type: String): String {
             word.replaceFirstChar { it.uppercase() }
         }
 }
-
 
 @Preview
 @Composable
