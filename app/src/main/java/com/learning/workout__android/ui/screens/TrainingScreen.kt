@@ -52,9 +52,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.R
 import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.components.Calendar
 import com.learning.workout__android.ui.components.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
@@ -282,16 +284,8 @@ private fun TrainingExerciseList(
                     modifier = Modifier.fillMaxWidth(),
                     idx = idx,
                     draggableHandler = {
-                        Icon(
-                            painter = painterResource(R.drawable.hand),
-                            contentDescription = "Handle",
-                            tint = Color.Gray.copy(alpha = 0.6f),
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .size(24.dp)
-                                .clip(ShapeDefaults.Large)
-                                .background(MaterialTheme.colorScheme.background)
-                                .draggableHandle()
+                        DraggableHandler(
+                            modifier = Modifier.draggableHandle()
                         )
                     }
                 )
@@ -322,6 +316,20 @@ private fun ExerciseItem(
                         end = 8.dp
                     )
                 )
+                if(
+                    exercise.type == ExerciseType.DYNAMIC ||
+                    exercise.type == ExerciseType.STATIC ||
+                    exercise.type == ExerciseType.LADDER
+                    ) {
+                    when(exercise.type) {
+                        ExerciseType.DYNAMIC -> ExerciseStatItem("Reps:", exercise.reps.toString())
+                        ExerciseType.LADDER -> ExerciseStatItem("Reps:", exercise.reps.toString())
+                        ExerciseType.STATIC -> ExerciseStatItem("Hold:", "${exercise.reps} sec.")
+                        else -> null
+                    }
+                    ExerciseStatItem("Sets:", exercise.sets.toString())
+                    ExerciseStatItem("Rest:", "${exercise.rest} sec.")
+                }
                 draggableHandler()
             }
             Row(
@@ -340,9 +348,9 @@ private fun ExerciseItem(
                     modifier = Modifier.width(80.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("0/1")
+                    Text("${exercise.setsDone}/${exercise.sets}")
                     LinearProgressIndicator(
-                        progress = { 0.5f },
+                        progress = { ((exercise.setsDone / exercise.sets)).toFloat() },
                         modifier = Modifier.fillMaxWidth(),
                         trackColor = MaterialTheme.colorScheme.onPrimary,
                         color = MaterialTheme.colorScheme.primary,
@@ -364,9 +372,51 @@ private fun ExerciseItem(
 }
 
 @Composable
+private fun ExerciseStatItem(
+    stat: String,
+    value: String
+) {
+    Column (
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(stat, fontSize = 12.sp, lineHeight = 14.sp)
+        Text(value, fontSize = 12.sp, lineHeight = 14.sp)
+    }
+}
+
+@Composable
+private fun DraggableHandler (modifier: Modifier = Modifier) {
+    Icon(
+        painter = painterResource(R.drawable.hand),
+        contentDescription = "Handle",
+        tint = Color.Gray.copy(alpha = 0.6f),
+        modifier = modifier
+            .padding(vertical = 8.dp)
+            .size(24.dp)
+            .clip(ShapeDefaults.Large)
+            .background(MaterialTheme.colorScheme.background)
+    )
+}
+
+@Composable
 @Preview
 fun TrainingScreenPreview() {
     Workout__AndroidTheme {
         TrainingScreen()
+    }
+}
+
+@Composable
+@Preview
+fun ExerciseItemPreview() {
+    Workout__AndroidTheme {
+        ExerciseItem(
+            exercise = Exercise(0, trainingDayId = 0, name = "Exercise preview", reps = 10, sets = 10, setsDone = 2, type = ExerciseType.DYNAMIC, order = 0, rest = 10),
+            modifier = Modifier,
+            draggableHandler = { DraggableHandler() },
+            idx = 0
+            )
     }
 }
