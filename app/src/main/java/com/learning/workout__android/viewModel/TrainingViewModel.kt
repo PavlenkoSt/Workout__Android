@@ -7,9 +7,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
+import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
+import com.learning.workout__android.ui.components.ExerciseDefaultFormResult
+import com.learning.workout__android.ui.components.ExerciseLadderFormResult
+import com.learning.workout__android.ui.components.ExerciseSimpleFormResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -100,6 +105,70 @@ class TrainingViewModel(
         _visibleWeekStart.value = monday
         onDateSelected(today)
         return monday
+    }
+
+    fun addDefaultExercise(formResult: ExerciseDefaultFormResult) {
+        viewModelScope.launch {
+            val selectedDate = _selectedDate.value.toString()
+            val exercise = Exercise(
+                trainingDayId = 0, // Will be set by repository
+                name = formResult.name,
+                reps = formResult.reps.toInt(),
+                sets = formResult.sets.toInt(),
+                rest = formResult.rest.toInt(),
+                type = formResult.type,
+                setsDone = 0
+            )
+            trainingDayRepository.addExerciseToDate(selectedDate, exercise)
+        }
+    }
+
+    fun addLadderExercise(formResult: ExerciseLadderFormResult) {
+        viewModelScope.launch {
+            val selectedDate = _selectedDate.value.toString()
+            val from = formResult.from.toInt()
+            val to = formResult.to.toInt()
+            val step = formResult.step.toInt()
+            val rest = formResult.rest.toInt()
+
+            // Generate exercises for each rung of the ladder
+            val exercises = mutableListOf<Exercise>()
+            var currentReps = from
+            while (currentReps <= to) {
+                exercises.add(
+                    Exercise(
+                        trainingDayId = 0, // Will be set by repository
+                        name = formResult.name,
+                        reps = currentReps,
+                        sets = 1,
+                        rest = rest,
+                        type = formResult.type,
+                        setsDone = 0
+                    )
+                )
+                currentReps += step
+            }
+
+            trainingDayRepository.addExercisesToDate(selectedDate, exercises)
+        }
+    }
+
+    fun addSimpleExercise(formResult: ExerciseSimpleFormResult) {
+        viewModelScope.launch {
+            val selectedDate = _selectedDate.value.toString()
+
+            val exercise = Exercise(
+                trainingDayId = 0, // Will be set by repository
+                name = formResult.type.toString(),
+                reps = 1,
+                sets = 1,
+                rest = 0,
+                type = formResult.type,
+                setsDone = 0
+            )
+
+            trainingDayRepository.addExerciseToDate(selectedDate, exercise)
+        }
     }
 
     // ---- Helpers ----

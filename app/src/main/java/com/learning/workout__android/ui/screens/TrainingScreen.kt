@@ -92,28 +92,21 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 title = ui.title,
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Header(
-                currentDate = ui.selectedDate,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if(ui.currentDay != null) {
-                TrainingExerciseList(exercisesList = ui.currentDay?.exercises ?: emptyList())
-            }else {
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = {
-                        showBottomSheet = true
-                    }) {
-                        Text(text = "Create training")
-                    }
+            TrainingExerciseList(
+                exercisesList = ui.currentDay?.exercises ?: emptyList(),
+                footer = {
+                    Footer(
+                        text = if (ui.currentDay != null) { "+ Add exercise" } else { "Create training" },
+                        onClick = { showBottomSheet = true })
+                },
+                header = {
+                    Header(
+                        currentDate = ui.selectedDate,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            }
+            )
         }
 
         if (!ui.calendar.selectedDate.isToday) {
@@ -143,12 +136,15 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         ) {
             ExerciseForm(
                 onDefaultExerciseSubmit = { result ->
+                    vm.addDefaultExercise(result)
                     showBottomSheet = false
                 },
                 onLadderExerciseSubmit = { result ->
+                    vm.addLadderExercise(result)
                     showBottomSheet = false
                 },
                 onSimpleExerciseSubmit = { result ->
+                    vm.addSimpleExercise(result)
                     showBottomSheet = false
                 },
                 exerciseToEdit = null
@@ -171,6 +167,21 @@ private fun Header(
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+private fun Footer(
+    text: String,
+    onClick: () -> Unit
+){
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Button(onClick = onClick) {
+            Text(text = text)
+        }
     }
 }
 
@@ -201,7 +212,9 @@ private fun TodayFloatBtn(
 
 @Composable
 private fun TrainingExerciseList(
-    exercisesList: List<Exercise>
+    exercisesList: List<Exercise>,
+    footer: @Composable () -> Unit,
+    header: @Composable () -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -212,6 +225,11 @@ private fun TrainingExerciseList(
         state = lazyListState,
         contentPadding = PaddingValues(all = 8.dp)
     ) {
+        item(key = "header") {
+            header()
+        }
+
+        // TODO fix list reordering to long press activation or drag specific element in item, right now it is impossible to scroll
         itemsIndexed(exercisesList, key = { _, item -> item.id }) { idx, item ->
             ReorderableItem(reorderableLazyListState, key = item.id) { isDragging ->
                 ExerciseItem(
@@ -222,6 +240,10 @@ private fun TrainingExerciseList(
                     idx = idx
                 )
             }
+        }
+
+        item(key = "footer") {
+            footer()
         }
     }
 }
