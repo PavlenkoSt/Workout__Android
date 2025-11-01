@@ -10,7 +10,7 @@ import com.learning.workout__android.data.models.Converters
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.TrainingDay
 
-@Database(entities = [TrainingDay::class, Exercise::class], version = 1, exportSchema = false)
+@Database(entities = [TrainingDay::class, Exercise::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun trainingDayDao(): TrainingDayDao
@@ -20,6 +20,7 @@ abstract class AppDatabase: RoomDatabase() {
         fun getDatabase(context: Context): AppDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, AppDatabase::class.java, "workout_database")
+                    .fallbackToDestructiveMigration(false) // For development - in production use proper migrations
                     .build()
                     .also { Instance = it }
             }

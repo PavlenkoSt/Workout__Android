@@ -13,6 +13,7 @@ import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.ui.components.ExerciseDefaultFormResult
 import com.learning.workout__android.ui.components.ExerciseLadderFormResult
 import com.learning.workout__android.ui.components.ExerciseSimpleFormResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -168,6 +170,19 @@ class TrainingViewModel(
             )
 
             trainingDayRepository.addExerciseToDate(selectedDate, exercise)
+        }
+    }
+
+    fun reorderExercises(fromIndex: Int, toIndex: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentDay = trainingDayRepository.getByDate(_selectedDate.value.toString()).first()
+            if (currentDay != null && fromIndex != toIndex) {
+                trainingDayRepository.reorderExercises(
+                    trainingDayId = currentDay.trainingDay.id,
+                    fromIndex = fromIndex,
+                    toIndex = toIndex
+                )
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -16,7 +17,12 @@ data class TrainingDayWithExercises (
         entityColumn = "trainingDayId"
     )
     val exercises: List<Exercise>
-)
+) {
+    // Sort exercises by order
+    // Marked as @Ignore since it's a computed property, not a database column
+    @Ignore
+    val sortedExercises: List<Exercise> = exercises.sortedBy { it.order }
+}
 
 @Entity(tableName = "training_days")
 data class TrainingDay (
@@ -44,7 +50,8 @@ data class Exercise (
     @ColumnInfo(name = "sets") val sets: Int,
     @ColumnInfo(name = "rest") val rest: Int,
     @ColumnInfo(name = "type") val type: ExerciseType,
-    @ColumnInfo(name = "setsDone") val setsDone: Int
+    @ColumnInfo(name = "setsDone") val setsDone: Int,
+    @ColumnInfo(name = "order") val order: Int = 0
 )
 
 enum class ExerciseType(val label: String) {

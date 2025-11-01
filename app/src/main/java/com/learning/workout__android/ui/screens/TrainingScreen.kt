@@ -1,5 +1,6 @@
 package com.learning.workout__android.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -32,19 +34,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.R
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.ui.components.Calendar
 import com.learning.workout__android.ui.components.ExerciseForm
@@ -93,7 +102,8 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
             )
 
             TrainingExerciseList(
-                exercisesList = ui.currentDay?.exercises ?: emptyList(),
+                exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
+                onReorder = { from, to -> vm.reorderExercises(from, to) },
                 footer = {
                     Footer(
                         text = if (ui.currentDay != null) { "+ Add exercise" } else { "Create training" },
@@ -213,12 +223,48 @@ private fun TodayFloatBtn(
 @Composable
 private fun TrainingExerciseList(
     exercisesList: List<Exercise>,
+    onReorder: (from: Int, to: Int) -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit
 ) {
+    // Local state for optimistic updates to prevent flickering
+    val localExercises = remember { mutableStateListOf<Exercise>() }
+    val onReorderCallback = rememberUpdatedState(onReorder)
+    val coroutineScope = rememberCoroutineScope()
+    var isReordering by remember { mutableStateOf(false) }
+    
+    // Update local state when the source list changes (but not during reordering)
+    LaunchedEffect(exercisesList) {
+        if (!isReordering) {
+            // Only update if the lists are actually different to avoid unnecessary updates
+            if (localExercises.size != exercisesList.size || 
+                localExercises.zip(exercisesList).any { (a, b) -> a.id != b.id || a.order != b.order }) {
+                localExercises.clear()
+                localExercises.addAll(exercisesList)
+            }
+        }
+    }
+    
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        // Update the list
+        // Adjust indices to account for header item (header is at index 0)
+        val adjustedFrom = from.index - 1 // Subtract 1 for header
+        val adjustedTo = to.index - 1 // Subtract 1 for header
+        
+        if (adjustedFrom in localExercises.indices && adjustedTo in 0..localExercises.size) {
+            // Optimistic update: immediately update local state
+            isReordering = true
+            val item = localExercises.removeAt(adjustedFrom)
+            localExercises.add(adjustedTo, item)
+            
+            // Persist to database after a short delay to let animation complete
+            coroutineScope.launch {
+                delay(150) // Small delay to let animation finish
+                onReorderCallback.value(adjustedFrom, adjustedTo)
+                delay(100) // Wait a bit more for DB update to complete
+                isReordering = false
+            }
+        }
     }
 
     LazyColumn(
@@ -229,15 +275,25 @@ private fun TrainingExerciseList(
             header()
         }
 
-        // TODO fix list reordering to long press activation or drag specific element in item, right now it is impossible to scroll
-        itemsIndexed(exercisesList, key = { _, item -> item.id }) { idx, item ->
+        itemsIndexed(localExercises, key = { _, item -> item.id }) { idx, item ->
             ReorderableItem(reorderableLazyListState, key = item.id) { isDragging ->
                 ExerciseItem(
                     exercise = item,
-                    modifier = Modifier
-                        .draggableHandle()
-                        .fillMaxWidth(),
-                    idx = idx
+                    modifier = Modifier.fillMaxWidth(),
+                    idx = idx,
+                    draggableHandler = {
+                        Icon(
+                            painter = painterResource(R.drawable.hand),
+                            contentDescription = "Handle",
+                            tint = Color.Gray.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .size(24.dp)
+                                .clip(ShapeDefaults.Large)
+                                .background(MaterialTheme.colorScheme.background)
+                                .draggableHandle()
+                        )
+                    }
                 )
             }
         }
@@ -252,18 +308,22 @@ private fun TrainingExerciseList(
 private fun ExerciseItem(
     exercise: Exercise,
     idx: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    draggableHandler: @Composable () ->  Unit
 ) {
     Column {
         Card(modifier = modifier) {
-            Text(
-                text = "${idx + 1}. ${exercise.name}",
-                modifier = Modifier.padding(
-                    top = 8.dp,
-                    start = 8.dp,
-                    end = 8.dp
+            Row(modifier = Modifier.fillMaxWidth().padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = "${idx + 1}. ${exercise.name}",
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                        start = 8.dp,
+                        end = 8.dp
+                    )
                 )
-            )
+                draggableHandler()
+            }
             Row(
                 modifier = Modifier.padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically

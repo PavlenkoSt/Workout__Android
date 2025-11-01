@@ -12,13 +12,31 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingDayDao {
-    @Query("SELECT * FROM training_days")
+    @Query("""
+        SELECT * FROM training_days
+    """)
     @Transaction
     fun getAll(): Flow<List<TrainingDayWithExercises>>
 
-    @Query(value = "SELECT * FROM training_days WHERE date = :date")
+    @Query(value = """
+        SELECT * FROM training_days WHERE date = :date
+    """)
     @Transaction
     fun getByDate(date: String): Flow<TrainingDayWithExercises?>
+    
+    @Query("""
+        SELECT * FROM exercises 
+        WHERE trainingDayId = :trainingDayId 
+        ORDER BY "order" ASC
+    """)
+    suspend fun getExercisesByTrainingDayId(trainingDayId: Int): List<Exercise>
+    
+    @Query("""
+        UPDATE exercises 
+        SET "order" = :order 
+        WHERE id = :exerciseId
+    """)
+    suspend fun updateExerciseOrder(exerciseId: Int, order: Int)
 
     @Query("DELETE FROM training_days WHERE date = :date")
     @Transaction
@@ -28,7 +46,7 @@ interface TrainingDayDao {
     suspend fun create(trainingDay: TrainingDay): Long
 
     @Update
-    fun update(trainingDay: TrainingDay)
+    suspend fun update(trainingDay: TrainingDay)
 
     @Insert
     suspend fun insertExercise(exercise: Exercise): Long
@@ -37,5 +55,5 @@ interface TrainingDayDao {
     suspend fun updateExercise(exercise: Exercise)
 
     @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
-    fun deleteExercisesByTrainingDayId(trainingDayId: Int)
+    suspend fun deleteExercisesByTrainingDayId(trainingDayId: Int)
 }
