@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +60,12 @@ fun ExerciseForm(
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf(exerciseTypes[0]) }
 
+    var sharedSeed by remember { mutableStateOf(SharedSeed()) }
+
+    fun onSaveSeed (seed: SharedSeed) {
+        sharedSeed = seed
+    }
+
     Column (modifier = Modifier.padding(horizontal = 8.dp)) {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -96,7 +103,9 @@ fun ExerciseForm(
                 ExerciseFormDefault(
                     exerciseToEdit = exerciseToEdit,
                     exerciseType = selectedType,
-                    onDefaultExerciseSubmit = onDefaultExerciseSubmit
+                    onDefaultExerciseSubmit = onDefaultExerciseSubmit,
+                    seed = sharedSeed,
+                    onSaveSeed = { onSaveSeed(it) }
                 )
             }
             ExerciseType.STATIC -> {
@@ -104,21 +113,29 @@ fun ExerciseForm(
                     isStatic = true,
                     exerciseToEdit = exerciseToEdit,
                     exerciseType = selectedType,
-                    onDefaultExerciseSubmit = onDefaultExerciseSubmit
+                    onDefaultExerciseSubmit = onDefaultExerciseSubmit,
+                    seed = sharedSeed,
+                    onSaveSeed = { onSaveSeed(it) }
                 )
             }
             ExerciseType.LADDER -> {
                 ExerciseFormLadder(
                     onLadderExerciseSubmit = onLadderExerciseSubmit,
-                    exerciseToEdit = exerciseToEdit
+                    exerciseToEdit = exerciseToEdit,
+                    seed = sharedSeed,
+                    onSaveSeed = { onSaveSeed(it) }
                 )
             }
             else -> {
+                LaunchedEffect (Unit) {
+                    onSaveSeed(SharedSeed())
+                }
+
                 SubmitBtn(
                     onClick = {
                         onSimpleExerciseSubmit(ExerciseSimpleFormResult(selectedType))
                     },
-                    isEditing = exerciseToEdit != null
+                    isEditing = exerciseToEdit != null,
                 )
             }
         }
@@ -131,7 +148,9 @@ fun ExerciseFormDefault(
     exerciseToEdit: Exercise?,
     onDefaultExerciseSubmit: (result: ExerciseDefaultFormResult) -> Unit,
     exerciseType: ExerciseType,
-    vm: ExerciseFormDefaultViewModel = viewModel()
+    vm: ExerciseFormDefaultViewModel = viewModel(),
+    seed: SharedSeed,
+    onSaveSeed: (seed: SharedSeed) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -141,8 +160,20 @@ fun ExerciseFormDefault(
     val setsFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
+    LaunchedEffect(seed) {
+        vm.seed(seed)
+    }
+
     DisposableEffect(Unit) {
         onDispose {
+            onSaveSeed(
+                SharedSeed(
+                    name = ui.name.value,
+                    rest = ui.rest.value,
+                    sets = ui.sets.value,
+                    reps = ui.reps.value
+                )
+            )
             vm.reset()
         }
     }
@@ -267,7 +298,9 @@ fun ExerciseFormDefault(
 fun ExerciseFormLadder(
     onLadderExerciseSubmit: (result: ExerciseLadderFormResult) -> Unit,
     exerciseToEdit: Exercise?,
-    vm: ExerciseFormLadderViewModel = viewModel()
+    vm: ExerciseFormLadderViewModel = viewModel(),
+    seed: SharedSeed,
+    onSaveSeed: (seed: SharedSeed) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -278,8 +311,13 @@ fun ExerciseFormLadder(
     val stepFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
+    LaunchedEffect(seed) {
+        vm.seed(seed)
+    }
+
     DisposableEffect(Unit) {
         onDispose {
+            onSaveSeed(SharedSeed(name = ui.name.value))
             vm.reset()
         }
     }
@@ -465,6 +503,13 @@ data class ExerciseLadderFormResult (
     val to: Number,
     val step: Number,
     val rest: Number
+)
+
+data class SharedSeed(
+    val name: String = "",
+    val rest: String = "",
+    val sets: String = "",
+    val reps: String = ""
 )
 
 @Preview

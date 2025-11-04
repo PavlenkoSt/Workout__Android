@@ -1,6 +1,7 @@
 package com.learning.workout__android.viewModel
 
 import androidx.lifecycle.ViewModel
+import com.learning.workout__android.ui.components.SharedSeed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -103,6 +104,25 @@ class ExerciseFormDefaultViewModel : ViewModel() {
                 error = if (current.touched) validator(value) else null
             )
             set(s, updated)
+        }
+    }
+
+    fun seed(seed: SharedSeed) {
+        _ui.update { s ->
+            s.copy(
+                name = s.name.copy(
+                    value = seed.name
+                ),
+                reps = s.reps.copy(
+                    value = seed.reps,
+                ),
+                sets = s.sets.copy(
+                    value = seed.sets,
+                ),
+                rest = s.rest.copy(
+                    value = seed.rest,
+                )
+            )
         }
     }
 

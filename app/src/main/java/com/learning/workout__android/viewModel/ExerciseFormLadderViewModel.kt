@@ -1,6 +1,7 @@
 package com.learning.workout__android.viewModel
 
 import androidx.lifecycle.ViewModel
+import com.learning.workout__android.ui.components.SharedSeed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,6 +69,16 @@ class ExerciseFormLadderViewModel : ViewModel() {
         }
         val current = _ui.value
         return current.isValid
+    }
+
+    fun seed(seed: SharedSeed) {
+        _ui.update { s ->
+            s.copy(
+                name = s.name.copy(
+                    value = seed.name,
+                ),
+            )
+        }
     }
 
     fun reset() {
