@@ -10,7 +10,7 @@ import com.learning.workout__android.ui.components.BottomNavBar
 import com.learning.workout__android.ui.screens.GoalsScreen
 import com.learning.workout__android.ui.screens.PresetsScreen
 import com.learning.workout__android.ui.screens.RecordsScreen
-import com.learning.workout__android.ui.screens.TrainingScreen
+import com.learning.workout__android.ui.screens.training.TrainingScreen
 
 @Composable
 fun App() {
