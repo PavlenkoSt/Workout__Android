@@ -13,12 +13,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,8 +31,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -281,7 +287,6 @@ private fun TrainingExerciseList(
             ReorderableItem(reorderableLazyListState, key = item.id) { isDragging ->
                 ExerciseItem(
                     exercise = item,
-                    modifier = Modifier.fillMaxWidth(),
                     idx = idx,
                     draggableHandler = {
                         DraggableHandler(
@@ -298,72 +303,125 @@ private fun TrainingExerciseList(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExerciseItem(
     exercise: Exercise,
     idx: Int,
-    modifier: Modifier = Modifier,
     draggableHandler: @Composable () ->  Unit
 ) {
-    Column {
-        Card(modifier = modifier) {
-            Row(modifier = Modifier.fillMaxWidth().padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text = "${idx + 1}. ${exercise.name}",
-                    modifier = Modifier.padding(
-                        top = 8.dp,
-                        start = 8.dp,
-                        end = 8.dp
-                    )
-                )
-                if(
-                    exercise.type == ExerciseType.DYNAMIC ||
-                    exercise.type == ExerciseType.STATIC ||
-                    exercise.type == ExerciseType.LADDER
-                    ) {
-                    when(exercise.type) {
-                        ExerciseType.DYNAMIC -> ExerciseStatItem("Reps:", exercise.reps.toString())
-                        ExerciseType.LADDER -> ExerciseStatItem("Reps:", exercise.reps.toString())
-                        ExerciseType.STATIC -> ExerciseStatItem("Hold:", "${exercise.reps} sec.")
-                        else -> null
-                    }
-                    ExerciseStatItem("Sets:", exercise.sets.toString())
-                    ExerciseStatItem("Rest:", "${exercise.rest} sec.")
-                }
-                draggableHandler()
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            if (it == SwipeToDismissBoxValue.EndToStart) {
+                // TODO remove
+                print("remove")
+            } else if (it == SwipeToDismissBoxValue.StartToEnd) {
+                // TODO edit
+                print("edit")
             }
-            Row(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = {},
-                    modifier = Modifier.weight(1f),
-                    shape = ShapeDefaults.Medium
-                ) {
-                    Text("-")
+            it != SwipeToDismissBoxValue.StartToEnd
+        },
+        positionalThreshold = { totalDistance -> totalDistance * 0.35f }
+    )
+
+    Column {
+        SwipeToDismissBox(
+            state = swipeToDismissBoxState,
+            modifier = Modifier.fillMaxWidth(),
+            backgroundContent = {
+                when (swipeToDismissBoxState.dismissDirection) {
+                    SwipeToDismissBoxValue.StartToEnd  -> {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit exercise",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(ShapeDefaults.Medium)
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(horizontal = 24.dp)
+                                .wrapContentSize(Alignment.CenterStart)
+                               ,
+                            tint = Color.White
+                        )
+                    }
+                    SwipeToDismissBoxValue.EndToStart -> {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Remove exercise",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(ShapeDefaults.Medium)
+                                .background(Color.Red)
+                                .padding(horizontal = 24.dp)
+                                .wrapContentSize(Alignment.CenterEnd),
+                            tint = Color.White
+                        )
+                    }
+                    SwipeToDismissBoxValue.Settled -> {}
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    modifier = Modifier.width(80.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("${exercise.setsDone}/${exercise.sets}")
-                    LinearProgressIndicator(
-                        progress = { ((exercise.setsDone / exercise.sets)).toFloat() },
-                        modifier = Modifier.fillMaxWidth(),
-                        trackColor = MaterialTheme.colorScheme.onPrimary,
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeCap = StrokeCap.Round,
+            }
+        ) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "${idx + 1}. ${exercise.name}",
+                        modifier = Modifier.padding(
+                            top = 8.dp,
+                            start = 8.dp,
+                            end = 8.dp
+                        )
                     )
+                    if(
+                        exercise.type == ExerciseType.DYNAMIC ||
+                        exercise.type == ExerciseType.STATIC ||
+                        exercise.type == ExerciseType.LADDER
+                        ) {
+                        when(exercise.type) {
+                            ExerciseType.DYNAMIC -> ExerciseStatItem("Reps:", exercise.reps.toString())
+                            ExerciseType.LADDER -> ExerciseStatItem("Reps:", exercise.reps.toString())
+                            ExerciseType.STATIC -> ExerciseStatItem("Hold:", "${exercise.reps} sec.")
+                            else -> null
+                        }
+                        ExerciseStatItem("Sets:", exercise.sets.toString())
+                        ExerciseStatItem("Rest:", "${exercise.rest} sec.")
+                    }
+                    draggableHandler()
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(
-                    onClick = {},
-                    modifier = Modifier.weight(1f),
-                    shape = ShapeDefaults.Medium
+                Row(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("+")
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.weight(1f),
+                        shape = ShapeDefaults.Medium
+                    ) {
+                        Text("-")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier.width(80.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("${exercise.setsDone}/${exercise.sets}")
+                        LinearProgressIndicator(
+                            progress = { ((exercise.setsDone / exercise.sets)).toFloat() },
+                            modifier = Modifier.fillMaxWidth(),
+                            trackColor = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeCap = StrokeCap.Round,
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.weight(1f),
+                        shape = ShapeDefaults.Medium
+                    ) {
+                        Text("+")
+                    }
                 }
             }
         }
@@ -414,7 +472,6 @@ fun ExerciseItemPreview() {
     Workout__AndroidTheme {
         ExerciseItem(
             exercise = Exercise(0, trainingDayId = 0, name = "Exercise preview", reps = 10, sets = 10, setsDone = 2, type = ExerciseType.DYNAMIC, order = 0, rest = 10),
-            modifier = Modifier,
             draggableHandler = { DraggableHandler() },
             idx = 0
             )
