@@ -26,6 +26,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,20 +46,22 @@ fun ExerciseItem(
     exercise: Exercise,
     idx: Int,
     draggableHandler: @Composable () ->  Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEdit: (exercise: Exercise) -> Unit
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            if (it == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-            } else if (it == SwipeToDismissBoxValue.StartToEnd) {
-                // TODO edit
-                print("edit")
-            }
-            it != SwipeToDismissBoxValue.StartToEnd
-        },
-        positionalThreshold = { totalDistance -> totalDistance * 0.35f }
-    )
+    val swipeToDismissBoxState = key(exercise) {
+        rememberSwipeToDismissBoxState(
+            confirmValueChange = {
+                if (it == SwipeToDismissBoxValue.EndToStart) {
+                    onDelete()
+                } else if (it == SwipeToDismissBoxValue.StartToEnd) {
+                    onEdit(exercise)
+                }
+                it != SwipeToDismissBoxValue.StartToEnd
+            },
+            positionalThreshold = { totalDistance -> totalDistance * 0.3f },
+        )
+    }
 
     Column {
         SwipeToDismissBox(
@@ -102,7 +105,7 @@ fun ExerciseItem(
                     .fillMaxWidth()
                     .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = "${idx + 1}. ${exercise.name}",
+                        text = "${idx + 1}. ${getExerciseName(exercise)}",
                         modifier = Modifier.padding(
                             top = 8.dp,
                             start = 8.dp,
@@ -180,6 +183,23 @@ private fun ExerciseStatItem(
     }
 }
 
+private fun getExerciseName(exercise: Exercise): String {
+    return when(exercise.type) {
+        ExerciseType.FLEXIBILITY_SESSION -> {
+            "Flexibility session"
+        }
+        ExerciseType.HAND_BALANCE_SESSION -> {
+            "Hand balance session"
+        }
+        ExerciseType.WARMUP -> {
+            "Warmup"
+        }
+        else -> {
+            exercise.name
+        }
+    }
+}
+
 @Composable
 @Preview
 fun ExerciseItemPreview() {
@@ -188,7 +208,8 @@ fun ExerciseItemPreview() {
             exercise = Exercise(0, trainingDayId = 0, name = "Exercise preview", reps = 10, sets = 10, setsDone = 2, type = ExerciseType.DYNAMIC, order = 0, rest = 10),
             draggableHandler = {},
             idx = 0,
-            onDelete = {}
+            onDelete = {},
+            onEdit = {}
         )
     }
 }

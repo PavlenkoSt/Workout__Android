@@ -49,7 +49,13 @@ fun ExerciseForm(
     onSimpleExerciseSubmit: (formResult: ExerciseSimpleFormResult) -> Unit,
     exerciseToEdit: Exercise?
 ) {
-    val exerciseTypes =  listOf(
+    val exerciseTypes = if(exerciseToEdit != null) listOf(
+        ExerciseType.DYNAMIC,
+        ExerciseType.STATIC,
+        ExerciseType.HAND_BALANCE_SESSION,
+        ExerciseType.FLEXIBILITY_SESSION,
+        ExerciseType.WARMUP
+    ) else listOf(
         ExerciseType.DYNAMIC,
         ExerciseType.STATIC,
         ExerciseType.LADDER,
@@ -64,6 +70,12 @@ fun ExerciseForm(
 
     fun onSaveSeed (seed: SharedSeed) {
         sharedSeed = seed
+    }
+
+    LaunchedEffect(exerciseToEdit?.type) {
+        if(exerciseToEdit != null) {
+            selectedType = exerciseToEdit.type
+        }
     }
 
     Column (modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -97,7 +109,6 @@ fun ExerciseForm(
             }
         }
 
-        val isEditing = exerciseToEdit != null
         when(selectedType) {
             ExerciseType.DYNAMIC -> {
                 ExerciseFormDefault(
@@ -160,7 +171,16 @@ fun ExerciseFormDefault(
     val setsFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(seed) {
+    LaunchedEffect(seed, exerciseToEdit) {
+        if(exerciseToEdit != null) {
+            vm.seed(SharedSeed(
+                name = exerciseToEdit.name,
+                rest = exerciseToEdit.rest.toString(),
+                sets = exerciseToEdit.sets.toString(),
+                reps = exerciseToEdit.reps.toString()
+            ))
+            return@LaunchedEffect
+        }
         vm.seed(seed)
     }
 
@@ -311,7 +331,16 @@ fun ExerciseFormLadder(
     val stepFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(seed) {
+    LaunchedEffect(seed, exerciseToEdit) {
+        if(exerciseToEdit != null) {
+            vm.seed(SharedSeed(
+                name = exerciseToEdit.name,
+                rest = exerciseToEdit.rest.toString(),
+                sets = exerciseToEdit.sets.toString(),
+                reps = exerciseToEdit.reps.toString()
+            ))
+            return@LaunchedEffect
+        }
         vm.seed(seed)
     }
 
@@ -452,7 +481,6 @@ fun ExerciseFormLadder(
             if(!isValid) return@SubmitBtn
             val result = ExerciseLadderFormResult(
                 name = ui.name.value,
-                type = ExerciseType.LADDER,
                 from = ui.from.value.toInt(),
                 to = ui.to.value.toInt(),
                 step = ui.step.value.toInt(),
@@ -498,7 +526,6 @@ data class ExerciseSimpleFormResult (
 
 data class ExerciseLadderFormResult (
     val name: String,
-    val type: ExerciseType,
     val from: Number,
     val to: Number,
     val step: Number,

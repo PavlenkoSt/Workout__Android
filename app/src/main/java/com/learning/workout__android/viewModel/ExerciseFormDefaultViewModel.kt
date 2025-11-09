@@ -1,6 +1,7 @@
 package com.learning.workout__android.viewModel
 
 import androidx.lifecycle.ViewModel
+import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.ui.components.SharedSeed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

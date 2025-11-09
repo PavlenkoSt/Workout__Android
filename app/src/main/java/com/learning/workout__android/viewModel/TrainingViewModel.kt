@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.ui.components.ExerciseDefaultFormResult
@@ -21,13 +22,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+typealias Reducer<S> = (S) -> S
+private inline fun <S, T> Flow<T>.toReducer(
+    crossinline update: S.(T) -> S
+): Flow<Reducer<S>> = distinctUntilChanged().map { v -> { s: S -> s.update(v) } }
 class TrainingViewModel(
     private val trainingDayRepository: TrainingDayRepository
 ) : ViewModel() {
@@ -43,6 +51,8 @@ class TrainingViewModel(
 
     // All days for list; and current day for selected date
     private val allDaysFlow = trainingDayRepository.getAll() // Flow<List<TrainingDay>>
+
+    private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val selectedDayFlow: Flow<TrainingDayWithExercises?> =
@@ -72,23 +82,19 @@ class TrainingViewModel(
             }
         }
 
-    // Single UI state the screen observes
+    private val calendarReducers = calendarUiFlow.toReducer<TrainingUiState, CalendarUiModel> { copy(calendar = it) }
+    private val titleReducers    = titleFlow.toReducer<TrainingUiState, String>       { copy(title = it) }
+    private val dateReducers     = _selectedDate.toReducer<TrainingUiState, LocalDate>   { copy(selectedDate = it) }
+    private val allDaysReducers  = allDaysFlow.toReducer<TrainingUiState, List<TrainingDayWithExercises>>     { copy(trainingDays = it) }
+    private val dayReducers      = selectedDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
+        copy(currentDay = it)
+    }
+    private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?>  { copy(exerciseToEdit = it) }
+
     val uiState: StateFlow<TrainingUiState> =
-        combine(
-            calendarUiFlow,
-            titleFlow,
-            _selectedDate,
-            allDaysFlow,
-            selectedDayFlow
-        ) { calendarUi, title, selected, allDays, currentDay ->
-            TrainingUiState(
-                title = title,
-                calendar = calendarUi,
-                selectedDate = selected,
-                trainingDays = allDays,
-                currentDay = currentDay
-            )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, TrainingUiState())
+        merge(calendarReducers, titleReducers, dateReducers, allDaysReducers, dayReducers, editReducers)
+            .scan(TrainingUiState()) { state, reduce -> reduce(state) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TrainingUiState())
 
     // Called by the Composable when pager page changes
     fun onWeekVisible(start: LocalDate) {
@@ -107,6 +113,10 @@ class TrainingViewModel(
         _visibleWeekStart.value = monday
         onDateSelected(today)
         return monday
+    }
+
+    fun setExerciseToEdit(exercise: Exercise?) {
+        exerciseToEdit.value = exercise
     }
 
     fun addDefaultExercise(formResult: ExerciseDefaultFormResult) {
@@ -144,7 +154,7 @@ class TrainingViewModel(
                         reps = currentReps,
                         sets = 1,
                         rest = rest,
-                        type = formResult.type,
+                        type = ExerciseType.DYNAMIC,
                         setsDone = 0
                     )
                 )
@@ -161,7 +171,7 @@ class TrainingViewModel(
 
             val exercise = Exercise(
                 trainingDayId = 0, // Will be set by repository
-                name = formResult.type.toString(),
+                name = "",
                 reps = 1,
                 sets = 1,
                 rest = 0,
@@ -242,7 +252,8 @@ data class TrainingUiState(
     val calendar: CalendarUiModel = CalendarUiModel.empty(),
     val selectedDate: LocalDate = LocalDate.now(),
     val trainingDays: List<TrainingDayWithExercises> = emptyList(),
-    val currentDay: TrainingDayWithExercises? = null
+    val currentDay: TrainingDayWithExercises? = null,
+    val exerciseToEdit: Exercise? = null
 )
 
 data class CalendarUiModel(

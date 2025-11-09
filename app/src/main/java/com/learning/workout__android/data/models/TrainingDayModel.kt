@@ -26,7 +26,7 @@ data class TrainingDayWithExercises (
 
 @Entity(tableName = "training_days")
 data class TrainingDay (
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "date") val date: String
 )
 
@@ -43,8 +43,8 @@ data class TrainingDay (
     indices = [Index("trainingDayId")]
 )
 data class Exercise (
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "trainingDayId") val trainingDayId: Int,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "trainingDayId") val trainingDayId: Long,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "reps") val reps: Int,
     @ColumnInfo(name = "sets") val sets: Int,

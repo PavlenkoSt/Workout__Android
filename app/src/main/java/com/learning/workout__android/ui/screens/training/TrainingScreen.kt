@@ -85,7 +85,11 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 },
-                onDeleteExercise={ vm.deleteExercise(it) }
+                onDeleteExercise={ vm.deleteExercise(it) },
+                onSwipeToEditExercise= {
+                    vm.setExerciseToEdit(it)
+                    showBottomSheet = true
+                }
             )
         }
 
@@ -111,23 +115,56 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
 
     if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = {  showBottomSheet = false  },
+            onDismissRequest = {
+                vm.setExerciseToEdit(null)
+                showBottomSheet = false
+           },
             sheetState = sheetState
         ) {
             ExerciseForm(
                 onDefaultExerciseSubmit = { result ->
+                    showBottomSheet = false
+
+                    ui.exerciseToEdit?.let {
+                        val exerciseToUpdate = it.copy(
+                            type = result.type,
+                            name = result.name,
+                            reps = result.reps.toInt(),
+                            rest = result.rest.toInt(),
+                            sets = result.sets.toInt()
+                        )
+                        vm.setExerciseToEdit(null)
+                        vm.updateExercise(exercise = exerciseToUpdate)
+
+                        return@ExerciseForm
+                    }
+
                     vm.addDefaultExercise(result)
-                    showBottomSheet = false
-                },
-                onLadderExerciseSubmit = { result ->
-                    vm.addLadderExercise(result)
-                    showBottomSheet = false
                 },
                 onSimpleExerciseSubmit = { result ->
-                    vm.addSimpleExercise(result)
                     showBottomSheet = false
+
+                    // edit
+                    ui.exerciseToEdit?.let {
+                        val exerciseToUpdate = it.copy(
+                            type = result.type,
+                            name = "",
+                            rest = 0,
+                            reps = 1,
+                            sets = 1
+                        )
+                        vm.setExerciseToEdit(null)
+                        vm.updateExercise(exercise = exerciseToUpdate)
+
+                        return@ExerciseForm
+                    }
+                    vm.addSimpleExercise(result)
                 },
-                exerciseToEdit = null
+                onLadderExerciseSubmit = { result ->
+                    showBottomSheet = false
+                    vm.addLadderExercise(result)
+                },
+                exerciseToEdit = ui.exerciseToEdit
             )
         }
     }

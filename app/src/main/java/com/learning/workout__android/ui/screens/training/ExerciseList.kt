@@ -13,6 +13,7 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ fun ExerciseList(
     exercisesList: List<Exercise>,
     onReorder: (from: Int, to: Int) -> Unit,
     onDeleteExercise: (exercise: Exercise) -> Unit,
+    onSwipeToEditExercise: (exercise: Exercise) -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit
 ) {
@@ -54,7 +56,7 @@ fun ExerciseList(
         if (!isReordering) {
             // Only update if the lists are actually different to avoid unnecessary updates
             if (localExercises.size != exercisesList.size ||
-                localExercises.zip(exercisesList).any { (a, b) -> a.id != b.id || a.order != b.order }) {
+                localExercises != exercisesList) {
                 localExercises.clear()
                 localExercises.addAll(exercisesList)
             }
@@ -85,7 +87,7 @@ fun ExerciseList(
 
     LazyColumn(
         state = lazyListState,
-        contentPadding = PaddingValues(all = 8.dp)
+        contentPadding = PaddingValues(all = 8.dp),
     ) {
         item(key = "header") {
             header()
@@ -101,7 +103,8 @@ fun ExerciseList(
                             modifier = Modifier.draggableHandle()
                         )
                     },
-                    onDelete={ onDeleteExercise(item) }
+                    onDelete={ onDeleteExercise(item) },
+                    onEdit = onSwipeToEditExercise
                 )
             }
         }
@@ -132,7 +135,7 @@ fun ExerciseListPreview() {
     Workout__AndroidTheme {
        ExerciseList(
            exercisesList = List(10, {idx -> Exercise(
-               id = idx,
+               id = idx.toLong(),
                trainingDayId = 0,
                name = "Preview exercise",
                reps = 10,
@@ -145,7 +148,8 @@ fun ExerciseListPreview() {
            onReorder = {from, to -> },
            header = {},
            footer = {},
-           onDeleteExercise = {}
+           onDeleteExercise = {},
+           onSwipeToEditExercise = {}
        )
     }
 }
