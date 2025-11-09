@@ -102,7 +102,9 @@ fun ExerciseList(
                     idx = idx,
                     draggableHandler = {
                         DraggableHandler(
-                            modifier = Modifier.draggableHandle()
+                            modifier = Modifier
+                                .draggableHandle()
+                                .longPressDraggableHandle()
                         )
                     },
                     isDragging = isDragging,
