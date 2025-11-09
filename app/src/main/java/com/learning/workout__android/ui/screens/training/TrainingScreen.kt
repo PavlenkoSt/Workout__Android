@@ -116,6 +116,13 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     }
 
     if (showBottomSheet) {
+        fun onHide() {
+            coroutineScope.launch {
+                sheetState.hide()
+                showBottomSheet = false
+            }
+        }
+
         ModalBottomSheet(
             onDismissRequest = {
                 vm.setExerciseToEdit(null)
@@ -125,8 +132,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         ) {
             ExerciseForm(
                 onDefaultExerciseSubmit = { result ->
-                    showBottomSheet = false
-
+                    onHide()
                     ui.exerciseToEdit?.let {
                         val exerciseToUpdate = it.copy(
                             type = result.type,
@@ -144,8 +150,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     vm.addDefaultExercise(result)
                 },
                 onSimpleExerciseSubmit = { result ->
-                    showBottomSheet = false
-
+                    onHide()
                     // edit
                     ui.exerciseToEdit?.let {
                         val exerciseToUpdate = it.copy(
@@ -163,7 +168,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     vm.addSimpleExercise(result)
                 },
                 onLadderExerciseSubmit = { result ->
-                    showBottomSheet = false
+                    onHide()
                     vm.addLadderExercise(result)
                 },
                 exerciseToEdit = ui.exerciseToEdit
