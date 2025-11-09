@@ -41,6 +41,8 @@ fun ExerciseList(
     exercisesList: List<Exercise>,
     onReorder: (from: Int, to: Int) -> Unit,
     onDeleteExercise: (exercise: Exercise) -> Unit,
+    onIncrementExercise: (exercise: Exercise) -> Unit,
+    onDecrementExercise: (exercise: Exercise) -> Unit,
     onSwipeToEditExercise: (exercise: Exercise) -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit
@@ -105,7 +107,9 @@ fun ExerciseList(
                     },
                     isDragging = isDragging,
                     onDelete = { onDeleteExercise(item) },
-                    onEdit = { onSwipeToEditExercise(item) }
+                    onEdit = { onSwipeToEditExercise(item) },
+                    onIncrement = { onIncrementExercise(item) },
+                    onDecrement = { onDecrementExercise(item) }
                 )
             }
         }
@@ -150,7 +154,9 @@ fun ExerciseListPreview() {
            header = {},
            footer = {},
            onDeleteExercise = {},
-           onSwipeToEditExercise = {}
+           onSwipeToEditExercise = {},
+           onDecrementExercise = {},
+           onIncrementExercise = {}
        )
     }
 }

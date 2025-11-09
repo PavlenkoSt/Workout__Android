@@ -89,7 +89,9 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 onSwipeToEditExercise= {
                     vm.setExerciseToEdit(it)
                     showBottomSheet = true
-                }
+                },
+                onDecrementExercise = { vm.updateExercise(it.copy(setsDone = it.setsDone - 1)) },
+                onIncrementExercise = { vm.updateExercise(it.copy(setsDone = it.setsDone + 1)) }
             )
         }
 

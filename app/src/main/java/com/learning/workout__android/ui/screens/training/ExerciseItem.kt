@@ -51,7 +51,9 @@ fun ExerciseItem(
     draggableHandler: @Composable () ->  Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
-    isDragging: Boolean
+    isDragging: Boolean,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
 ) {
     val swipeToDismissBoxState = key(exercise) {
         rememberSwipeToDismissBoxState(
@@ -145,29 +147,21 @@ fun ExerciseItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = {},
+                        onClick = onDecrement,
                         modifier = Modifier.weight(1f),
                         shape = ShapeDefaults.Medium
                     ) {
                         Text("-")
                     }
+
                     Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier.width(80.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("${exercise.setsDone}/${exercise.sets}")
-                        LinearProgressIndicator(
-                            progress = { ((exercise.setsDone / exercise.sets)).toFloat() },
-                            modifier = Modifier.fillMaxWidth(),
-                            trackColor = MaterialTheme.colorScheme.onPrimary,
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeCap = StrokeCap.Round,
-                        )
-                    }
+
+                    ExerciseAnimatedProgressBar(setsDone = exercise.setsDone, sets = exercise.sets)
+
                     Spacer(modifier = Modifier.width(16.dp))
+
                     Button(
-                        onClick = {},
+                        onClick = onIncrement,
                         modifier = Modifier.weight(1f),
                         shape = ShapeDefaults.Medium
                     ) {
@@ -177,6 +171,32 @@ fun ExerciseItem(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun ExerciseAnimatedProgressBar (
+    setsDone: Int,
+    sets: Int
+) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = (setsDone.toFloat() / sets.toFloat()),
+        label = "progress"
+    )
+
+    Spacer(modifier = Modifier.width(16.dp))
+    Column(
+        modifier = Modifier.width(80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("${setsDone}/${sets}")
+        LinearProgressIndicator(
+            progress = { animatedProgress },
+            modifier = Modifier.fillMaxWidth(),
+            trackColor = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.primary,
+            strokeCap = StrokeCap.Round,
+        )
     }
 }
 
@@ -222,7 +242,9 @@ fun ExerciseItemPreview() {
             idx = 0,
             onDelete = {},
             onEdit = {},
-            isDragging = false
+            isDragging = false,
+            onDecrement = {},
+            onIncrement = {}
         )
     }
 }
