@@ -1,14 +1,17 @@
 package com.learning.workout__android.ui.screens.training
 
+import DrawingCheckmark
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -27,6 +30,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
@@ -68,6 +72,7 @@ fun ExerciseItem(
             positionalThreshold = { totalDistance -> totalDistance * 0.3f },
         )
     }
+
 
     val scale by animateFloatAsState(
         targetValue = if (isDragging) 1.05f else 1f,
@@ -156,7 +161,20 @@ fun ExerciseItem(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    ExerciseAnimatedProgressBar(setsDone = exercise.setsDone, sets = exercise.sets)
+                    Box{
+                        val isCheckMarkVisible by derivedStateOf { exercise.setsDone >= exercise.sets }
+
+                        ExerciseAnimatedProgressBar(setsDone = exercise.setsDone, sets = exercise.sets)
+
+                        DrawingCheckmark(
+                            isVisible = isCheckMarkVisible,
+                            size = 32,
+                            modifier = Modifier
+                                .align(alignment = Alignment.BottomEnd)
+                                .offset(x = 8.dp, y = 4.dp),
+                            backgroundColor = if(isCheckMarkVisible) Color(0xFF14B8A6) else Color.Transparent
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
