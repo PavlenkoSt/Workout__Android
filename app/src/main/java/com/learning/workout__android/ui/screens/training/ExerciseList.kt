@@ -39,6 +39,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun ExerciseList(
     exercisesList: List<Exercise>,
     onReorder: (from: Int, to: Int) -> Unit,
+    onDeleteExercise: (exercise: Exercise) -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit
 ) {
@@ -99,7 +100,8 @@ fun ExerciseList(
                         DraggableHandler(
                             modifier = Modifier.draggableHandle()
                         )
-                    }
+                    },
+                    onDelete={ onDeleteExercise(item) }
                 )
             }
         }
@@ -142,7 +144,8 @@ fun ExerciseListPreview() {
            )}),
            onReorder = {from, to -> },
            header = {},
-           footer = {}
+           footer = {},
+           onDeleteExercise = {}
        )
     }
 }

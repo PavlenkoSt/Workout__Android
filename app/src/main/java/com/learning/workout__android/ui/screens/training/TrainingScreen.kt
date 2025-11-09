@@ -84,7 +84,8 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                }
+                },
+                onDeleteExercise={ vm.deleteExercise(it) }
             )
         }
 

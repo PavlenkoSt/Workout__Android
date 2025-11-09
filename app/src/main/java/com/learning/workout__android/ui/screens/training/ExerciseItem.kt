@@ -44,13 +44,13 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 fun ExerciseItem(
     exercise: Exercise,
     idx: Int,
-    draggableHandler: @Composable () ->  Unit
+    draggableHandler: @Composable () ->  Unit,
+    onDelete: () -> Unit
 ) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = {
             if (it == SwipeToDismissBoxValue.EndToStart) {
-                // TODO remove
-                print("remove")
+                onDelete()
             } else if (it == SwipeToDismissBoxValue.StartToEnd) {
                 // TODO edit
                 print("edit")
@@ -186,8 +186,9 @@ fun ExerciseItemPreview() {
     Workout__AndroidTheme {
         ExerciseItem(
             exercise = Exercise(0, trainingDayId = 0, name = "Exercise preview", reps = 10, sets = 10, setsDone = 2, type = ExerciseType.DYNAMIC, order = 0, rest = 10),
-            draggableHandler = {  },
-            idx = 0
+            draggableHandler = {},
+            idx = 0,
+            onDelete = {}
         )
     }
 }

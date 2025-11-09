@@ -1,6 +1,7 @@
 package com.learning.workout__android.data.daos
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -53,6 +54,9 @@ interface TrainingDayDao {
 
     @Update
     suspend fun updateExercise(exercise: Exercise)
+
+    @Delete
+    suspend fun deleteExercise(exercise: Exercise)
 
     @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
     suspend fun deleteExercisesByTrainingDayId(trainingDayId: Int)

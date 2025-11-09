@@ -93,6 +93,14 @@ class TrainingDayRepository (
         }
     }
 
+    suspend fun updateExercise(exercise: Exercise) {
+        trainingDayDao.updateExercise(exercise)
+    }
+
+    suspend fun deleteExercise(exercise: Exercise) {
+        trainingDayDao.deleteExercise(exercise)
+    }
+
     suspend fun reorderExercises(trainingDayId: Int, fromIndex: Int, toIndex: Int) {
         val exercises = trainingDayDao.getExercisesByTrainingDayId(trainingDayId)
         if (fromIndex in exercises.indices && toIndex in 0..exercises.size) {

@@ -173,6 +173,18 @@ class TrainingViewModel(
         }
     }
 
+    fun updateExercise(exercise: Exercise) {
+        viewModelScope.launch {
+            trainingDayRepository.updateExercise(exercise)
+        }
+    }
+
+    fun deleteExercise(exercise: Exercise) {
+        viewModelScope.launch {
+            trainingDayRepository.deleteExercise(exercise)
+        }
+    }
+
     fun reorderExercises(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentDay = trainingDayRepository.getByDate(_selectedDate.value.toString()).first()
