@@ -47,7 +47,7 @@ fun ExerciseItem(
     idx: Int,
     draggableHandler: @Composable () ->  Unit,
     onDelete: () -> Unit,
-    onEdit: (exercise: Exercise) -> Unit
+    onEdit: () -> Unit
 ) {
     val swipeToDismissBoxState = key(exercise) {
         rememberSwipeToDismissBoxState(
@@ -55,7 +55,7 @@ fun ExerciseItem(
                 if (it == SwipeToDismissBoxValue.EndToStart) {
                     onDelete()
                 } else if (it == SwipeToDismissBoxValue.StartToEnd) {
-                    onEdit(exercise)
+                    onEdit()
                 }
                 it != SwipeToDismissBoxValue.StartToEnd
             },

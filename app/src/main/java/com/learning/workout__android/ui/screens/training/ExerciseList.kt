@@ -104,7 +104,7 @@ fun ExerciseList(
                         )
                     },
                     onDelete={ onDeleteExercise(item) },
-                    onEdit = onSwipeToEditExercise
+                    onEdit = { onSwipeToEditExercise(item) }
                 )
             }
         }
