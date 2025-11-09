@@ -1,2 +1,5 @@
-package com.learning.workout__android.ui.components.ExerciseForm
+import com.learning.workout__android.data.models.ExerciseType
 
+data class ExerciseSimpleFormResult (
+    val type: ExerciseType
+)

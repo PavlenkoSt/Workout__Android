@@ -1,4 +1,6 @@
-package com.learning.workout__android.ui.components.ExerciseForm
-
-class SharedSeed {
-}
+data class SharedSeed(
+    val name: String = "",
+    val rest: String = "",
+    val sets: String = "",
+    val reps: String = ""
+)

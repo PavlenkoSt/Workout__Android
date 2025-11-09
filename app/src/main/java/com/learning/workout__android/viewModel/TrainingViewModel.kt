@@ -1,5 +1,8 @@
 package com.learning.workout__android.viewModel
 
+import ExerciseDefaultFormResult
+import ExerciseLadderFormResult
+import ExerciseSimpleFormResult
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,9 +14,6 @@ import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
-import com.learning.workout__android.ui.components.ExerciseDefaultFormResult
-import com.learning.workout__android.ui.components.ExerciseLadderFormResult
-import com.learning.workout__android.ui.components.ExerciseSimpleFormResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

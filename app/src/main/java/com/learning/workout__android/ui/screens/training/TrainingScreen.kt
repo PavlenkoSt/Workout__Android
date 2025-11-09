@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.components.Calendar
-import com.learning.workout__android.ui.components.ExerciseForm
+import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.TrainingViewModel
 import kotlinx.coroutines.launch

@@ -174,7 +174,7 @@ private fun ExerciseStatItem(
     value: String
 ) {
     Column (
-        modifier = Modifier,
+        modifier = Modifier.padding(top = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
