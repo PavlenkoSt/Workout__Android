@@ -103,7 +103,8 @@ fun ExerciseList(
                             modifier = Modifier.draggableHandle()
                         )
                     },
-                    onDelete={ onDeleteExercise(item) },
+                    isDragging = isDragging,
+                    onDelete = { onDeleteExercise(item) },
                     onEdit = { onSwipeToEditExercise(item) }
                 )
             }

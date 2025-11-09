@@ -1,5 +1,6 @@
 package com.learning.workout__android.ui.screens.training
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,12 +27,14 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +50,8 @@ fun ExerciseItem(
     idx: Int,
     draggableHandler: @Composable () ->  Unit,
     onDelete: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    isDragging: Boolean
 ) {
     val swipeToDismissBoxState = key(exercise) {
         rememberSwipeToDismissBoxState(
@@ -63,7 +67,15 @@ fun ExerciseItem(
         )
     }
 
-    Column {
+    val scale by animateFloatAsState(
+        targetValue = if (isDragging) 1.05f else 1f,
+        label = "scale"
+    )
+
+    Column (modifier = Modifier.graphicsLayer {
+        scaleX = scale
+        scaleY = scale
+    }) {
         SwipeToDismissBox(
             state = swipeToDismissBoxState,
             modifier = Modifier.fillMaxWidth(),
@@ -209,7 +221,8 @@ fun ExerciseItemPreview() {
             draggableHandler = {},
             idx = 0,
             onDelete = {},
-            onEdit = {}
+            onEdit = {},
+            isDragging = false
         )
     }
 }
