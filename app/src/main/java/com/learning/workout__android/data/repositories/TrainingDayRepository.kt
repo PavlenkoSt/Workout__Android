@@ -19,8 +19,8 @@ class TrainingDayRepository (
         return trainingDayDao.getDayByDate(date)
     }
 
-    fun deleteByDate(date: String) {
-        trainingDayDao.deleteByDate(date)
+    suspend fun deleteTrainingDayWithExercises(date: String) {
+        trainingDayDao.deleteTrainingDayWithExercises(date)
     }
 
     suspend fun addExerciseToDate(date: String, exercise: Exercise) {

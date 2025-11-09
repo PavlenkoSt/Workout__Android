@@ -2,10 +2,8 @@ package com.learning.workout__android.ui.screens.training
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,9 +79,15 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 header = {
                     TrainingHeader(
                         currentDate = ui.selectedDate,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        isNotEmptyTrainingDay = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false,
+                        onDeleteTrainingDay = {
+                            vm.deleteTrainingDay(ui.selectedDate)
+                        },
+                        onSaveAsPresetClick = {
+                            // TODO add this after implemented presets
+                        }
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
                 },
                 onDeleteExercise={ vm.deleteExercise(it) },
                 onSwipeToEditExercise= {

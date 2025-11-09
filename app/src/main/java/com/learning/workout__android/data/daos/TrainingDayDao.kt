@@ -47,7 +47,6 @@ interface TrainingDayDao {
     suspend fun updateExerciseOrder(exerciseId: Long, order: Int)
 
     @Query("DELETE FROM training_days WHERE date = :date")
-    @Transaction
     fun deleteByDate(date: String)
 
     @Insert
@@ -66,5 +65,17 @@ interface TrainingDayDao {
     suspend fun deleteExercise(exercise: Exercise)
 
     @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
-    suspend fun deleteExercisesByTrainingDayId(trainingDayId: Long)
+    fun deleteExercisesByTrainingDayId(trainingDayId: Long)
+
+    @Query("SELECT id FROM training_days WHERE date = :date")
+    suspend fun getTrainingDayIdByDate(date: String): Long?
+
+    @Transaction
+    suspend fun deleteTrainingDayWithExercises(date: String) {
+        val trainingDayId = getTrainingDayIdByDate(date)
+        trainingDayId?.let {
+            deleteExercisesByTrainingDayId(it)
+            deleteByDate(date)
+        }
+    }
 }

@@ -89,7 +89,7 @@ fun ExerciseList(
 
     LazyColumn(
         state = lazyListState,
-        contentPadding = PaddingValues(all = 8.dp),
+        contentPadding = PaddingValues(end = 8.dp, start = 8.dp, bottom = 12.dp),
     ) {
         item(key = "header") {
             header()
