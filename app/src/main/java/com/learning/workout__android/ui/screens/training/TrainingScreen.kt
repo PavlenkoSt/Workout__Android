@@ -90,8 +90,16 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     vm.setExerciseToEdit(it)
                     showBottomSheet = true
                 },
-                onDecrementExercise = { vm.updateExercise(it.copy(setsDone = it.setsDone - 1)) },
-                onIncrementExercise = { vm.updateExercise(it.copy(setsDone = it.setsDone + 1)) }
+                onDecrementExercise = {
+                    vm.updateExercise(it.copy(
+                        setsDone = if (it.setsDone > 0) it.setsDone - 1 else 0
+                    ))
+                },
+                onIncrementExercise = {
+                    vm.updateExercise(it.copy(
+                        setsDone = it.setsDone + 1
+                    ))
+                }
             )
         }
 
