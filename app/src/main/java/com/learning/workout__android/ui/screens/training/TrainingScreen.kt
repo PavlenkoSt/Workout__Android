@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -81,7 +82,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     TrainingHeader(
                         currentDate = ui.selectedDate,
                         modifier = Modifier.fillMaxWidth(),
-                        isNotEmptyTrainingDay = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false,
+                        isTrainingDay = ui.currentDay != null,
                         onDeleteTrainingDay = {
                             vm.deleteTrainingDay(ui.selectedDate)
                         },
@@ -90,7 +91,21 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                         }
                     )
                 },
-                onDeleteExercise={ vm.deleteExercise(it) },
+                emptyMessage = {
+                    if(ui.currentDay != null) {
+                        Box (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 12.dp)
+                        ) {
+                            Text(
+                                text = "No exercises yet",
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                },
+                onDeleteExercise = { vm.deleteExercise(it) },
                 onSwipeToEditExercise= {
                     vm.setExerciseToEdit(it)
                     showBottomSheet = true

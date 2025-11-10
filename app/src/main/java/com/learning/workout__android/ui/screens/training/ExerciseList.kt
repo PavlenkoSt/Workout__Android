@@ -13,7 +13,6 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +44,8 @@ fun ExerciseList(
     onDecrementExercise: (exercise: Exercise) -> Unit,
     onSwipeToEditExercise: (exercise: Exercise) -> Unit,
     footer: @Composable () -> Unit,
-    header: @Composable () -> Unit
+    header: @Composable () -> Unit,
+    emptyMessage: @Composable () -> Unit
 ) {
     // Local state for optimistic updates to prevent flickering
     val localExercises = remember { mutableStateListOf<Exercise>() }
@@ -95,24 +95,32 @@ fun ExerciseList(
             header()
         }
 
-        itemsIndexed(localExercises, key = { _, item -> item.id }) { idx, item ->
-            ReorderableItem(reorderableLazyListState, key = item.id) { isDragging ->
-                ExerciseItem(
-                    exercise = item,
-                    idx = idx,
-                    draggableHandler = {
-                        DraggableHandler(
-                            modifier = Modifier
-                                .draggableHandle()
-                                .longPressDraggableHandle()
-                        )
-                    },
-                    isDragging = isDragging,
-                    onDelete = { onDeleteExercise(item) },
-                    onEdit = { onSwipeToEditExercise(item) },
-                    onIncrement = { onIncrementExercise(item) },
-                    onDecrement = { onDecrementExercise(item) }
-                )
+        if(localExercises.isNotEmpty()) {
+            itemsIndexed(localExercises, key = { _, item -> item.id }) { idx, item ->
+                ReorderableItem(reorderableLazyListState, key = item.id, enabled = localExercises.size > 1) { isDragging ->
+                    ExerciseItem(
+                        exercise = item,
+                        idx = idx,
+                        draggableHandler = {
+                            if(localExercises.size > 1) {
+                                DraggableHandler(
+                                    modifier = Modifier
+                                        .draggableHandle()
+                                        .longPressDraggableHandle()
+                                )
+                            }
+                        },
+                        isDragging = isDragging,
+                        onDelete = { onDeleteExercise(item) },
+                        onEdit = { onSwipeToEditExercise(item) },
+                        onIncrement = { onIncrementExercise(item) },
+                        onDecrement = { onDecrementExercise(item) }
+                    )
+                }
+            }
+        }else {
+            item("empty") {
+                emptyMessage()
             }
         }
 
@@ -158,7 +166,8 @@ fun ExerciseListPreview() {
            onDeleteExercise = {},
            onSwipeToEditExercise = {},
            onDecrementExercise = {},
-           onIncrementExercise = {}
+           onIncrementExercise = {},
+           emptyMessage = {}
        )
     }
 }

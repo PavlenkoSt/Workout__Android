@@ -26,7 +26,7 @@ import java.time.LocalDate
 fun TrainingHeader(
     currentDate: LocalDate,
     modifier: Modifier = Modifier,
-    isNotEmptyTrainingDay: Boolean,
+    isTrainingDay: Boolean,
     onDeleteTrainingDay: () -> Unit,
     onSaveAsPresetClick: () -> Unit
 ) {
@@ -36,7 +36,7 @@ fun TrainingHeader(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .clickable (enabled = isNotEmptyTrainingDay) {
+            .clickable (enabled = isTrainingDay) {
                 dropdownMenuExpanded = true
             }
             .padding(all = 8.dp)
@@ -84,6 +84,6 @@ fun TrainingHeader(
 @Composable
 fun TrainingHeaderPreview() {
     Workout__AndroidTheme {
-        TrainingHeader(currentDate = LocalDate.now(), onDeleteTrainingDay = {}, onSaveAsPresetClick = {}, isNotEmptyTrainingDay = false)
+        TrainingHeader(currentDate = LocalDate.now(), onDeleteTrainingDay = {}, onSaveAsPresetClick = {}, isTrainingDay = false)
     }
 }
