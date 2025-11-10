@@ -3,8 +3,12 @@ package com.learning.workout__android.ui.screens.training
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +60,9 @@ fun TrainingHeader(
                 onClick = {
                     onSaveAsPresetClick()
                     dropdownMenuExpanded = false
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Save")
                 }
             )
             DropdownMenuItem(
@@ -63,6 +70,9 @@ fun TrainingHeader(
                 onClick = {
                     openAlertDialog = true
                     dropdownMenuExpanded = false
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                 }
             )
         }
