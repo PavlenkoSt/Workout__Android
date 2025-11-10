@@ -31,6 +31,7 @@ fun TrainingHeader(
     currentDate: LocalDate,
     modifier: Modifier = Modifier,
     isTrainingDay: Boolean,
+    hasExercises: Boolean,
     onDeleteTrainingDay: () -> Unit,
     onSaveAsPresetClick: () -> Unit
 ) {
@@ -40,7 +41,7 @@ fun TrainingHeader(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .clickable (enabled = isTrainingDay) {
+            .clickable(enabled = isTrainingDay) {
                 dropdownMenuExpanded = true
             }
             .padding(all = 8.dp)
@@ -55,16 +56,18 @@ fun TrainingHeader(
             expanded = dropdownMenuExpanded,
             onDismissRequest = { dropdownMenuExpanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text("Save as preset") },
-                onClick = {
-                    onSaveAsPresetClick()
-                    dropdownMenuExpanded = false
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Save")
-                }
-            )
+            if(hasExercises) {
+                DropdownMenuItem(
+                    text = { Text("Save as preset") },
+                    onClick = {
+                        onSaveAsPresetClick()
+                        dropdownMenuExpanded = false
+                    },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Favorite, contentDescription = "Save")
+                    }
+                )
+            }
             DropdownMenuItem(
                 text = { Text("Delete training day", color = Color.Red) },
                 onClick = {
@@ -94,6 +97,6 @@ fun TrainingHeader(
 @Composable
 fun TrainingHeaderPreview() {
     Workout__AndroidTheme {
-        TrainingHeader(currentDate = LocalDate.now(), onDeleteTrainingDay = {}, onSaveAsPresetClick = {}, isTrainingDay = false)
+        TrainingHeader(currentDate = LocalDate.now(), onDeleteTrainingDay = {}, onSaveAsPresetClick = {}, isTrainingDay = false, hasExercises = true)
     }
 }

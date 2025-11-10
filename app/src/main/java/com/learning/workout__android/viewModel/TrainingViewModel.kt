@@ -91,8 +91,20 @@ class TrainingViewModel(
     private val allDaysReducers  = trainingDaysWithCompleteness.toReducer<TrainingUiState, List<TrainingDayWithCompleteness>> {
         copy(trainingDaysWithCompleteness = it)
     }
-    private val dayReducers      = selectedDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
-        copy(currentDay = it)
+    private val dayReducers      = selectedDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> { currentDay ->
+        copy(
+            currentDay = currentDay,
+            currentDayStatistics = currentDay?.sortedExercises
+                ?.groupBy { it.name }
+                ?.map { (name, exercises) ->
+                TrainingStatisticsItem(
+                    name,
+                    exercises.first().type,
+                    exercises.sumOf { it.reps * it.sets },
+                    exercises.sumOf { it.reps * it.setsDone }
+                )
+            } ?: emptyList()
+        )
     }
     private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
         copy(exerciseToEdit = it)
@@ -266,7 +278,8 @@ data class TrainingUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val trainingDaysWithCompleteness: List<TrainingDayWithCompleteness> = emptyList(),
     val currentDay: TrainingDayWithExercises? = null,
-    val exerciseToEdit: Exercise? = null
+    val exerciseToEdit: Exercise? = null,
+    val currentDayStatistics: List<TrainingStatisticsItem> = emptyList()
 )
 
 data class CalendarUiModel(
@@ -289,3 +302,10 @@ data class CalendarUiModel(
         }
     }
 }
+
+data class TrainingStatisticsItem(
+    val exerciseName: String,
+    val exerciseType: ExerciseType,
+    val repsToDo: Int,
+    val repsDone: Int
+)

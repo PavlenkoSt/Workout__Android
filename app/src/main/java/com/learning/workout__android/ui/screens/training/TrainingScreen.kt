@@ -76,7 +76,9 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 footer = {
                     TrainingFooter(
                         text = if (ui.currentDay != null) { "+ Add exercise" } else { "Create training" },
-                        onClick = { showBottomSheet = true })
+                        onClick = { showBottomSheet = true },
+                        statistics= ui.currentDayStatistics
+                    )
                 },
                 header = {
                     TrainingHeader(
@@ -88,7 +90,8 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                         },
                         onSaveAsPresetClick = {
                             // TODO add this after implemented presets
-                        }
+                        },
+                        hasExercises = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false
                     )
                 },
                 emptyMessage = {
