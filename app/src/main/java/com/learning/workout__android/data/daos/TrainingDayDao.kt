@@ -8,16 +8,25 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.TrainingDay
+import com.learning.workout__android.data.models.TrainingDayWithCompleteness
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingDayDao {
     @Query("""
-        SELECT * FROM training_days
-    """)
-    @Transaction
-    fun getAll(): Flow<List<TrainingDayWithExercises>>
+    SELECT training_days.*, 
+           CASE 
+               WHEN COUNT(exercises.id) > 0 
+                    AND COUNT(exercises.id) = COUNT(CASE WHEN exercises.setsDone >= exercises.sets THEN 1 END)
+               THEN 1 
+               ELSE 0 
+           END as isCompleted
+    FROM training_days
+    LEFT JOIN exercises ON exercises.trainingDayId = training_days.id
+    GROUP BY training_days.id
+""")
+    fun getAllWithCompleteness(): Flow<List<TrainingDayWithCompleteness>>
 
     @Query(value = """
         SELECT * FROM training_days WHERE date = :date

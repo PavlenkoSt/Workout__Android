@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.ui.components.Calendar
+import com.learning.workout__android.ui.components.Calendar.Calendar
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.TrainingViewModel
@@ -66,6 +66,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 initialWeekStart = initialWeekStart,
                 initialPage = initialPage,
                 title = ui.title,
+                trainingDaysWithCompleteness = ui.trainingDaysWithCompleteness
             )
 
             ExerciseList(

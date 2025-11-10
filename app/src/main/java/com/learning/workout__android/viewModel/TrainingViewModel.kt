@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.TrainingDayWithCompleteness
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import kotlinx.coroutines.Dispatchers
@@ -44,14 +45,11 @@ class TrainingViewModel(
     private val initialWeekStart: LocalDate =
         LocalDate.now().with(java.time.DayOfWeek.MONDAY)
 
-    // UI-driven: currently visible week start (fed by pager)
     private val _visibleWeekStart = MutableStateFlow(initialWeekStart)
 
-    // Selected date lives here (authoritative)
     private val _selectedDate = MutableStateFlow(LocalDate.now())
 
-    // All days for list; and current day for selected date
-    private val allDaysFlow = trainingDayRepository.getAll() // Flow<List<TrainingDay>>
+    private val trainingDaysWithCompleteness = trainingDayRepository.getAllTrainingDaysWithCompleteness()
 
     private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
 
@@ -61,13 +59,11 @@ class TrainingViewModel(
             trainingDayRepository.getByDate(date.toString())
         }
 
-    // Calendar model for the visible week (computed here, no separate VM needed)
     private val calendarUiFlow: Flow<CalendarUiModel> =
         combine(_visibleWeekStart, _selectedDate) { start, selected ->
             makeCalendarUi(start, selected)
         }
 
-    // Title like "October & November 2025"
     private val titleFlow: Flow<String> =
         calendarUiFlow.map { ui ->
             val week = ui.week
@@ -83,14 +79,24 @@ class TrainingViewModel(
             }
         }
 
-    private val calendarReducers = calendarUiFlow.toReducer<TrainingUiState, CalendarUiModel> { copy(calendar = it) }
-    private val titleReducers    = titleFlow.toReducer<TrainingUiState, String>       { copy(title = it) }
-    private val dateReducers     = _selectedDate.toReducer<TrainingUiState, LocalDate>   { copy(selectedDate = it) }
-    private val allDaysReducers  = allDaysFlow.toReducer<TrainingUiState, List<TrainingDayWithExercises>>     { copy(trainingDays = it) }
+    private val calendarReducers = calendarUiFlow.toReducer<TrainingUiState, CalendarUiModel> {
+        copy(calendar = it)
+    }
+    private val titleReducers    = titleFlow.toReducer<TrainingUiState, String> {
+        copy(title = it)
+    }
+    private val dateReducers     = _selectedDate.toReducer<TrainingUiState, LocalDate> {
+        copy(selectedDate = it)
+    }
+    private val allDaysReducers  = trainingDaysWithCompleteness.toReducer<TrainingUiState, List<TrainingDayWithCompleteness>> {
+        copy(trainingDaysWithCompleteness = it)
+    }
     private val dayReducers      = selectedDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
         copy(currentDay = it)
     }
-    private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?>  { copy(exerciseToEdit = it) }
+    private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
+        copy(exerciseToEdit = it)
+    }
 
     val uiState: StateFlow<TrainingUiState> =
         merge(calendarReducers, titleReducers, dateReducers, allDaysReducers, dayReducers, editReducers)
@@ -258,7 +264,7 @@ data class TrainingUiState(
     val title: String = "",
     val calendar: CalendarUiModel = CalendarUiModel.empty(),
     val selectedDate: LocalDate = LocalDate.now(),
-    val trainingDays: List<TrainingDayWithExercises> = emptyList(),
+    val trainingDaysWithCompleteness: List<TrainingDayWithCompleteness> = emptyList(),
     val currentDay: TrainingDayWithExercises? = null,
     val exerciseToEdit: Exercise? = null
 )

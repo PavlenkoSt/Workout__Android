@@ -68,3 +68,15 @@ class Converters {
     fun fromType(type: ExerciseType): String = type.name
     @TypeConverter fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
 }
+
+data class TrainingDayWithCompleteness(
+    @Embedded val trainingDay: TrainingDay,
+    val isCompleted: Boolean
+)
+
+enum class TrainingDayStatus() {
+    NONE,
+    COMPLETED,
+    PENDING,
+    FAILED
+}

@@ -1,14 +1,9 @@
-package com.learning.workout__android.ui.components
+package com.learning.workout__android.ui.components.Calendar
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
@@ -16,8 +11,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,9 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.dataSources.CalendarDataSource
+import com.learning.workout__android.data.models.TrainingDayStatus
+import com.learning.workout__android.data.models.TrainingDayWithCompleteness
 import com.learning.workout__android.viewModel.CalendarUiModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -41,7 +35,8 @@ fun Calendar(
     pagerState: PagerState,
     initialPage: Int,
     initialWeekStart: LocalDate,
-    onDateClick: (CalendarUiModel.Date) -> Unit
+    onDateClick: (CalendarUiModel.Date) -> Unit,
+    trainingDaysWithCompleteness: List<TrainingDayWithCompleteness>
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -78,7 +73,8 @@ fun Calendar(
             DaysRow(
                 data = rowCalendar,
                 onDateClick = onDateClick,
-                activeDate = calendarUiModel.selectedDate.date
+                activeDate = calendarUiModel.selectedDate.date,
+                trainingDaysWithCompleteness = trainingDaysWithCompleteness
             )
         }
     }
@@ -116,75 +112,40 @@ private fun Header(
 fun DaysRow(
     data: CalendarUiModel,
     onDateClick: (CalendarUiModel.Date) -> Unit,
-    activeDate: LocalDate
+    activeDate: LocalDate,
+    trainingDaysWithCompleteness: List<TrainingDayWithCompleteness>
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         data.week.forEach { date ->
-            Day(
+            CalendarDay(
                 date = date,
                 onClick = onDateClick,
                 modifier = Modifier
                     .padding(vertical = 4.dp, horizontal = 2.dp)
                     .weight(1f),
-                isActive = activeDate == date.date // compare LocalDate directly
+                isActive = activeDate == date.date,
+                trainingDayStatus = getTrainingDayStatus(
+                    trainingDaysWithCompleteness.find { it.trainingDay.date == date.date.toString() }
+                )
             )
         }
     }
 }
 
-@Composable
-fun Day(
-    date: CalendarUiModel.Date,
-    onClick: (CalendarUiModel.Date) -> Unit,
-    modifier: Modifier = Modifier,
-    isActive: Boolean
-) {
-    Card(
-        modifier = modifier.clickable { onClick(date) },
-        border = BorderStroke(
-            width = 2.dp,
-            color = MaterialTheme.colorScheme.scrim
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isActive) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.primary
-            }
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .height(56.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = date.day,
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = date.date.dayOfMonth.toString(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        if (date.isToday) {
-            Text(
-                text = "Today",
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
-                    .background(
-                        if (isActive) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.secondary
-                    )
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-            )
-        }
+fun getTrainingDayStatus (day: TrainingDayWithCompleteness?): TrainingDayStatus {
+    if(day == null) {
+        return TrainingDayStatus.NONE
     }
+
+    if(day.isCompleted) {
+        return TrainingDayStatus.COMPLETED
+    }
+
+    val isInPast = LocalDate.parse(day.trainingDay.date).isBefore(LocalDate.now())
+
+    if(isInPast) {
+        return TrainingDayStatus.FAILED
+    }
+
+    return TrainingDayStatus.PENDING
 }
