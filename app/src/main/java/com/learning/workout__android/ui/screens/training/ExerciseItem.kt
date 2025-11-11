@@ -129,7 +129,8 @@ fun ExerciseItem(
                             top = 8.dp,
                             start = 8.dp,
                             end = 8.dp
-                        )
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if(
                         exercise.type == ExerciseType.DYNAMIC ||
@@ -211,7 +212,7 @@ private fun ExerciseAnimatedProgressBar (
         LinearProgressIndicator(
             progress = { animatedProgress },
             modifier = Modifier.fillMaxWidth(),
-            trackColor = MaterialTheme.colorScheme.onPrimary,
+            trackColor = MaterialTheme.colorScheme.surfaceContainer,
             color = MaterialTheme.colorScheme.primary,
             strokeCap = StrokeCap.Round,
         )
@@ -228,8 +229,8 @@ private fun ExerciseStatItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(stat, fontSize = 12.sp, lineHeight = 14.sp)
-        Text(value, fontSize = 12.sp, lineHeight = 14.sp)
+        Text(stat, fontSize = 12.sp, lineHeight = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+        Text(value, fontSize = 12.sp, lineHeight = 14.sp, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 

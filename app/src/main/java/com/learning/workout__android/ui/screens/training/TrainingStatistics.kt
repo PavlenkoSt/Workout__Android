@@ -49,7 +49,7 @@ fun TrainingStatistics(
             onDismissRequest = {
                 expanded = false
             },
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 12.dp)
         ) {
             statistics.forEach {
                 StatisticItem(it)

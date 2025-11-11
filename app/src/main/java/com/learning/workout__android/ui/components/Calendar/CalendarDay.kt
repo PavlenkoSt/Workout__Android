@@ -53,9 +53,9 @@ fun CalendarDay(
         ),
         colors = CardDefaults.cardColors(
             containerColor = if (isActive) {
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.primaryContainer
             } else {
-                MaterialTheme.colorScheme.primary
+                MaterialTheme.colorScheme.surfaceContainer
             }
         ),
     ) {
@@ -69,11 +69,13 @@ fun CalendarDay(
             ) {
                 Text(
                     text = date.day,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if(isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = date.date.dayOfMonth.toString(),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if(isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -115,10 +117,7 @@ fun CalendarDay(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
-                    .background(
-                        if (isActive) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.secondary
-                    )
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 6.dp, vertical = 2.dp)
             )
         }

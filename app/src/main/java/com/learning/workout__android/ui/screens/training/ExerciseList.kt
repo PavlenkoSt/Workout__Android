@@ -140,7 +140,7 @@ private fun DraggableHandler (modifier: Modifier = Modifier) {
             .padding(vertical = 8.dp)
             .size(24.dp)
             .clip(ShapeDefaults.Large)
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surface)
     )
 }
 
