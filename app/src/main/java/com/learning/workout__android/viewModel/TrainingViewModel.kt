@@ -12,25 +12,23 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
-import com.learning.workout__android.data.models.TrainingDayWithCompleteness
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
+import com.learning.workout__android.utils.formatExerciseType
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -50,18 +48,26 @@ class TrainingViewModel(
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
 
-    private val trainingDaysWithCompleteness = trainingDayRepository.getAllTrainingDaysWithCompleteness()
+    private val allTrainingDaysWithLoading: Flow<LoadState<List<TrainingDayWithExercises>>> = trainingDayRepository.getAllTrainingDays()
+        .distinctUntilChanged()
+        .map<List<TrainingDayWithExercises>, LoadState<List<TrainingDayWithExercises>>> {
+            LoadState.Success(it)
+        }
+
+    private val allTrainingDays: Flow<List<TrainingDayWithExercises>> =
+        allTrainingDaysWithLoading
+            .filterIsInstance<LoadState.Success<List<TrainingDayWithExercises>>>()
+            .map { it.data }
+
+    private val currentDayFlow: Flow<TrainingDayWithExercises?> =
+        combine(allTrainingDays, _selectedDate) { allDays, selectedDate ->
+            allDays.firstOrNull { it.trainingDay.date == selectedDate.toString() }
+        }.distinctUntilChanged()
+
+    private val isLoadingFlow: Flow<Boolean> =
+        allTrainingDaysWithLoading.map { it is LoadState.Loading }
 
     private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentDayState: Flow<LoadState<TrainingDayWithExercises?>> =
-        _selectedDate.flatMapLatest { date ->
-            trainingDayRepository.getByDate(date.toString())
-                .distinctUntilChanged()
-                .map<TrainingDayWithExercises?, LoadState<TrainingDayWithExercises?>> { LoadState.Success(it) }
-                .onStart { emit(LoadState.Loading) }
-        }
 
     private val calendarUiFlow: Flow<CalendarUiModel> =
         combine(_visibleWeekStart, _selectedDate) { start, selected ->
@@ -92,22 +98,17 @@ class TrainingViewModel(
     private val dateReducers     = _selectedDate.toReducer<TrainingUiState, LocalDate> {
         copy(selectedDate = it)
     }
-    private val allDaysReducers  = trainingDaysWithCompleteness.toReducer<TrainingUiState, List<TrainingDayWithCompleteness>> {
-        copy(trainingDaysWithCompleteness = it)
+    private val allDaysReducers  = allTrainingDays.toReducer<TrainingUiState, List<TrainingDayWithExercises>> {
+        copy(allTrainingDays = it)
     }
-    private val dayReducers = currentDayState
-        .toReducer<TrainingUiState, LoadState<TrainingDayWithExercises?>> { load ->
-            when (load) {
-                is LoadState.Loading -> copy(isLoadingCurrentDay = true)
-                is LoadState.Success -> copy(
-                    currentDay = load.data,
-                    currentDayStatistics = buildStats(load.data),
-                    isLoadingCurrentDay = false
-                )
-            }
-        }
+    private val dayReducers = currentDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
+        copy(currentDay = it, currentDayStatistics = buildStats(it))
+    }
     private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
         copy(exerciseToEdit = it)
+    }
+    private val isLoadingReducer = isLoadingFlow.toReducer<TrainingUiState, Boolean> {
+        copy(isLoading = it)
     }
 
     val uiState: StateFlow<TrainingUiState> =
@@ -118,6 +119,7 @@ class TrainingViewModel(
             allDaysReducers,
             dayReducers,
             editReducers,
+            isLoadingReducer
         )
             .scan(TrainingUiState()) { state, reduce ->
                 reduce(state)
@@ -291,23 +293,29 @@ private fun buildStats(day: TrainingDayWithExercises?): List<TrainingStatisticsI
     day?.sortedExercises
         ?.groupBy { it.name }
         ?.map { (name, exercises) ->
+            val exerciseType = exercises.first().type
             TrainingStatisticsItem(
-                exerciseName = name,
-                exerciseType = exercises.first().type,
+                exerciseName = getStatItemName(name, exerciseType),
+                exerciseType = exerciseType,
                 repsToDo = exercises.sumOf { it.reps * it.sets },
                 repsDone = exercises.sumOf { it.reps * it.setsDone }
             )
         } ?: emptyList()
 
+private fun getStatItemName (name: String, exerciseType: ExerciseType): String {
+    if(name.isNotEmpty()) return name
+    return formatExerciseType(exerciseType.toString())
+}
+
 data class TrainingUiState(
     val title: String = "",
     val calendar: CalendarUiModel = CalendarUiModel.empty(),
     val selectedDate: LocalDate = LocalDate.now(),
-    val trainingDaysWithCompleteness: List<TrainingDayWithCompleteness> = emptyList(),
+    val allTrainingDays: List<TrainingDayWithExercises> = emptyList(),
     val currentDay: TrainingDayWithExercises? = null,
     val exerciseToEdit: Exercise? = null,
     val currentDayStatistics: List<TrainingStatisticsItem> = emptyList(),
-    val isLoadingCurrentDay: Boolean = true
+    val isLoading: Boolean = true
 )
 
 data class CalendarUiModel(

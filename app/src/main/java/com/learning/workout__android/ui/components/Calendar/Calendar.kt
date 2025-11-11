@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.dataSources.CalendarDataSource
 import com.learning.workout__android.data.models.TrainingDayStatus
-import com.learning.workout__android.data.models.TrainingDayWithCompleteness
+import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.viewModel.CalendarUiModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -36,7 +36,7 @@ fun Calendar(
     initialPage: Int,
     initialWeekStart: LocalDate,
     onDateClick: (CalendarUiModel.Date) -> Unit,
-    trainingDaysWithCompleteness: List<TrainingDayWithCompleteness>
+    allTrainingDays: List<TrainingDayWithExercises>
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -74,7 +74,7 @@ fun Calendar(
                 data = rowCalendar,
                 onDateClick = onDateClick,
                 activeDate = calendarUiModel.selectedDate.date,
-                trainingDaysWithCompleteness = trainingDaysWithCompleteness
+                allTrainingDays = allTrainingDays
             )
         }
     }
@@ -113,7 +113,7 @@ fun DaysRow(
     data: CalendarUiModel,
     onDateClick: (CalendarUiModel.Date) -> Unit,
     activeDate: LocalDate,
-    trainingDaysWithCompleteness: List<TrainingDayWithCompleteness>
+    allTrainingDays: List<TrainingDayWithExercises>
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         data.week.forEach { date ->
@@ -125,14 +125,14 @@ fun DaysRow(
                     .weight(1f),
                 isActive = activeDate == date.date,
                 trainingDayStatus = getTrainingDayStatus(
-                    trainingDaysWithCompleteness.find { it.trainingDay.date == date.date.toString() }
+                    allTrainingDays.find { it.trainingDay.date == date.date.toString() }
                 )
             )
         }
     }
 }
 
-fun getTrainingDayStatus (day: TrainingDayWithCompleteness?): TrainingDayStatus {
+fun getTrainingDayStatus (day: TrainingDayWithExercises?): TrainingDayStatus {
     if(day == null) {
         return TrainingDayStatus.NONE
     }

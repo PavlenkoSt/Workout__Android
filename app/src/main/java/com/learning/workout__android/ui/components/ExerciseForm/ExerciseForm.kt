@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.utils.formatExerciseType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,17 +137,6 @@ fun ExerciseForm(
             }
         }
     }
-}
-
-private fun formatExerciseType(type: String): String {
-    return type
-        .lowercase()
-        .replace("_", " ")
-        .split(" ")
-        .filter { it.isNotBlank() }
-        .joinToString(" ") { word ->
-            word.replaceFirstChar { it.uppercase() }
-        }
 }
 
 @Preview

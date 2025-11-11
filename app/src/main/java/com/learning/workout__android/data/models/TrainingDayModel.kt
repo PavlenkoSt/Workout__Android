@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -18,10 +17,10 @@ data class TrainingDayWithExercises (
     )
     val exercises: List<Exercise>
 ) {
-    // Sort exercises by order
-    // Marked as @Ignore since it's a computed property, not a database column
-    @Ignore
-    val sortedExercises: List<Exercise> = exercises.sortedBy { it.order }
+    val sortedExercises: List<Exercise>
+        get() = exercises.sortedBy { it.order }
+    val isCompleted: Boolean
+        get() = exercises.isNotEmpty() && exercises.all { it.setsDone >= it.sets }
 }
 
 @Entity(
@@ -71,11 +70,6 @@ class Converters {
     fun fromType(type: ExerciseType): String = type.name
     @TypeConverter fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
 }
-
-data class TrainingDayWithCompleteness(
-    @Embedded val trainingDay: TrainingDay,
-    val isCompleted: Boolean
-)
 
 enum class TrainingDayStatus() {
     NONE,

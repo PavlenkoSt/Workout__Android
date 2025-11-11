@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -57,93 +58,97 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         vm.onWeekVisible(start)
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column {
-            Calendar(
-                modifier = Modifier.fillMaxWidth(),
-                onDateClick = { date -> vm.onDateSelected(date.date) },
-                pagerState = pagerState,
-                calendarUiModel = ui.calendar,
-                initialWeekStart = initialWeekStart,
-                initialPage = initialPage,
-                title = ui.title,
-                trainingDaysWithCompleteness = ui.trainingDaysWithCompleteness
-            )
-            ExerciseList(
-                exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
-                onReorder = { from, to -> vm.reorderExercises(from, to) },
-                footer = {
-                    if (!ui.isLoadingCurrentDay) {
+    if (ui.isLoading) {
+        Box(modifier = modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    } else {
+        Box(modifier = modifier.fillMaxSize()) {
+            Column {
+                Calendar(
+                    modifier = Modifier.fillMaxWidth(),
+                    onDateClick = { date -> vm.onDateSelected(date.date) },
+                    pagerState = pagerState,
+                    calendarUiModel = ui.calendar,
+                    initialWeekStart = initialWeekStart,
+                    initialPage = initialPage,
+                    title = ui.title,
+                    allTrainingDays = ui.allTrainingDays
+                )
+                ExerciseList(
+                    exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
+                    onReorder = { from, to -> vm.reorderExercises(from, to) },
+                    footer = {
                         TrainingFooter(
                             text = if (ui.currentDay != null) { "+ Add exercise" } else { "Create training" },
                             onClick = { showBottomSheet = true },
                             statistics= ui.currentDayStatistics
                         )
-                    }
-                },
-                header = {
-                    TrainingHeader(
-                        currentDate = ui.selectedDate,
-                        modifier = Modifier.fillMaxWidth(),
-                        isTrainingDay = ui.currentDay != null,
-                        onDeleteTrainingDay = {
-                            vm.deleteTrainingDay(ui.selectedDate)
-                        },
-                        onSaveAsPresetClick = {
-                            // TODO add this after implemented presets
-                        },
-                        hasExercises = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false
-                    )
-                },
-                emptyMessage = {
-                    if(ui.currentDay != null && !ui.isLoadingCurrentDay) {
-                        Box (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp, horizontal = 12.dp)
-                        ) {
-                            Text(
-                                text = "No exercises yet",
-                                modifier = Modifier.align(Alignment.Center)
-                            )
+                    },
+                    header = {
+                        TrainingHeader(
+                            currentDate = ui.selectedDate,
+                            modifier = Modifier.fillMaxWidth(),
+                            isTrainingDay = ui.currentDay != null,
+                            onDeleteTrainingDay = {
+                                vm.deleteTrainingDay(ui.selectedDate)
+                            },
+                            onSaveAsPresetClick = {
+                                // TODO add this after implemented presets
+                            },
+                            hasExercises = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false
+                        )
+                    },
+                    emptyMessage = {
+                        if(ui.currentDay != null && ui.currentDay?.exercises?.isEmpty() == true) {
+                            Box (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 12.dp)
+                            ) {
+                                Text(
+                                    text = "No exercises yet",
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
                         }
+                    },
+                    onDeleteExercise = { vm.deleteExercise(it) },
+                    onSwipeToEditExercise= {
+                        vm.setExerciseToEdit(it)
+                        showBottomSheet = true
+                    },
+                    onDecrementExercise = {
+                        vm.updateExercise(it.copy(
+                            setsDone = if (it.setsDone > 0) it.setsDone - 1 else 0
+                        ))
+                    },
+                    onIncrementExercise = {
+                        vm.updateExercise(it.copy(
+                            setsDone = it.setsDone + 1
+                        ))
                     }
-                },
-                onDeleteExercise = { vm.deleteExercise(it) },
-                onSwipeToEditExercise= {
-                    vm.setExerciseToEdit(it)
-                    showBottomSheet = true
-                },
-                onDecrementExercise = {
-                    vm.updateExercise(it.copy(
-                        setsDone = if (it.setsDone > 0) it.setsDone - 1 else 0
-                    ))
-                },
-                onIncrementExercise = {
-                    vm.updateExercise(it.copy(
-                        setsDone = it.setsDone + 1
-                    ))
-                }
-            )
-        }
+                )
+            }
 
-        if (!ui.calendar.selectedDate.isToday) {
-            TodayFloatBtn(
-                onClick = {
-                    val monday = vm.scrollToToday()
-                    // jump pager to that week
-                    val base = LocalDate.now().with(DayOfWeek.MONDAY)
-                    val deltaWeeks = ChronoUnit.WEEKS.between(
-                        base, monday
-                    ).toInt()
-                    val target = initialPage + deltaWeeks
-                    // animate
-                    coroutineScope.launch { pagerState.animateScrollToPage(target) }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            )
+            if (!ui.calendar.selectedDate.isToday) {
+                TodayFloatBtn(
+                    onClick = {
+                        val monday = vm.scrollToToday()
+                        // jump pager to that week
+                        val base = LocalDate.now().with(DayOfWeek.MONDAY)
+                        val deltaWeeks = ChronoUnit.WEEKS.between(
+                            base, monday
+                        ).toInt()
+                        val target = initialPage + deltaWeeks
+                        // animate
+                        coroutineScope.launch { pagerState.animateScrollToPage(target) }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                )
+            }
         }
     }
 
