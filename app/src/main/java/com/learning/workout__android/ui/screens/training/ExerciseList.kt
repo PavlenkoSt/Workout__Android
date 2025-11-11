@@ -43,6 +43,7 @@ fun ExerciseList(
     onIncrementExercise: (exercise: Exercise) -> Unit,
     onDecrementExercise: (exercise: Exercise) -> Unit,
     onSwipeToEditExercise: (exercise: Exercise) -> Unit,
+    onListReady: () -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit,
     emptyMessage: @Composable () -> Unit
@@ -56,11 +57,11 @@ fun ExerciseList(
     // Update local state when the source list changes (but not during reordering)
     LaunchedEffect(exercisesList) {
         if (!isReordering) {
-            // Only update if the lists are actually different to avoid unnecessary updates
             if (localExercises.size != exercisesList.size ||
                 localExercises != exercisesList) {
                 localExercises.clear()
                 localExercises.addAll(exercisesList)
+                onListReady()
             }
         }
     }
@@ -167,7 +168,8 @@ fun ExerciseListPreview() {
            onSwipeToEditExercise = {},
            onDecrementExercise = {},
            onIncrementExercise = {},
-           emptyMessage = {}
+           emptyMessage = {},
+           onListReady = {}
        )
     }
 }
