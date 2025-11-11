@@ -15,12 +15,12 @@ import com.learning.workout__android.viewModel.TrainingStatisticsItem
 fun TrainingFooter(
     text: String,
     onClick: () -> Unit,
-    statistics:  List<TrainingStatisticsItem>
-){
-    Box (
+    statistics: List<TrainingStatisticsItem>
+) {
+    Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-       if(statistics.isNotEmpty()) {
+        if (statistics.isNotEmpty()) {
             TrainingStatistics(
                 statistics = statistics,
                 modifier = Modifier.align(Alignment.CenterStart)

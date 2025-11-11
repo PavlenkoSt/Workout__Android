@@ -1,6 +1,11 @@
 package com.learning.workout__android.ui.screens.training
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -82,12 +87,23 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 AnimatedContent(
                     targetState = ui.selectedDate,
                     label = "ExerciseListDaySwitch",
+                    transitionSpec = {
+                        if (targetState.isAfter(initialState)) {
+                            slideInHorizontally { width -> width } + fadeIn() togetherWith
+                                    slideOutHorizontally { width -> width } + fadeOut()
+                        } else if (targetState.isBefore(initialState)) {
+                            slideInHorizontally { width -> -width } + fadeIn() togetherWith
+                                    slideOutHorizontally { width -> -width } + fadeOut()
+                        } else {
+                            fadeIn() togetherWith fadeOut()
+                        }
+                    },
                 ) {
                     ExerciseList(
                         exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
                         onReorder = { from, to -> vm.reorderExercises(from, to) },
                         footer = {
-                            if(listReady){
+                            if (listReady) {
                                 TrainingFooter(
                                     text = if (ui.currentDay != null) {
                                         "+ Add exercise"

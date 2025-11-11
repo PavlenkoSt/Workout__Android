@@ -41,10 +41,26 @@ class ExerciseFormDefaultViewModel : ViewModel() {
                 validator = ::validateNonNegativeInt
             )
 
-            ExerciseDefaultFormEvent.NameBlur -> blur("name", ::validateName) { it.copy(name = it.name.copy(touched = true)) }
-            ExerciseDefaultFormEvent.RepsBlur -> blur("reps", ::validatePositiveInt) { it.copy(reps = it.reps.copy(touched = true)) }
-            ExerciseDefaultFormEvent.SetsBlur -> blur("sets", ::validatePositiveInt) { it.copy(sets = it.sets.copy(touched = true)) }
-            ExerciseDefaultFormEvent.RestBlur -> blur("rest", ::validateNonNegativeInt) { it.copy(rest = it.rest.copy(touched = true)) }
+            ExerciseDefaultFormEvent.NameBlur -> blur(
+                "name",
+                ::validateName
+            ) { it.copy(name = it.name.copy(touched = true)) }
+
+            ExerciseDefaultFormEvent.RepsBlur -> blur(
+                "reps",
+                ::validatePositiveInt
+            ) { it.copy(reps = it.reps.copy(touched = true)) }
+
+            ExerciseDefaultFormEvent.SetsBlur -> blur(
+                "sets",
+                ::validatePositiveInt
+            ) { it.copy(sets = it.sets.copy(touched = true)) }
+
+            ExerciseDefaultFormEvent.RestBlur -> blur("rest", ::validateNonNegativeInt) {
+                it.copy(
+                    rest = it.rest.copy(touched = true)
+                )
+            }
         }
     }
 

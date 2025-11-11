@@ -1,6 +1,6 @@
 import com.learning.workout__android.data.models.ExerciseType
 
-data class ExerciseDefaultFormResult (
+data class ExerciseDefaultFormResult(
     val name: String,
     val type: ExerciseType,
     val reps: Number,

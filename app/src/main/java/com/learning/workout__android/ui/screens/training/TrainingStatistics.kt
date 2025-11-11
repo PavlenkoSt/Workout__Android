@@ -32,7 +32,7 @@ import com.learning.workout__android.viewModel.TrainingStatisticsItem
 
 @Composable
 fun TrainingStatistics(
-    statistics:  List<TrainingStatisticsItem>,
+    statistics: List<TrainingStatisticsItem>,
     modifier: Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -69,19 +69,21 @@ private fun StatisticItem(item: TrainingStatisticsItem) {
         )
         Spacer(modifier = Modifier.width(32.dp))
         Row() {
-            if(item.exerciseType == ExerciseType.STATIC || item.exerciseType == ExerciseType.DYNAMIC) {
+            if (item.exerciseType == ExerciseType.STATIC || item.exerciseType == ExerciseType.DYNAMIC) {
                 Text(
                     text = "${item.repsDone}/${item.repsToDo} ${if (item.exerciseType == ExerciseType.STATIC) "sec" else "reps"}",
                     fontSize = 12.sp
                 )
             }
             Box(modifier = Modifier.size(24.dp)) {
-                if(item.repsDone >= item.repsToDo) {
+                if (item.repsDone >= item.repsToDo) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         tint = Color(0xFF14B8A6),
                         contentDescription = "Check",
-                        modifier = Modifier.size(16.dp).align(Alignment.Center)
+                        modifier = Modifier
+                            .size(16.dp)
+                            .align(Alignment.Center)
                     )
                 }
             }
@@ -95,10 +97,20 @@ private fun StatisticItemPreview() {
     Workout__AndroidTheme {
         Column {
             StatisticItem(
-                item = TrainingStatisticsItem("Pull ups", ExerciseType.DYNAMIC, repsToDo = 20, repsDone = 10)
+                item = TrainingStatisticsItem(
+                    "Pull ups",
+                    ExerciseType.DYNAMIC,
+                    repsToDo = 20,
+                    repsDone = 10
+                )
             )
             StatisticItem(
-                item = TrainingStatisticsItem("Pull ups", ExerciseType.STATIC, repsToDo = 10, repsDone = 20)
+                item = TrainingStatisticsItem(
+                    "Pull ups",
+                    ExerciseType.STATIC,
+                    repsToDo = 10,
+                    repsDone = 20
+                )
             )
         }
     }

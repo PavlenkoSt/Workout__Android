@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import androidx.room.TypeConverter
 
-data class TrainingDayWithExercises (
+data class TrainingDayWithExercises(
     @Embedded val trainingDay: TrainingDay,
     @Relation(
         parentColumn = "id",
@@ -27,7 +27,7 @@ data class TrainingDayWithExercises (
     tableName = "training_days",
     indices = [Index(value = ["date"], unique = true)]
 )
-data class TrainingDay (
+data class TrainingDay(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "date") val date: String
 )
@@ -44,7 +44,7 @@ data class TrainingDay (
     ],
     indices = [Index("trainingDayId")]
 )
-data class Exercise (
+data class Exercise(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "trainingDayId") val trainingDayId: Long,
     @ColumnInfo(name = "name") val name: String,
@@ -68,7 +68,8 @@ enum class ExerciseType(val label: String) {
 class Converters {
     @TypeConverter
     fun fromType(type: ExerciseType): String = type.name
-    @TypeConverter fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
+    @TypeConverter
+    fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
 }
 
 enum class TrainingDayStatus() {

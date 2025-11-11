@@ -51,13 +51,15 @@ fun ExerciseFormDefault(
     val restFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(seed, exerciseToEdit) {
-        if(exerciseToEdit != null) {
-            vm.seed(SharedSeed(
-                name = exerciseToEdit.name,
-                rest = exerciseToEdit.rest.toString(),
-                sets = exerciseToEdit.sets.toString(),
-                reps = exerciseToEdit.reps.toString()
-            ))
+        if (exerciseToEdit != null) {
+            vm.seed(
+                SharedSeed(
+                    name = exerciseToEdit.name,
+                    rest = exerciseToEdit.rest.toString(),
+                    sets = exerciseToEdit.sets.toString(),
+                    reps = exerciseToEdit.reps.toString()
+                )
+            )
             return@LaunchedEffect
         }
         vm.seed(seed)
@@ -77,10 +79,10 @@ fun ExerciseFormDefault(
         }
     }
 
-    Column (modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = ui.name.value,
-            onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.NameChanged(it))},
+            onValueChange = { vm.onEvent(ExerciseDefaultFormEvent.NameChanged(it)) },
             modifier = Modifier.fillMaxWidth(),
             isError = ui.name.touched && ui.name.error != null,
             supportingText = {
@@ -100,10 +102,10 @@ fun ExerciseFormDefault(
             ),
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Row (modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = ui.reps.value,
-                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.RepsChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseDefaultFormEvent.RepsChanged(it)) },
                 isError = ui.reps.touched && ui.reps.error != null,
                 supportingText = {
                     if (ui.reps.touched && ui.reps.error != null) Text(ui.reps.error!!)
@@ -112,7 +114,13 @@ fun ExerciseFormDefault(
                     .weight(1f)
                     .focusRequester(repsFocusRequester),
                 label = {
-                    Text(text = if(isStatic == true) {"Hold (sec)"} else {"Reps"})
+                    Text(
+                        text = if (isStatic == true) {
+                            "Hold (sec)"
+                        } else {
+                            "Reps"
+                        }
+                    )
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -128,7 +136,7 @@ fun ExerciseFormDefault(
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 value = ui.sets.value,
-                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.SetsChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseDefaultFormEvent.SetsChanged(it)) },
                 isError = ui.sets.touched && ui.sets.error != null,
                 supportingText = {
                     if (ui.sets.touched && ui.sets.error != null) Text(ui.sets.error!!)
@@ -153,7 +161,7 @@ fun ExerciseFormDefault(
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 value = ui.rest.value,
-                onValueChange = {vm.onEvent(ExerciseDefaultFormEvent.RestChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseDefaultFormEvent.RestChanged(it)) },
                 isError = ui.rest.touched && ui.rest.error != null,
                 supportingText = {
                     if (ui.rest.touched && ui.rest.error != null) Text(ui.rest.error!!)
@@ -179,7 +187,7 @@ fun ExerciseFormDefault(
         Spacer(modifier = Modifier.height(4.dp))
         ExerciseFormSubmitBtn(onClick = {
             val isValid = vm.submit()
-            if(!isValid) return@ExerciseFormSubmitBtn
+            if (!isValid) return@ExerciseFormSubmitBtn
             val result = ExerciseDefaultFormResult(
                 ui.name.value,
                 type = exerciseType,

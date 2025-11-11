@@ -12,7 +12,7 @@ import com.learning.workout__android.data.models.TrainingDay
 
 @Database(entities = [TrainingDay::class, Exercise::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun trainingDayDao(): TrainingDayDao
 
     companion object {

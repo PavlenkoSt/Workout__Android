@@ -17,23 +17,29 @@ interface TrainingDayDao {
     @Transaction
     fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>>
 
-    @Query(value = """
+    @Query(
+        value = """
         SELECT * FROM training_days WHERE date = :date
-    """)
+    """
+    )
     fun getDayByDate(date: String): Flow<TrainingDayWithExercises?>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM exercises 
         WHERE trainingDayId = :trainingDayId 
         ORDER BY "order" ASC
-    """)
+    """
+    )
     suspend fun getExercisesByTrainingDayId(trainingDayId: Long): List<Exercise>
-    
-    @Query("""
+
+    @Query(
+        """
         UPDATE exercises 
         SET "order" = :order 
         WHERE id = :exerciseId
-    """)
+    """
+    )
     suspend fun updateExerciseOrder(exerciseId: Long, order: Int)
 
     @Query("DELETE FROM training_days WHERE date = :date")

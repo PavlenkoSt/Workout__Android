@@ -35,7 +35,7 @@ fun ExerciseForm(
     onSimpleExerciseSubmit: (formResult: ExerciseSimpleFormResult) -> Unit,
     exerciseToEdit: Exercise?
 ) {
-    val exerciseTypes = if(exerciseToEdit != null) listOf(
+    val exerciseTypes = if (exerciseToEdit != null) listOf(
         ExerciseType.DYNAMIC,
         ExerciseType.STATIC,
         ExerciseType.HAND_BALANCE_SESSION,
@@ -54,17 +54,17 @@ fun ExerciseForm(
 
     var sharedSeed by remember { mutableStateOf(SharedSeed()) }
 
-    fun onSaveSeed (seed: SharedSeed) {
+    fun onSaveSeed(seed: SharedSeed) {
         sharedSeed = seed
     }
 
     LaunchedEffect(exerciseToEdit?.type) {
-        if(exerciseToEdit != null) {
+        if (exerciseToEdit != null) {
             selectedType = exerciseToEdit.type
         }
     }
 
-    Column (modifier = Modifier.padding(horizontal = 8.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
@@ -76,7 +76,9 @@ fun ExerciseForm(
                 readOnly = true,
                 label = { Text("Exercise Type") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
             )
 
             ExposedDropdownMenu(
@@ -95,7 +97,7 @@ fun ExerciseForm(
             }
         }
 
-        when(selectedType) {
+        when (selectedType) {
             ExerciseType.DYNAMIC -> {
                 ExerciseFormDefault(
                     exerciseToEdit = exerciseToEdit,
@@ -105,6 +107,7 @@ fun ExerciseForm(
                     onSaveSeed = { onSaveSeed(it) }
                 )
             }
+
             ExerciseType.STATIC -> {
                 ExerciseFormDefault(
                     isStatic = true,
@@ -115,6 +118,7 @@ fun ExerciseForm(
                     onSaveSeed = { onSaveSeed(it) }
                 )
             }
+
             ExerciseType.LADDER -> {
                 ExerciseFormLadder(
                     onLadderExerciseSubmit = onLadderExerciseSubmit,
@@ -123,8 +127,9 @@ fun ExerciseForm(
                     onSaveSeed = { onSaveSeed(it) }
                 )
             }
+
             else -> {
-                LaunchedEffect (Unit) {
+                LaunchedEffect(Unit) {
                     onSaveSeed(SharedSeed())
                 }
 
@@ -141,7 +146,7 @@ fun ExerciseForm(
 
 @Preview
 @Composable
-fun ExerciseFormPreview () {
+fun ExerciseFormPreview() {
     Workout__AndroidTheme {
         ExerciseForm(
             onLadderExerciseSubmit = {},

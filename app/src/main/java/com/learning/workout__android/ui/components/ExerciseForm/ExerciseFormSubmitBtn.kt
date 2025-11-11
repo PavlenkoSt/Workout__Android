@@ -12,6 +12,12 @@ fun ExerciseFormSubmitBtn(
     isEditing: Boolean
 ) {
     Button(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Text(text =  if(isEditing) {"Update"} else {"Add +"})
+        Text(
+            text = if (isEditing) {
+                "Update"
+            } else {
+                "Add +"
+            }
+        )
     }
 }

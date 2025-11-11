@@ -48,11 +48,31 @@ class ExerciseFormLadderViewModel : ViewModel() {
                 validator = ::validateNonNegativeInt
             )
 
-            ExerciseLadderFormEvent.NameBlur -> blur("name", ::validateName) { it.copy(name = it.name.copy(touched = true)) }
-            ExerciseLadderFormEvent.FromBlur -> blur("from", ::validatePositiveInt) { it.copy(from = it.from.copy(touched = true)) }
-            ExerciseLadderFormEvent.ToBlur -> blur("to", ::validatePositiveInt) { it.copy(to = it.to.copy(touched = true)) }
-            ExerciseLadderFormEvent.StepBlur -> blur("step", ::validatePositiveInt) { it.copy(step = it.step.copy(touched = true)) }
-            ExerciseLadderFormEvent.RestBlur -> blur("rest", ::validateNonNegativeInt) { it.copy(rest = it.rest.copy(touched = true)) }
+            ExerciseLadderFormEvent.NameBlur -> blur(
+                "name",
+                ::validateName
+            ) { it.copy(name = it.name.copy(touched = true)) }
+
+            ExerciseLadderFormEvent.FromBlur -> blur(
+                "from",
+                ::validatePositiveInt
+            ) { it.copy(from = it.from.copy(touched = true)) }
+
+            ExerciseLadderFormEvent.ToBlur -> blur(
+                "to",
+                ::validatePositiveInt
+            ) { it.copy(to = it.to.copy(touched = true)) }
+
+            ExerciseLadderFormEvent.StepBlur -> blur(
+                "step",
+                ::validatePositiveInt
+            ) { it.copy(step = it.step.copy(touched = true)) }
+
+            ExerciseLadderFormEvent.RestBlur -> blur("rest", ::validateNonNegativeInt) {
+                it.copy(
+                    rest = it.rest.copy(touched = true)
+                )
+            }
         }
     }
 

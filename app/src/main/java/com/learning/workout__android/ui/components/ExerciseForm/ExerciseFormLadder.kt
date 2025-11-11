@@ -49,13 +49,15 @@ fun ExerciseFormLadder(
     val restFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(seed, exerciseToEdit) {
-        if(exerciseToEdit != null) {
-            vm.seed(SharedSeed(
-                name = exerciseToEdit.name,
-                rest = exerciseToEdit.rest.toString(),
-                sets = exerciseToEdit.sets.toString(),
-                reps = exerciseToEdit.reps.toString()
-            ))
+        if (exerciseToEdit != null) {
+            vm.seed(
+                SharedSeed(
+                    name = exerciseToEdit.name,
+                    rest = exerciseToEdit.rest.toString(),
+                    sets = exerciseToEdit.sets.toString(),
+                    reps = exerciseToEdit.reps.toString()
+                )
+            )
             return@LaunchedEffect
         }
         vm.seed(seed)
@@ -68,10 +70,10 @@ fun ExerciseFormLadder(
         }
     }
 
-    Column (modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = ui.name.value,
-            onValueChange = {vm.onEvent(ExerciseLadderFormEvent.NameChanged(it))},
+            onValueChange = { vm.onEvent(ExerciseLadderFormEvent.NameChanged(it)) },
             modifier = Modifier.fillMaxWidth(),
             isError = ui.name.touched && ui.name.error != null,
             supportingText = {
@@ -91,10 +93,10 @@ fun ExerciseFormLadder(
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Row (modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = ui.from.value,
-                onValueChange = {vm.onEvent(ExerciseLadderFormEvent.FromChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseLadderFormEvent.FromChanged(it)) },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(fromFocusRequester),
@@ -119,7 +121,7 @@ fun ExerciseFormLadder(
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 value = ui.to.value,
-                onValueChange = {vm.onEvent(ExerciseLadderFormEvent.ToChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseLadderFormEvent.ToChanged(it)) },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(toFocusRequester),
@@ -144,7 +146,7 @@ fun ExerciseFormLadder(
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 value = ui.step.value,
-                onValueChange = {vm.onEvent(ExerciseLadderFormEvent.StepChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseLadderFormEvent.StepChanged(it)) },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(stepFocusRequester),
@@ -169,7 +171,7 @@ fun ExerciseFormLadder(
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 value = ui.rest.value,
-                onValueChange = {vm.onEvent(ExerciseLadderFormEvent.RestChanged(it))},
+                onValueChange = { vm.onEvent(ExerciseLadderFormEvent.RestChanged(it)) },
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(restFocusRequester),
@@ -195,7 +197,7 @@ fun ExerciseFormLadder(
         Spacer(modifier = Modifier.width(8.dp))
         ExerciseFormSubmitBtn(onClick = {
             val isValid = vm.submit()
-            if(!isValid) return@ExerciseFormSubmitBtn
+            if (!isValid) return@ExerciseFormSubmitBtn
             val result = ExerciseLadderFormResult(
                 name = ui.name.value,
                 from = ui.from.value.toInt(),

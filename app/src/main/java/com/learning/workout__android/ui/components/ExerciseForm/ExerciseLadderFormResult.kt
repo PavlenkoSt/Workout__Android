@@ -1,5 +1,4 @@
-
-data class ExerciseLadderFormResult (
+data class ExerciseLadderFormResult(
     val name: String,
     val from: Number,
     val to: Number,

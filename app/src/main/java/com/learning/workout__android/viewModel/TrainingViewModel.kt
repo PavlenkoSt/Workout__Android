@@ -33,10 +33,12 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 typealias Reducer<S> = (S) -> S
+
 private inline fun <S, T> Flow<T>.toReducer(
     crossinline update: S.(T) -> S
 
 ): Flow<Reducer<S>> = distinctUntilChanged().map { v -> { s: S -> s.update(v) } }
+
 class TrainingViewModel(
     private val trainingDayRepository: TrainingDayRepository
 ) : ViewModel() {
@@ -48,11 +50,12 @@ class TrainingViewModel(
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
 
-    private val allTrainingDaysWithLoading: Flow<LoadState<List<TrainingDayWithExercises>>> = trainingDayRepository.getAllTrainingDays()
-        .distinctUntilChanged()
-        .map<List<TrainingDayWithExercises>, LoadState<List<TrainingDayWithExercises>>> {
-            LoadState.Success(it)
-        }
+    private val allTrainingDaysWithLoading: Flow<LoadState<List<TrainingDayWithExercises>>> =
+        trainingDayRepository.getAllTrainingDays()
+            .distinctUntilChanged()
+            .map<List<TrainingDayWithExercises>, LoadState<List<TrainingDayWithExercises>>> {
+                LoadState.Success(it)
+            }
 
     private val allTrainingDays: Flow<List<TrainingDayWithExercises>> =
         allTrainingDaysWithLoading
@@ -92,19 +95,20 @@ class TrainingViewModel(
     private val calendarReducers = calendarUiFlow.toReducer<TrainingUiState, CalendarUiModel> {
         copy(calendar = it)
     }
-    private val titleReducers    = titleFlow.toReducer<TrainingUiState, String> {
+    private val titleReducers = titleFlow.toReducer<TrainingUiState, String> {
         copy(title = it)
     }
-    private val dateReducers     = _selectedDate.toReducer<TrainingUiState, LocalDate> {
+    private val dateReducers = _selectedDate.toReducer<TrainingUiState, LocalDate> {
         copy(selectedDate = it)
     }
-    private val allDaysReducers  = allTrainingDays.toReducer<TrainingUiState, List<TrainingDayWithExercises>> {
-        copy(allTrainingDays = it)
-    }
+    private val allDaysReducers =
+        allTrainingDays.toReducer<TrainingUiState, List<TrainingDayWithExercises>> {
+            copy(allTrainingDays = it)
+        }
     private val dayReducers = currentDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
         copy(currentDay = it, currentDayStatistics = buildStats(it))
     }
-    private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
+    private val editReducers = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
         copy(exerciseToEdit = it)
     }
     private val isLoadingReducer = isLoadingFlow.toReducer<TrainingUiState, Boolean> {
@@ -138,7 +142,7 @@ class TrainingViewModel(
     }
 
     fun onDateSelected(date: LocalDate) {
-        if(_selectedDate != date) {
+        if (_selectedDate != date) {
             _selectedDate.value = date
         }
     }
@@ -302,8 +306,8 @@ private fun buildStats(day: TrainingDayWithExercises?): List<TrainingStatisticsI
             )
         } ?: emptyList()
 
-private fun getStatItemName (name: String, exerciseType: ExerciseType): String {
-    if(name.isNotEmpty()) return name
+private fun getStatItemName(name: String, exerciseType: ExerciseType): String {
+    if (name.isNotEmpty()) return name
     return formatExerciseType(exerciseType.toString())
 }
 

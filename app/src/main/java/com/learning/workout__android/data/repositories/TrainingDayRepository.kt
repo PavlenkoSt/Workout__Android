@@ -8,7 +8,7 @@ import com.learning.workout__android.data.models.TrainingDayWithExercises
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
-class TrainingDayRepository (
+class TrainingDayRepository(
     private val trainingDayDao: TrainingDayDao
 ) {
     fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>> {
@@ -29,7 +29,12 @@ class TrainingDayRepository (
             val trainingDayId = existingDay.trainingDay.id
             val existingExercises = trainingDayDao.getExercisesByTrainingDayId(trainingDayId)
             val maxOrder = existingExercises.maxOfOrNull { it.order } ?: -1
-            trainingDayDao.insertExercise(exercise.copy(trainingDayId = trainingDayId, order = maxOrder + 1))
+            trainingDayDao.insertExercise(
+                exercise.copy(
+                    trainingDayId = trainingDayId,
+                    order = maxOrder + 1
+                )
+            )
         } else {
             val createdId = trainingDayDao.create(TrainingDay(date = date))
             trainingDayDao.insertExercise(
@@ -52,28 +57,32 @@ class TrainingDayRepository (
         val existingDay = trainingDayDao.getDayByDate(date).first()
 
         if (existingDay != null) {
-            val existingExercises = trainingDayDao.getExercisesByTrainingDayId(existingDay.trainingDay.id)
+            val existingExercises =
+                trainingDayDao.getExercisesByTrainingDayId(existingDay.trainingDay.id)
             val maxOrder = existingExercises.maxOfOrNull { it.order } ?: -1
             exercises.forEachIndexed { index, exercise ->
                 trainingDayDao.insertExercise(
                     exercise.copy(
                         trainingDayId = existingDay.trainingDay.id,
-                        order = maxOrder + 1 + index)
+                        order = maxOrder + 1 + index
+                    )
                 )
             }
         } else {
             val createdTrainingDayId = trainingDayDao.create(TrainingDay(date = date))
 
-            trainingDayDao.insertExercise(Exercise(
-                trainingDayId = createdTrainingDayId,
-                name = "Warmup",
-                type = ExerciseType.WARMUP,
-                reps = 1,
-                sets = 1,
-                setsDone = 0,
-                rest = 0,
-                order = 0
-            ))
+            trainingDayDao.insertExercise(
+                Exercise(
+                    trainingDayId = createdTrainingDayId,
+                    name = "Warmup",
+                    type = ExerciseType.WARMUP,
+                    reps = 1,
+                    sets = 1,
+                    setsDone = 0,
+                    rest = 0,
+                    order = 0
+                )
+            )
 
             exercises.forEachIndexed { index, exercise ->
                 trainingDayDao.insertExercise(
@@ -97,7 +106,7 @@ class TrainingDayRepository (
             val sortedExercises = exercises.sortedBy { it.order }.toMutableList()
             val item = sortedExercises.removeAt(fromIndex)
             sortedExercises.add(toIndex, item)
-            
+
             // Update order for all affected exercises
             sortedExercises.forEachIndexed { index, exercise ->
                 if (exercise.order != index) {

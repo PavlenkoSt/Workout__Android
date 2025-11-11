@@ -107,7 +107,8 @@ fun DrawingCheckmark(
 
         // Draw second part of check
         if (checkProgress * totalLength > stroke1Length) {
-            val progress2 = (checkProgress * totalLength - stroke1Length).coerceAtMost(stroke2Length)
+            val progress2 =
+                (checkProgress * totalLength - stroke1Length).coerceAtMost(stroke2Length)
             val ratio2 = progress2 / stroke2Length
 
             drawLine(

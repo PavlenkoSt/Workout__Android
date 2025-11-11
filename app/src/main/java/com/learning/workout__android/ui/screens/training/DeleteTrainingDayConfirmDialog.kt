@@ -23,12 +23,12 @@ fun DeleteTrainingDayConfirmDialog(
         },
         onDismissRequest = onCancel,
         confirmButton = {
-            TextButton( onClick = onDelete ) {
+            TextButton(onClick = onDelete) {
                 Text("Delete", color = Color.Red)
             }
         },
         dismissButton = {
-            TextButton(  onClick = onCancel ) {
+            TextButton(onClick = onCancel) {
                 Text("Dismiss")
             }
         }

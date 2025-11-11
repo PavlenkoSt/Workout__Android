@@ -56,7 +56,7 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 fun ExerciseItem(
     exercise: Exercise,
     idx: Int,
-    draggableHandler: @Composable () ->  Unit,
+    draggableHandler: @Composable () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     isDragging: Boolean,
@@ -83,7 +83,7 @@ fun ExerciseItem(
         label = "scale"
     )
 
-    Column (modifier = Modifier.graphicsLayer {
+    Column(modifier = Modifier.graphicsLayer {
         scaleX = scale
         scaleY = scale
     }) {
@@ -92,7 +92,7 @@ fun ExerciseItem(
             modifier = Modifier.fillMaxWidth(),
             backgroundContent = {
                 when (swipeToDismissBoxState.dismissDirection) {
-                    SwipeToDismissBoxValue.StartToEnd  -> {
+                    SwipeToDismissBoxValue.StartToEnd -> {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit exercise",
@@ -101,11 +101,11 @@ fun ExerciseItem(
                                 .clip(ShapeDefaults.Medium)
                                 .background(MaterialTheme.colorScheme.primary)
                                 .padding(horizontal = 24.dp)
-                                .wrapContentSize(Alignment.CenterStart)
-                            ,
+                                .wrapContentSize(Alignment.CenterStart),
                             tint = Color.White
                         )
                     }
+
                     SwipeToDismissBoxValue.EndToStart -> {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -119,6 +119,7 @@ fun ExerciseItem(
                             tint = Color.White
                         )
                     }
+
                     SwipeToDismissBoxValue.Settled -> {}
                 }
             }
@@ -131,9 +132,11 @@ fun ExerciseItem(
                 ),
                 border = CardDefaults.outlinedCardBorder(enabled = true)
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = "${idx + 1}. ${getExerciseName(exercise)}",
                         modifier = Modifier.padding(
@@ -143,15 +146,27 @@ fun ExerciseItem(
                         ),
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    if(
+                    if (
                         exercise.type == ExerciseType.DYNAMIC ||
                         exercise.type == ExerciseType.STATIC ||
                         exercise.type == ExerciseType.LADDER
                     ) {
-                        when(exercise.type) {
-                            ExerciseType.DYNAMIC -> ExerciseStatItem("Reps:", exercise.reps.toString())
-                            ExerciseType.LADDER -> ExerciseStatItem("Reps:", exercise.reps.toString())
-                            ExerciseType.STATIC -> ExerciseStatItem("Hold:", "${exercise.reps} sec.")
+                        when (exercise.type) {
+                            ExerciseType.DYNAMIC -> ExerciseStatItem(
+                                "Reps:",
+                                exercise.reps.toString()
+                            )
+
+                            ExerciseType.LADDER -> ExerciseStatItem(
+                                "Reps:",
+                                exercise.reps.toString()
+                            )
+
+                            ExerciseType.STATIC -> ExerciseStatItem(
+                                "Hold:",
+                                "${exercise.reps} sec."
+                            )
+
                             else -> null
                         }
                         ExerciseStatItem("Sets:", exercise.sets.toString())
@@ -167,10 +182,13 @@ fun ExerciseItem(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Box{
+                    Box {
                         val isCheckMarkVisible = exercise.setsDone >= exercise.sets
 
-                        ExerciseAnimatedProgressBar(setsDone = exercise.setsDone, sets = exercise.sets)
+                        ExerciseAnimatedProgressBar(
+                            setsDone = exercise.setsDone,
+                            sets = exercise.sets
+                        )
 
                         DrawingCheckmark(
                             isVisible = isCheckMarkVisible,
@@ -178,7 +196,7 @@ fun ExerciseItem(
                             modifier = Modifier
                                 .align(alignment = Alignment.BottomEnd)
                                 .offset(x = 8.dp, y = 4.dp),
-                            backgroundColor = if(isCheckMarkVisible) Color(0xFF14B8A6) else Color.Transparent
+                            backgroundColor = if (isCheckMarkVisible) Color(0xFF14B8A6) else Color.Transparent
                         )
                     }
 
@@ -212,7 +230,7 @@ private fun RowScope.SetsUpdateBtn(
 }
 
 @Composable
-private fun ExerciseAnimatedProgressBar (
+private fun ExerciseAnimatedProgressBar(
     setsDone: Int,
     sets: Int
 ) {
@@ -242,27 +260,40 @@ private fun ExerciseStatItem(
     stat: String,
     value: String
 ) {
-    Column (
+    Column(
         modifier = Modifier.padding(top = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(stat, fontSize = 12.sp, lineHeight = 14.sp, color = MaterialTheme.colorScheme.onSurface)
-        Text(value, fontSize = 12.sp, lineHeight = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            stat,
+            fontSize = 12.sp,
+            lineHeight = 14.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            value,
+            fontSize = 12.sp,
+            lineHeight = 14.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
 private fun getExerciseName(exercise: Exercise): String {
-    return when(exercise.type) {
+    return when (exercise.type) {
         ExerciseType.FLEXIBILITY_SESSION -> {
             "Flexibility session"
         }
+
         ExerciseType.HAND_BALANCE_SESSION -> {
             "Hand balance session"
         }
+
         ExerciseType.WARMUP -> {
             "Warmup"
         }
+
         else -> {
             exercise.name
         }
@@ -274,7 +305,17 @@ private fun getExerciseName(exercise: Exercise): String {
 fun ExerciseItemPreview() {
     Workout__AndroidTheme {
         ExerciseItem(
-            exercise = Exercise(0, trainingDayId = 0, name = "Exercise preview", reps = 10, sets = 10, setsDone = 2, type = ExerciseType.DYNAMIC, order = 0, rest = 10),
+            exercise = Exercise(
+                0,
+                trainingDayId = 0,
+                name = "Exercise preview",
+                reps = 10,
+                sets = 10,
+                setsDone = 2,
+                type = ExerciseType.DYNAMIC,
+                order = 0,
+                rest = 10
+            ),
             draggableHandler = {},
             idx = 0,
             onDelete = {},

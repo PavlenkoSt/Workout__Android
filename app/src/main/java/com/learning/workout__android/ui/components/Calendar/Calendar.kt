@@ -132,18 +132,18 @@ fun DaysRow(
     }
 }
 
-fun getTrainingDayStatus (day: TrainingDayWithExercises?): TrainingDayStatus {
-    if(day == null) {
+fun getTrainingDayStatus(day: TrainingDayWithExercises?): TrainingDayStatus {
+    if (day == null) {
         return TrainingDayStatus.NONE
     }
 
-    if(day.isCompleted) {
+    if (day.isCompleted) {
         return TrainingDayStatus.COMPLETED
     }
 
     val isInPast = LocalDate.parse(day.trainingDay.date).isBefore(LocalDate.now())
 
-    if(isInPast) {
+    if (isInPast) {
         return TrainingDayStatus.FAILED
     }
 

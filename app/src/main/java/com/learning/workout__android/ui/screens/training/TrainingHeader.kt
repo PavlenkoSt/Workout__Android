@@ -56,7 +56,7 @@ fun TrainingHeader(
             expanded = dropdownMenuExpanded,
             onDismissRequest = { dropdownMenuExpanded = false }
         ) {
-            if(hasExercises) {
+            if (hasExercises) {
                 DropdownMenuItem(
                     text = { Text("Save as preset") },
                     onClick = {
@@ -75,13 +75,17 @@ fun TrainingHeader(
                     dropdownMenuExpanded = false
                 },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Red
+                    )
                 }
             )
         }
     }
 
-    if(openAlertDialog) {
+    if (openAlertDialog) {
         DeleteTrainingDayConfirmDialog(
             onDelete = {
                 onDeleteTrainingDay()
@@ -97,6 +101,12 @@ fun TrainingHeader(
 @Composable
 fun TrainingHeaderPreview() {
     Workout__AndroidTheme {
-        TrainingHeader(currentDate = LocalDate.now(), onDeleteTrainingDay = {}, onSaveAsPresetClick = {}, isTrainingDay = false, hasExercises = true)
+        TrainingHeader(
+            currentDate = LocalDate.now(),
+            onDeleteTrainingDay = {},
+            onSaveAsPresetClick = {},
+            isTrainingDay = false,
+            hasExercises = true
+        )
     }
 }

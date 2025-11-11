@@ -70,16 +70,16 @@ fun CalendarDay(
                 Text(
                     text = date.day,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if(isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                    color = if (isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = date.date.dayOfMonth.toString(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if(isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                    color = if (isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            when(trainingDayStatus) {
+            when (trainingDayStatus) {
                 TrainingDayStatus.COMPLETED -> {
                     DayStatusMark(
                         imageVector = Icons.Default.Check,
@@ -87,6 +87,7 @@ fun CalendarDay(
                         isToday = date.isToday
                     )
                 }
+
                 TrainingDayStatus.FAILED -> {
                     DayStatusMark(
                         imageVector = Icons.Default.Close,
@@ -94,6 +95,7 @@ fun CalendarDay(
                         isToday = date.isToday
                     )
                 }
+
                 TrainingDayStatus.PENDING -> {
                     DayStatusMark(
                         imageVector = Icons.Default.PlayArrow,
@@ -101,6 +103,7 @@ fun CalendarDay(
                         isToday = date.isToday
                     )
                 }
+
                 else -> {}
             }
         }
@@ -122,19 +125,18 @@ fun CalendarDay(
 }
 
 @Composable
-fun BoxScope.DayStatusMark (
+fun BoxScope.DayStatusMark(
     imageVector: ImageVector,
     color: Color,
     isToday: Boolean
 ) {
     Box(
         modifier = Modifier
-            .offset(x = (-4).dp, y = if(isToday) -(1).dp else (-4).dp)
+            .offset(x = (-4).dp, y = if (isToday) -(1).dp else (-4).dp)
             .background(MaterialTheme.colorScheme.onPrimary, shape = ShapeDefaults.Large)
             .padding(1.dp)
             .background(color, shape = ShapeDefaults.Large)
-            .align(Alignment.BottomEnd)
-        ,
+            .align(Alignment.BottomEnd),
     ) {
         Icon(
             imageVector = imageVector,

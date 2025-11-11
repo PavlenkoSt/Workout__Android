@@ -58,7 +58,8 @@ fun ExerciseList(
     LaunchedEffect(exercisesList) {
         if (!isReordering) {
             if (localExercises.size != exercisesList.size ||
-                localExercises != exercisesList) {
+                localExercises != exercisesList
+            ) {
                 localExercises.clear()
                 localExercises.addAll(exercisesList)
                 onListReady()
@@ -96,14 +97,18 @@ fun ExerciseList(
             header()
         }
 
-        if(localExercises.isNotEmpty()) {
+        if (localExercises.isNotEmpty()) {
             itemsIndexed(localExercises, key = { _, item -> item.id }) { idx, item ->
-                ReorderableItem(reorderableLazyListState, key = item.id, enabled = localExercises.size > 1) { isDragging ->
+                ReorderableItem(
+                    reorderableLazyListState,
+                    key = item.id,
+                    enabled = localExercises.size > 1
+                ) { isDragging ->
                     ExerciseItem(
                         exercise = item,
                         idx = idx,
                         draggableHandler = {
-                            if(localExercises.size > 1) {
+                            if (localExercises.size > 1) {
                                 DraggableHandler(
                                     modifier = Modifier
                                         .draggableHandle()
@@ -119,7 +124,7 @@ fun ExerciseList(
                     )
                 }
             }
-        }else {
+        } else {
             item("empty") {
                 emptyMessage()
             }
@@ -132,7 +137,7 @@ fun ExerciseList(
 }
 
 @Composable
-private fun DraggableHandler (modifier: Modifier = Modifier) {
+private fun DraggableHandler(modifier: Modifier = Modifier) {
     Icon(
         painter = painterResource(R.drawable.hand),
         contentDescription = "Handle",
@@ -149,27 +154,29 @@ private fun DraggableHandler (modifier: Modifier = Modifier) {
 @Preview
 fun ExerciseListPreview() {
     Workout__AndroidTheme {
-       ExerciseList(
-           exercisesList = List(10, {idx -> Exercise(
-               id = idx.toLong(),
-               trainingDayId = 0,
-               name = "Preview exercise",
-               reps = 10,
-               sets = 10,
-               rest = 60,
-               type = ExerciseType.DYNAMIC,
-               setsDone = 1,
-               order = idx
-           )}),
-           onReorder = {from, to -> },
-           header = {},
-           footer = {},
-           onDeleteExercise = {},
-           onSwipeToEditExercise = {},
-           onDecrementExercise = {},
-           onIncrementExercise = {},
-           emptyMessage = {},
-           onListReady = {}
-       )
+        ExerciseList(
+            exercisesList = List(10, { idx ->
+                Exercise(
+                    id = idx.toLong(),
+                    trainingDayId = 0,
+                    name = "Preview exercise",
+                    reps = 10,
+                    sets = 10,
+                    rest = 60,
+                    type = ExerciseType.DYNAMIC,
+                    setsDone = 1,
+                    order = idx
+                )
+            }),
+            onReorder = { from, to -> },
+            header = {},
+            footer = {},
+            onDeleteExercise = {},
+            onSwipeToEditExercise = {},
+            onDecrementExercise = {},
+            onIncrementExercise = {},
+            emptyMessage = {},
+            onListReady = {}
+        )
     }
 }
