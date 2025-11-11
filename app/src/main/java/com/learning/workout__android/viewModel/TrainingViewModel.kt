@@ -49,6 +49,8 @@ class TrainingViewModel(
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
 
+    private val isCurrentDayLoading = MutableStateFlow(true)
+
     private val trainingDaysWithCompleteness = trainingDayRepository.getAllTrainingDaysWithCompleteness()
 
     private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
@@ -91,8 +93,11 @@ class TrainingViewModel(
     private val allDaysReducers  = trainingDaysWithCompleteness.toReducer<TrainingUiState, List<TrainingDayWithCompleteness>> {
         copy(trainingDaysWithCompleteness = it)
     }
+    private val currentDayLoadingReducers = isCurrentDayLoading.toReducer<TrainingUiState, Boolean> {
+        copy(isLoadingCurrentDay = it)
+    }
     private val dayReducers      = selectedDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> { currentDay ->
-        copy(
+       val newState = copy(
             currentDay = currentDay,
             currentDayStatistics = currentDay?.sortedExercises
                 ?.groupBy { it.name }
@@ -103,17 +108,35 @@ class TrainingViewModel(
                     exercises.sumOf { it.reps * it.sets },
                     exercises.sumOf { it.reps * it.setsDone }
                 )
-            } ?: emptyList()
+            } ?: emptyList(),
         )
+
+        isCurrentDayLoading.value = false
+
+        newState
     }
     private val editReducers     = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
         copy(exerciseToEdit = it)
     }
 
     val uiState: StateFlow<TrainingUiState> =
-        merge(calendarReducers, titleReducers, dateReducers, allDaysReducers, dayReducers, editReducers)
-            .scan(TrainingUiState()) { state, reduce -> reduce(state) }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TrainingUiState())
+        merge(
+            calendarReducers,
+            titleReducers,
+            dateReducers,
+            allDaysReducers,
+            dayReducers,
+            editReducers,
+            currentDayLoadingReducers
+        )
+            .scan(TrainingUiState()) { state, reduce ->
+                reduce(state)
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                TrainingUiState()
+            )
 
     // Called by the Composable when pager page changes
     fun onWeekVisible(start: LocalDate) {
@@ -123,6 +146,10 @@ class TrainingViewModel(
     }
 
     fun onDateSelected(date: LocalDate) {
+        if(_selectedDate.value == date) {
+            return
+        }
+        isCurrentDayLoading.value = true
         _selectedDate.value = date
     }
 
@@ -279,7 +306,8 @@ data class TrainingUiState(
     val trainingDaysWithCompleteness: List<TrainingDayWithCompleteness> = emptyList(),
     val currentDay: TrainingDayWithExercises? = null,
     val exerciseToEdit: Exercise? = null,
-    val currentDayStatistics: List<TrainingStatisticsItem> = emptyList()
+    val currentDayStatistics: List<TrainingStatisticsItem> = emptyList(),
+    val isLoadingCurrentDay: Boolean = true
 )
 
 data class CalendarUiModel(
