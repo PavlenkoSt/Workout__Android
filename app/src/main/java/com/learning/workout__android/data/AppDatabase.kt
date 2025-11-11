@@ -10,7 +10,7 @@ import com.learning.workout__android.data.models.Converters
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.TrainingDay
 
-@Database(entities = [TrainingDay::class, Exercise::class], version = 2, exportSchema = false)
+@Database(entities = [TrainingDay::class, Exercise::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun trainingDayDao(): TrainingDayDao

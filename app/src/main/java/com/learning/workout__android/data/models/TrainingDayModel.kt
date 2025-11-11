@@ -24,7 +24,10 @@ data class TrainingDayWithExercises (
     val sortedExercises: List<Exercise> = exercises.sortedBy { it.order }
 }
 
-@Entity(tableName = "training_days")
+@Entity(
+    tableName = "training_days",
+    indices = [Index(value = ["date"], unique = true)]
+)
 data class TrainingDay (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "date") val date: String
