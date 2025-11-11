@@ -84,7 +84,6 @@ fun CalendarDay(
                     DayStatusMark(
                         imageVector = Icons.Default.Check,
                         color = Color(0xFF14B8A6),
-                        isActive = isActive,
                         isToday = date.isToday
                     )
                 }
@@ -92,7 +91,6 @@ fun CalendarDay(
                     DayStatusMark(
                         imageVector = Icons.Default.Close,
                         color = Color.Red,
-                        isActive = isActive,
                         isToday = date.isToday
                     )
                 }
@@ -100,7 +98,6 @@ fun CalendarDay(
                     DayStatusMark(
                         imageVector = Icons.Default.PlayArrow,
                         color = Color(0xFFffb800),
-                        isActive = isActive,
                         isToday = date.isToday
                     )
                 }
@@ -128,13 +125,12 @@ fun CalendarDay(
 fun BoxScope.DayStatusMark (
     imageVector: ImageVector,
     color: Color,
-    isActive: Boolean,
     isToday: Boolean
 ) {
     Box(
         modifier = Modifier
             .offset(x = (-4).dp, y = if(isToday) -(1).dp else (-4).dp)
-            .background(if(isActive) Color.Black else Color.White, shape = ShapeDefaults.Large)
+            .background(MaterialTheme.colorScheme.onPrimary, shape = ShapeDefaults.Large)
             .padding(1.dp)
             .background(color, shape = ShapeDefaults.Large)
             .align(Alignment.BottomEnd)
@@ -143,7 +139,8 @@ fun BoxScope.DayStatusMark (
         Icon(
             imageVector = imageVector,
             contentDescription = "Status",
-            modifier = Modifier.size(14.dp)
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

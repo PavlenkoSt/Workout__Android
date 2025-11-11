@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -30,7 +34,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
@@ -39,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,7 +123,14 @@ fun ExerciseItem(
                 }
             }
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                border = CardDefaults.outlinedCardBorder(enabled = true)
+            ) {
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -152,24 +163,18 @@ fun ExerciseItem(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
-                        onClick = onDecrement,
-                        modifier = Modifier.weight(1f),
-                        shape = ShapeDefaults.Medium
-                    ) {
-                        Text("-")
-                    }
+                    SetsUpdateBtn(onClick = onDecrement, text = "-")
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Box{
-                        val isCheckMarkVisible by derivedStateOf { exercise.setsDone >= exercise.sets }
+                        val isCheckMarkVisible = exercise.setsDone >= exercise.sets
 
                         ExerciseAnimatedProgressBar(setsDone = exercise.setsDone, sets = exercise.sets)
 
                         DrawingCheckmark(
                             isVisible = isCheckMarkVisible,
-                            size = 32,
+                            size = 28,
                             modifier = Modifier
                                 .align(alignment = Alignment.BottomEnd)
                                 .offset(x = 8.dp, y = 4.dp),
@@ -179,17 +184,30 @@ fun ExerciseItem(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Button(
-                        onClick = onIncrement,
-                        modifier = Modifier.weight(1f),
-                        shape = ShapeDefaults.Medium
-                    ) {
-                        Text("+")
-                    }
+                    SetsUpdateBtn(onClick = onIncrement, text = "+")
                 }
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun RowScope.SetsUpdateBtn(
+    onClick: () -> Unit,
+    text: String
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.weight(1f),
+        shape = ShapeDefaults.Medium,
+        colors = ButtonDefaults.buttonColors(
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.primary,
+        ),
+        contentPadding = PaddingValues(vertical = 0.dp)
+    ) {
+        Text(text, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -212,7 +230,7 @@ private fun ExerciseAnimatedProgressBar (
         LinearProgressIndicator(
             progress = { animatedProgress },
             modifier = Modifier.fillMaxWidth(),
-            trackColor = MaterialTheme.colorScheme.surfaceContainer,
+            trackColor = MaterialTheme.colorScheme.surface,
             color = MaterialTheme.colorScheme.primary,
             strokeCap = StrokeCap.Round,
         )
