@@ -98,7 +98,7 @@ fun ExerciseList(
         }
 
         if (localExercises.isNotEmpty()) {
-            itemsIndexed(localExercises, key = { _, item -> item.id }) { idx, item ->
+            items(items = localExercises, key = { item -> item.id }) { item ->
                 ReorderableItem(
                     reorderableLazyListState,
                     key = item.id,
@@ -106,7 +106,6 @@ fun ExerciseList(
                 ) { isDragging ->
                     ExerciseItem(
                         exercise = item,
-                        idx = idx,
                         draggableHandler = {
                             if (localExercises.size > 1) {
                                 DraggableHandler(

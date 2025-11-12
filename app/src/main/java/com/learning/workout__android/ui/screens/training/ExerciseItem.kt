@@ -55,7 +55,6 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 @Composable
 fun ExerciseItem(
     exercise: Exercise,
-    idx: Int,
     draggableHandler: @Composable () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
@@ -138,7 +137,7 @@ fun ExerciseItem(
                         .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "${idx + 1}. ${getExerciseName(exercise)}",
+                        text = "${exercise.order + 1}. ${getExerciseName(exercise)}",
                         modifier = Modifier.padding(
                             top = 8.dp,
                             start = 8.dp,
