@@ -62,7 +62,7 @@ fun ExerciseItem(
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
 ) {
-    val swipeToDismissBoxState = key(exercise) {
+    val swipeToDismissBoxState = key(exercise.id) {
         rememberSwipeToDismissBoxState(
             confirmValueChange = {
                 if (it == SwipeToDismissBoxValue.EndToStart) {
@@ -75,7 +75,6 @@ fun ExerciseItem(
             positionalThreshold = { totalDistance -> totalDistance * 0.3f },
         )
     }
-
 
     val scale by animateFloatAsState(
         targetValue = if (isDragging) 1.05f else 1f,
@@ -90,37 +89,7 @@ fun ExerciseItem(
             state = swipeToDismissBoxState,
             modifier = Modifier.fillMaxWidth(),
             backgroundContent = {
-                when (swipeToDismissBoxState.dismissDirection) {
-                    SwipeToDismissBoxValue.StartToEnd -> {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit exercise",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(ShapeDefaults.Medium)
-                                .background(MaterialTheme.colorScheme.primary)
-                                .padding(horizontal = 24.dp)
-                                .wrapContentSize(Alignment.CenterStart),
-                            tint = Color.White
-                        )
-                    }
-
-                    SwipeToDismissBoxValue.EndToStart -> {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove exercise",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(ShapeDefaults.Medium)
-                                .background(Color.Red)
-                                .padding(horizontal = 24.dp)
-                                .wrapContentSize(Alignment.CenterEnd),
-                            tint = Color.White
-                        )
-                    }
-
-                    SwipeToDismissBoxValue.Settled -> {}
-                }
+                BackgroundContent(swipeToDismissBoxState.dismissDirection)
             }
         ) {
             Card(
@@ -131,77 +100,13 @@ fun ExerciseItem(
                 ),
                 border = CardDefaults.outlinedCardBorder(enabled = true)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "${exercise.order + 1}. ${getExerciseName(exercise)}",
-                        modifier = Modifier.padding(
-                            top = 8.dp,
-                            start = 8.dp,
-                            end = 8.dp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface
+                Column {
+                    ExerciseHeaderRow(exercise = exercise, draggableHandler = draggableHandler)
+                    ExerciseSetsRow(
+                        exercise = exercise,
+                        onIncrement = onIncrement,
+                        onDecrement = onDecrement
                     )
-                    if (
-                        exercise.type == ExerciseType.DYNAMIC ||
-                        exercise.type == ExerciseType.STATIC ||
-                        exercise.type == ExerciseType.LADDER
-                    ) {
-                        when (exercise.type) {
-                            ExerciseType.DYNAMIC -> ExerciseStatItem(
-                                "Reps:",
-                                exercise.reps.toString()
-                            )
-
-                            ExerciseType.LADDER -> ExerciseStatItem(
-                                "Reps:",
-                                exercise.reps.toString()
-                            )
-
-                            ExerciseType.STATIC -> ExerciseStatItem(
-                                "Hold:",
-                                "${exercise.reps} sec."
-                            )
-
-                            else -> null
-                        }
-                        ExerciseStatItem("Sets:", exercise.sets.toString())
-                        ExerciseStatItem("Rest:", "${exercise.rest} sec.")
-                    }
-                    draggableHandler()
-                }
-                Row(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SetsUpdateBtn(onClick = onDecrement, text = "-")
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Box {
-                        val isCheckMarkVisible = exercise.setsDone >= exercise.sets
-
-                        ExerciseAnimatedProgressBar(
-                            setsDone = exercise.setsDone,
-                            sets = exercise.sets
-                        )
-
-                        DrawingCheckmark(
-                            isVisible = isCheckMarkVisible,
-                            size = 28,
-                            modifier = Modifier
-                                .align(alignment = Alignment.BottomEnd)
-                                .offset(x = 8.dp, y = 4.dp),
-                            backgroundColor = if (isCheckMarkVisible) Color(0xFF14B8A6) else Color.Transparent
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    SetsUpdateBtn(onClick = onIncrement, text = "+")
                 }
             }
         }
@@ -209,6 +114,122 @@ fun ExerciseItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
+    when (dismissDirection) {
+        SwipeToDismissBoxValue.StartToEnd -> {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit exercise",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(ShapeDefaults.Medium)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 24.dp)
+                    .wrapContentSize(Alignment.CenterStart),
+                tint = Color.White
+            )
+        }
+
+        SwipeToDismissBoxValue.EndToStart -> {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Remove exercise",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(ShapeDefaults.Medium)
+                    .background(Color.Red)
+                    .padding(horizontal = 24.dp)
+                    .wrapContentSize(Alignment.CenterEnd),
+                tint = Color.White
+            )
+        }
+
+        SwipeToDismissBoxValue.Settled -> {}
+    }
+}
+
+@Composable
+private fun ExerciseHeaderRow(
+    exercise: Exercise,
+    draggableHandler: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "${exercise.order + 1}. ${getExerciseName(exercise)}",
+            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        if (exercise.type in setOf(
+                ExerciseType.DYNAMIC,
+                ExerciseType.STATIC,
+                ExerciseType.LADDER
+            )
+        ) {
+            when (exercise.type) {
+                ExerciseType.DYNAMIC, ExerciseType.LADDER ->
+                    ExerciseStatItem("Reps:", exercise.reps.toString())
+
+                ExerciseType.STATIC ->
+                    ExerciseStatItem("Hold:", "${exercise.reps} sec.")
+
+                else -> {}
+            }
+            ExerciseStatItem("Sets:", exercise.sets.toString())
+            ExerciseStatItem("Rest:", "${exercise.rest} sec.")
+        }
+        draggableHandler()
+    }
+}
+
+@Composable
+private fun ExerciseSetsRow(
+    exercise: Exercise,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    Row(
+        modifier = Modifier.padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SetsUpdateBtn(onClick = onDecrement, text = "-")
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Box {
+            val isCheckMarkVisible = exercise.setsDone >= exercise.sets
+
+            ExerciseAnimatedProgressBar(
+                setsDone = exercise.setsDone,
+                sets = exercise.sets
+            )
+
+            if (isCheckMarkVisible) {
+                DrawingCheckmark(
+                    isVisible = true,
+                    size = 28,
+                    modifier = Modifier
+                        .align(alignment = Alignment.BottomEnd)
+                        .offset(x = 8.dp, y = 4.dp),
+                    backgroundColor = Color(0xFF14B8A6)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        SetsUpdateBtn(onClick = onIncrement, text = "+")
+    }
+}
+
+// Keep existing helper composables but optimize DrawingCheckmark call
 @Composable
 private fun RowScope.SetsUpdateBtn(
     onClick: () -> Unit,
@@ -281,21 +302,10 @@ private fun ExerciseStatItem(
 
 private fun getExerciseName(exercise: Exercise): String {
     return when (exercise.type) {
-        ExerciseType.FLEXIBILITY_SESSION -> {
-            "Flexibility session"
-        }
-
-        ExerciseType.HAND_BALANCE_SESSION -> {
-            "Hand balance session"
-        }
-
-        ExerciseType.WARMUP -> {
-            "Warmup"
-        }
-
-        else -> {
-            exercise.name
-        }
+        ExerciseType.FLEXIBILITY_SESSION -> "Flexibility session"
+        ExerciseType.HAND_BALANCE_SESSION -> "Hand balance session"
+        ExerciseType.WARMUP -> "Warmup"
+        else -> exercise.name
     }
 }
 
@@ -316,7 +326,6 @@ fun ExerciseItemPreview() {
                 rest = 10
             ),
             draggableHandler = {},
-            idx = 0,
             onDelete = {},
             onEdit = {},
             isDragging = false,

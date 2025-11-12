@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +34,6 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-
 @Composable
 fun ExerciseList(
     exercisesList: List<Exercise>,
@@ -43,29 +42,15 @@ fun ExerciseList(
     onIncrementExercise: (exercise: Exercise) -> Unit,
     onDecrementExercise: (exercise: Exercise) -> Unit,
     onSwipeToEditExercise: (exercise: Exercise) -> Unit,
-    onListReady: () -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit,
-    emptyMessage: @Composable () -> Unit
+    emptyMessage: @Composable () -> Unit,
 ) {
     // Local state for optimistic updates to prevent flickering
     val localExercises = remember { mutableStateListOf<Exercise>() }
     val onReorderCallback = rememberUpdatedState(onReorder)
     val coroutineScope = rememberCoroutineScope()
     var isReordering by remember { mutableStateOf(false) }
-
-    // Update local state when the source list changes (but not during reordering)
-    LaunchedEffect(exercisesList) {
-        if (!isReordering) {
-            if (localExercises.size != exercisesList.size ||
-                localExercises != exercisesList
-            ) {
-                localExercises.clear()
-                localExercises.addAll(exercisesList)
-                onListReady()
-            }
-        }
-    }
 
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -85,6 +70,16 @@ fun ExerciseList(
                 onReorderCallback.value(adjustedFrom, adjustedTo)
                 delay(100) // Wait a bit more for DB update to complete
                 isReordering = false
+            }
+        }
+    }
+
+    // Update local state when the source list changes (but not during reordering)
+    LaunchedEffect(exercisesList, isReordering) {
+        if (!isReordering) {
+            if (localExercises != exercisesList) {
+                localExercises.clear()
+                localExercises.addAll(exercisesList)
             }
         }
     }
@@ -174,8 +169,7 @@ fun ExerciseListPreview() {
             onSwipeToEditExercise = {},
             onDecrementExercise = {},
             onIncrementExercise = {},
-            emptyMessage = {},
-            onListReady = {}
+            emptyMessage = {}
         )
     }
 }

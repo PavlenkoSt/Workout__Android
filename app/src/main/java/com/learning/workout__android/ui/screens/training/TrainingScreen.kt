@@ -57,9 +57,6 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    val dayKey = ui.currentDay?.trainingDay?.id ?: ui.selectedDate.toEpochDay()
-    var listReady by remember(dayKey) { mutableStateOf(false) }
-
     LaunchedEffect(pagerState.currentPage) {
         val weeksFromStart = pagerState.currentPage - initialPage
         val start =
@@ -98,30 +95,28 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                             fadeIn() togetherWith fadeOut()
                         }
                     },
-                ) {
+                ) { date ->
                     ExerciseList(
                         exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
                         onReorder = { from, to -> vm.reorderExercises(from, to) },
                         footer = {
-                            if (listReady) {
-                                TrainingFooter(
-                                    text = if (ui.currentDay != null) {
-                                        "+ Add exercise"
-                                    } else {
-                                        "Create training"
-                                    },
-                                    onClick = { showBottomSheet = true },
-                                    statistics = ui.currentDayStatistics
-                                )
-                            }
+                            TrainingFooter(
+                                text = if (ui.currentDay != null) {
+                                    "+ Add exercise"
+                                } else {
+                                    "Create training"
+                                },
+                                onClick = { showBottomSheet = true },
+                                statistics = ui.currentDayStatistics
+                            )
                         },
                         header = {
                             TrainingHeader(
-                                currentDate = ui.selectedDate,
+                                currentDate = date,
                                 modifier = Modifier.fillMaxWidth(),
                                 isTrainingDay = ui.currentDay != null,
                                 onDeleteTrainingDay = {
-                                    vm.deleteTrainingDay(ui.selectedDate)
+                                    vm.deleteTrainingDay(date)
                                 },
                                 onSaveAsPresetClick = {
                                     // TODO add this after implemented presets
@@ -162,7 +157,6 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                                 )
                             )
                         },
-                        onListReady = { listReady = true }
                     )
                 }
             }
