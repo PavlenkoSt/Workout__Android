@@ -24,8 +24,8 @@ fun TodayFloatBtn(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { onClick() },
-        shape = ShapeDefaults.Large,
+        onClick = onClick,
+        shape = ShapeDefaults.ExtraLarge,
         modifier = modifier
     ) {
         Row(
@@ -45,7 +45,7 @@ fun TodayFloatBtn(
 
 @Preview
 @Composable
-fun TodayFloatBtnPreview() {
+private fun TodayFloatBtnPreview() {
     Workout__AndroidTheme {
         TodayFloatBtn(onClick = {})
     }
