@@ -67,7 +67,12 @@ fun ExerciseFormLadder(
 
     DisposableEffect(Unit) {
         onDispose {
-            onSaveSeed(SharedSeed(name = ui.name.value))
+            onSaveSeed(
+                SharedSeed(
+                    name = ui.name.value,
+                    rest = ui.rest.value
+                )
+            )
             vm.reset()
         }
     }

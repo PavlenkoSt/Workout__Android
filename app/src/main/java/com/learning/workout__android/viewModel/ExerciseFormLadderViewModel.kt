@@ -97,6 +97,12 @@ class ExerciseFormLadderViewModel : ViewModel() {
                 name = s.name.copy(
                     value = seed.name,
                 ),
+                rest = s.rest.copy(
+                    value = seed.rest.ifEmpty { "120" }
+                ),
+                step = s.step.copy(
+                    value = "1"
+                )
             )
         }
     }

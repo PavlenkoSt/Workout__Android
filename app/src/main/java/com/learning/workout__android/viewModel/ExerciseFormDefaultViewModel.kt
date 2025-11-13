@@ -136,7 +136,7 @@ class ExerciseFormDefaultViewModel : ViewModel() {
                     value = seed.sets,
                 ),
                 rest = s.rest.copy(
-                    value = seed.rest,
+                    value = seed.rest.ifEmpty { "120" },
                 )
             )
         }
