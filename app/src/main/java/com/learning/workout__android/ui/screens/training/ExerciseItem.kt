@@ -55,6 +55,7 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 @Composable
 fun ExerciseItem(
     exercise: Exercise,
+    index: Int,
     draggableHandler: @Composable () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
@@ -101,7 +102,11 @@ fun ExerciseItem(
                 border = CardDefaults.outlinedCardBorder(enabled = true)
             ) {
                 Column {
-                    ExerciseHeaderRow(exercise = exercise, draggableHandler = draggableHandler)
+                    ExerciseHeaderRow(
+                        exercise = exercise,
+                        draggableHandler = draggableHandler,
+                        index = index
+                    )
                     ExerciseSetsRow(
                         exercise = exercise,
                         onIncrement = onIncrement,
@@ -153,7 +158,8 @@ private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
 @Composable
 private fun ExerciseHeaderRow(
     exercise: Exercise,
-    draggableHandler: @Composable () -> Unit
+    draggableHandler: @Composable () -> Unit,
+    index: Int
 ) {
     Row(
         modifier = Modifier
@@ -162,7 +168,7 @@ private fun ExerciseHeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "${exercise.order + 1}. ${getExerciseName(exercise)}",
+            text = "${index + 1}. ${getExerciseName(exercise)}",
             modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -330,7 +336,8 @@ fun ExerciseItemPreview() {
             onEdit = {},
             isDragging = false,
             onDecrement = {},
-            onIncrement = {}
+            onIncrement = {},
+            index = 0
         )
     }
 }

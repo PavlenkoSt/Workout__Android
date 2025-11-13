@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,7 +55,7 @@ fun ExerciseList(
     ) {
         item(key = "header") {
             header()
-            if(exercisesList.isNotEmpty()) {
+            if (exercisesList.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -63,7 +63,7 @@ fun ExerciseList(
         if (exercisesList.isNotEmpty()) {
             val canReorder = exercisesList.size > 1
 
-            items(items = exercisesList, key = { item -> item.id }) { item ->
+            itemsIndexed(items = exercisesList, key = { _, item -> item.id }) { index, item ->
                 ReorderableItem(
                     reorderableLazyListState,
                     key = item.id,
@@ -71,6 +71,7 @@ fun ExerciseList(
                 ) { isDragging ->
                     ExerciseItem(
                         exercise = item,
+                        index = index,
                         draggableHandler = {
                             if (canReorder) {
                                 DraggableHandler(
