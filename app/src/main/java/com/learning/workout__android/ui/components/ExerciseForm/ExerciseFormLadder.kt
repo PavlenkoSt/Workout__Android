@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,9 +24,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseFormLadderViewModel
 import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
 
@@ -71,7 +73,7 @@ fun ExerciseFormLadder(
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        TextField(
+        OutlinedTextField(
             value = ui.name.value,
             onValueChange = { vm.onEvent(ExerciseLadderFormEvent.NameChanged(it)) },
             modifier = Modifier.fillMaxWidth(),
@@ -94,7 +96,7 @@ fun ExerciseFormLadder(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
-            TextField(
+            OutlinedTextField(
                 value = ui.from.value,
                 onValueChange = { vm.onEvent(ExerciseLadderFormEvent.FromChanged(it)) },
                 modifier = Modifier
@@ -119,7 +121,7 @@ fun ExerciseFormLadder(
                 )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            TextField(
+            OutlinedTextField(
                 value = ui.to.value,
                 onValueChange = { vm.onEvent(ExerciseLadderFormEvent.ToChanged(it)) },
                 modifier = Modifier
@@ -144,7 +146,7 @@ fun ExerciseFormLadder(
                 )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            TextField(
+            OutlinedTextField(
                 value = ui.step.value,
                 onValueChange = { vm.onEvent(ExerciseLadderFormEvent.StepChanged(it)) },
                 modifier = Modifier
@@ -169,7 +171,7 @@ fun ExerciseFormLadder(
                 )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            TextField(
+            OutlinedTextField(
                 value = ui.rest.value,
                 onValueChange = { vm.onEvent(ExerciseLadderFormEvent.RestChanged(it)) },
                 modifier = Modifier
@@ -207,5 +209,18 @@ fun ExerciseFormLadder(
             )
             onLadderExerciseSubmit(result)
         }, isEditing = exerciseToEdit != null)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExerciseFormLadderPreview() {
+    Workout__AndroidTheme {
+        ExerciseFormLadder(
+            onLadderExerciseSubmit = {},
+            onSaveSeed = {},
+            seed = SharedSeed(),
+            exerciseToEdit = null
+        )
     }
 }

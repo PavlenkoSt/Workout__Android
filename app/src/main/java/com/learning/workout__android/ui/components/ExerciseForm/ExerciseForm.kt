@@ -11,8 +11,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,7 +69,7 @@ fun ExerciseForm(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
         ) {
-            TextField(
+            OutlinedTextField(
                 value = formatExerciseType(selectedType.label),
                 onValueChange = {},
                 supportingText = {},
@@ -144,9 +144,9 @@ fun ExerciseForm(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun ExerciseFormPreview() {
+private fun ExerciseFormPreview() {
     Workout__AndroidTheme {
         ExerciseForm(
             onLadderExerciseSubmit = {},
