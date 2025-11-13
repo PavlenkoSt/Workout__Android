@@ -96,7 +96,7 @@ class TrainingDayRepository(
         trainingDayDao.deleteExercise(exercise)
     }
 
-    suspend fun reorderExercises( from: Exercise, to: Exercise) {
-        trainingDayDao.swapExerciseOrder(from, to)
+    suspend fun reorderExercises(fromExerciseId: Long, toExerciseId: Long) {
+        trainingDayDao.swapExerciseOrder(fromExerciseId, toExerciseId)
     }
 }

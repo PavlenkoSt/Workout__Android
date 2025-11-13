@@ -269,8 +269,8 @@ class TrainingViewModel(
         viewModelScope.launch {
             if (from.order != to.order) {
                 trainingDayRepository.reorderExercises(
-                    from = from,
-                    to = to
+                    fromExerciseId = from.id,
+                    toExerciseId = to.id
                 )
                 // Clear local reorder after DB update completes
                 localReorderReducer.value = null

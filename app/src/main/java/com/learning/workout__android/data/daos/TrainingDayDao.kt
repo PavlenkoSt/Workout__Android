@@ -42,6 +42,14 @@ interface TrainingDayDao {
     )
     suspend fun updateExerciseOrder(exerciseId: Long, order: Int)
 
+    @Query(
+        """
+        SELECT * FROM exercises 
+        WHERE id = :exerciseId
+    """
+    )
+    suspend fun getExerciseById(exerciseId: Long): Exercise?
+
     @Query("DELETE FROM training_days WHERE date = :date")
     fun deleteByDate(date: String)
 
@@ -61,10 +69,17 @@ interface TrainingDayDao {
     suspend fun deleteExercise(exercise: Exercise)
 
     @Transaction
-    suspend fun swapExerciseOrder(from: Exercise, to: Exercise) {
-        if (from.order == to.order) return
-        updateExerciseOrder(from.id, to.order)
-        updateExerciseOrder(to.id, from.order)
+    suspend fun swapExerciseOrder(fromExerciseId: Long, toExerciseId: Long) {
+        // Fetch current state from database to avoid stale data
+        val fromExercise = getExerciseById(fromExerciseId) ?: return
+        val toExercise = getExerciseById(toExerciseId) ?: return
+        
+        // Only swap if orders are different
+        if (fromExercise.order == toExercise.order) return
+        
+        // Perform atomic swap
+        updateExerciseOrder(fromExercise.id, toExercise.order)
+        updateExerciseOrder(toExercise.id, fromExercise.order)
     }
 
     @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
