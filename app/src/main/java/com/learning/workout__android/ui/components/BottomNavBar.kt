@@ -15,8 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.learning.workout__android.navigation.NavigationScreen
 import com.learning.workout__android.navigation.NavigationState
+import com.learning.workout__android.navigation.Screen
 
 @Composable
 fun BottomNavBar(navState: NavigationState) {
@@ -29,22 +29,24 @@ fun BottomNavBar(navState: NavigationState) {
                 NavigationBarItem(
                     icon = { Icon(botBarRoute.icon, contentDescription = null) },
                     label = { Text(botBarRoute.name) },
-                    selected = currentDestination?.hierarchy?.any { it.route === botBarRoute.route }
-                        ?: false,
+                    selected = currentDestination?.hierarchy?.any {
+                        it.route?.contains(
+                            botBarRoute.route::class.simpleName ?: ""
+                        ) == true
+                    } ?: false,
                     onClick = {
                         navState.navigateTo(botBarRoute.route)
-                    }
-                )
+                    })
             }
         }
     }
 }
 
-data class BotBarRoute(val name: String, val route: String, val icon: ImageVector)
+data class BotBarRoute(val name: String, val route: Screen, val icon: ImageVector)
 
 val botBarRoutes = listOf(
-    BotBarRoute("Training", NavigationScreen.Training.route, Icons.Filled.Home),
-    BotBarRoute("Goals", NavigationScreen.Goals.route, Icons.Filled.Done),
-    BotBarRoute("Records", NavigationScreen.Records.route, Icons.Filled.Star),
-    BotBarRoute("Presets", NavigationScreen.Presets.route, Icons.Filled.Favorite),
+    BotBarRoute("Training", Screen.TrainingStack, Icons.Filled.Home),
+    BotBarRoute("Goals", Screen.GoalsScreen, Icons.Filled.Done),
+    BotBarRoute("Records", Screen.RecordsScreen, Icons.Filled.Star),
+    BotBarRoute("Presets", Screen.PresetsScreen, Icons.Filled.Favorite),
 )

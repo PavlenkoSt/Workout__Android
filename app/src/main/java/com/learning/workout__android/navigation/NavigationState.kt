@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 class NavigationState(
     val navHostController: NavHostController
 ) {
-    fun navigateTo(route: String) {
+    fun navigateTo(route: Screen) {
         navHostController.navigate(route) {
             popUpTo(navHostController.graph.findStartDestination().id) {
                 saveState = true

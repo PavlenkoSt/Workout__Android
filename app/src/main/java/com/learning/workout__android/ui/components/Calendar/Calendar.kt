@@ -11,6 +11,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.dataSources.CalendarDataSource
 import com.learning.workout__android.data.models.TrainingDayStatus
 import com.learning.workout__android.data.models.TrainingDayWithExercises
+import com.learning.workout__android.navigation.LocalNavController
+import com.learning.workout__android.navigation.Screen
 import com.learning.workout__android.viewModel.CalendarUiModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -87,7 +90,17 @@ private fun Header(
     onPrevClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
+    val navController = LocalNavController.current
+
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        IconButton(
+            onClick = {
+                navController.navigate(Screen.TrainingListScreen)
+            }
+        ) {
+            Icon(imageVector = Icons.Default.Person, contentDescription = null)
+        }
+
         Text(
             text = title,
             modifier = Modifier.weight(1f),
