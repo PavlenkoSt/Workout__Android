@@ -15,10 +15,6 @@ class TrainingDayRepository(
         return trainingDayDao.getAllTrainingDays()
     }
 
-    fun getByDate(date: String): Flow<TrainingDayWithExercises?> {
-        return trainingDayDao.getDayByDate(date)
-    }
-
     suspend fun deleteTrainingDayWithExercises(date: String) {
         trainingDayDao.deleteTrainingDayWithExercises(date)
     }
@@ -100,19 +96,7 @@ class TrainingDayRepository(
         trainingDayDao.deleteExercise(exercise)
     }
 
-    suspend fun reorderExercises(trainingDayId: Long, fromIndex: Int, toIndex: Int) {
-        val exercises = trainingDayDao.getExercisesByTrainingDayId(trainingDayId)
-        if (fromIndex in exercises.indices && toIndex in 0..exercises.size) {
-            val sortedExercises = exercises.sortedBy { it.order }.toMutableList()
-            val item = sortedExercises.removeAt(fromIndex)
-            sortedExercises.add(toIndex, item)
-
-            // Update order for all affected exercises
-            sortedExercises.forEachIndexed { index, exercise ->
-                if (exercise.order != index) {
-                    trainingDayDao.updateExerciseOrder(exercise.id, index)
-                }
-            }
-        }
+    suspend fun reorderExercises( from: Exercise, to: Exercise) {
+        trainingDayDao.swapExerciseOrder(from, to)
     }
 }

@@ -60,6 +60,13 @@ interface TrainingDayDao {
     @Delete
     suspend fun deleteExercise(exercise: Exercise)
 
+    @Transaction
+    suspend fun swapExerciseOrder(from: Exercise, to: Exercise) {
+        if (from.order == to.order) return
+        updateExerciseOrder(from.id, to.order)
+        updateExerciseOrder(to.id, from.order)
+    }
+
     @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
     fun deleteExercisesByTrainingDayId(trainingDayId: Long)
 

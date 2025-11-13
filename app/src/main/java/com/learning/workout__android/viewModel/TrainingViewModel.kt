@@ -15,7 +15,6 @@ import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.utils.formatExerciseType
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.scan
@@ -71,6 +69,7 @@ class TrainingViewModel(
         allTrainingDaysWithLoading.map { it is LoadState.Loading }
 
     private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
+    private val localReorderReducer = MutableStateFlow<Pair<Exercise, Exercise>?>(null)
 
     private val calendarUiFlow: Flow<CalendarUiModel> =
         combine(_visibleWeekStart, _selectedDate) { start, selected ->
@@ -114,6 +113,26 @@ class TrainingViewModel(
     private val isLoadingReducer = isLoadingFlow.toReducer<TrainingUiState, Boolean> {
         copy(isLoading = it)
     }
+    private val localReorderReducers = localReorderReducer.toReducer<TrainingUiState, Pair<Exercise, Exercise>?> {
+        if (it == null) return@toReducer this
+        val (from, to) = it
+        // Update currentDay locally by swapping exercise orders
+        val updatedDay = this.currentDay?.let { day ->
+            val updatedExercises = day.exercises.map { exercise ->
+                when (exercise.id) {
+                    from.id -> exercise.copy(order = to.order)
+                    to.id -> exercise.copy(order = from.order)
+                    else -> exercise
+                }
+            }
+            // Create new TrainingDayWithExercises with updated exercises
+            TrainingDayWithExercises(
+                trainingDay = day.trainingDay,
+                exercises = updatedExercises
+            )
+        }
+        copy(currentDay = updatedDay, currentDayStatistics = buildStats(updatedDay))
+    }
 
     val uiState: StateFlow<TrainingUiState> =
         merge(
@@ -123,7 +142,8 @@ class TrainingViewModel(
             allDaysReducers,
             dayReducers,
             editReducers,
-            isLoadingReducer
+            isLoadingReducer,
+            localReorderReducers
         )
             .scan(TrainingUiState()) { state, reduce ->
                 reduce(state)
@@ -155,8 +175,15 @@ class TrainingViewModel(
         return monday
     }
 
-    fun setExerciseToEdit(exercise: Exercise?) {
-        exerciseToEdit.value = exercise
+    fun setExerciseToEdit(exerciseId: Long?) {
+        if (exerciseId == null) {
+            exerciseToEdit.value = null
+            return
+        }
+        // Look up the exercise from the current state by ID to ensure we have the latest version
+        val currentDay = uiState.value.currentDay
+        val latestExercise = currentDay?.sortedExercises?.find { it.id == exerciseId }
+        exerciseToEdit.value = latestExercise
     }
 
     fun addDefaultExercise(formResult: ExerciseDefaultFormResult) {
@@ -235,15 +262,18 @@ class TrainingViewModel(
         }
     }
 
-    fun reorderExercises(fromIndex: Int, toIndex: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val currentDay = trainingDayRepository.getByDate(_selectedDate.value.toString()).first()
-            if (currentDay != null && fromIndex != toIndex) {
+    fun reorderExercises(from: Exercise, to: Exercise) {
+        // Update locally right away for smooth UI
+        localReorderReducer.value = from to to
+
+        viewModelScope.launch {
+            if (from.order != to.order) {
                 trainingDayRepository.reorderExercises(
-                    trainingDayId = currentDay.trainingDay.id,
-                    fromIndex = fromIndex,
-                    toIndex = toIndex
+                    from = from,
+                    to = to
                 )
+                // Clear local reorder after DB update completes
+                localReorderReducer.value = null
             }
         }
     }

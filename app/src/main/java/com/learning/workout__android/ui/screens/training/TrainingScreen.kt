@@ -98,7 +98,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 ) { date ->
                     ExerciseList(
                         exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
-                        onReorder = { from, to -> vm.reorderExercises(from, to) },
+                        onReorder = { from, to -> vm.reorderExercises(from, to)},
                         footer = {
                             TrainingFooter(
                                 text = if (ui.currentDay != null) {
@@ -140,7 +140,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                         },
                         onDeleteExercise = { vm.deleteExercise(it) },
                         onSwipeToEditExercise = {
-                            vm.setExerciseToEdit(it)
+                            vm.setExerciseToEdit(it.id)
                             showBottomSheet = true
                         },
                         onDecrementExercise = {

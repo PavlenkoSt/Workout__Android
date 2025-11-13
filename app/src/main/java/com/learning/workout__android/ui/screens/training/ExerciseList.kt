@@ -11,14 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -29,15 +21,13 @@ import com.learning.workout__android.R
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun ExerciseList(
     exercisesList: List<Exercise>,
-    onReorder: (from: Int, to: Int) -> Unit,
+    onReorder: (from: Exercise, to: Exercise) -> Unit,
     onDeleteExercise: (exercise: Exercise) -> Unit,
     onIncrementExercise: (exercise: Exercise) -> Unit,
     onDecrementExercise: (exercise: Exercise) -> Unit,
@@ -46,41 +36,14 @@ fun ExerciseList(
     header: @Composable () -> Unit,
     emptyMessage: @Composable () -> Unit,
 ) {
-    // Local state for optimistic updates to prevent flickering
-    val localExercises = remember { mutableStateListOf<Exercise>() }
-    val onReorderCallback = rememberUpdatedState(onReorder)
-    val coroutineScope = rememberCoroutineScope()
-    var isReordering by remember { mutableStateOf(false) }
-
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         // Adjust indices to account for header item (header is at index 0)
         val adjustedFrom = from.index - 1 // Subtract 1 for header
         val adjustedTo = to.index - 1 // Subtract 1 for header
 
-        if (adjustedFrom in localExercises.indices && adjustedTo in 0..localExercises.size) {
-            // Optimistic update: immediately update local state
-            isReordering = true
-            val item = localExercises.removeAt(adjustedFrom)
-            localExercises.add(adjustedTo, item)
-
-            // Persist to database after a short delay to let animation complete
-            coroutineScope.launch {
-                delay(150) // Small delay to let animation finish
-                onReorderCallback.value(adjustedFrom, adjustedTo)
-                delay(100) // Wait a bit more for DB update to complete
-                isReordering = false
-            }
-        }
-    }
-
-    // Update local state when the source list changes (but not during reordering)
-    LaunchedEffect(exercisesList, isReordering) {
-        if (!isReordering) {
-            if (localExercises != exercisesList) {
-                localExercises.clear()
-                localExercises.addAll(exercisesList)
-            }
+        if (adjustedFrom in exercisesList.indices && adjustedTo in 0..exercisesList.size) {
+            onReorder(exercisesList[adjustedFrom], exercisesList[adjustedTo])
         }
     }
 
@@ -92,17 +55,19 @@ fun ExerciseList(
             header()
         }
 
-        if (localExercises.isNotEmpty()) {
-            items(items = localExercises, key = { item -> item.id }) { item ->
+        if (exercisesList.isNotEmpty()) {
+            val canReorder = exercisesList.size > 1
+
+            items(items = exercisesList, key = { item -> item.id }) { item ->
                 ReorderableItem(
                     reorderableLazyListState,
                     key = item.id,
-                    enabled = localExercises.size > 1
+                    enabled = canReorder
                 ) { isDragging ->
                     ExerciseItem(
                         exercise = item,
                         draggableHandler = {
-                            if (localExercises.size > 1) {
+                            if (canReorder) {
                                 DraggableHandler(
                                     modifier = Modifier
                                         .draggableHandle()
