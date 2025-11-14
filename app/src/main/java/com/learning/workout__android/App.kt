@@ -1,9 +1,12 @@
 package com.learning.workout__android
 
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import com.learning.workout__android.navigation.Navigator
 import com.learning.workout__android.navigation.rememberNavigationState
 import com.learning.workout__android.ui.components.BottomNavBar
@@ -46,7 +49,11 @@ fun App() {
             },
             trainingListScreen = {
                 TrainingListScreen(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        bottom = paddingValues.calculateBottomPadding()
+                    )
                 )
             }
         )
