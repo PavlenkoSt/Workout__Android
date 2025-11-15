@@ -70,7 +70,8 @@ class TrainingViewModel(
         allTrainingDaysWithLoading.map { it is LoadState.Loading }
 
     private val exerciseToEdit = MutableStateFlow<TrainingExercise?>(null)
-    private val localReorderReducer = MutableStateFlow<Pair<TrainingExercise, TrainingExercise>?>(null)
+    private val localReorderReducer =
+        MutableStateFlow<Pair<TrainingExercise, TrainingExercise>?>(null)
 
     private val calendarUiFlow: Flow<CalendarUiModel> =
         combine(_visibleWeekStart, _selectedDate) { start, selected ->
@@ -315,11 +316,10 @@ class TrainingViewModel(
         fun provideFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val db = AppDatabase.getDatabase(context)
-                val airportRepository = TrainingDayRepository(trainingDayDao = db.trainingDayDao())
+                val trainingDayRepository =
+                    TrainingDayRepository(trainingDayDao = db.trainingDayDao())
 
-                TrainingViewModel(
-                    trainingDayRepository = airportRepository
-                )
+                TrainingViewModel(trainingDayRepository)
             }
         }
     }

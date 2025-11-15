@@ -90,11 +90,10 @@ class TrainingListViewModel(
         fun provideFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val db = AppDatabase.getDatabase(context)
-                val airportRepository = TrainingDayRepository(trainingDayDao = db.trainingDayDao())
+                val trainingDayRepository =
+                    TrainingDayRepository(trainingDayDao = db.trainingDayDao())
 
-                TrainingListViewModel(
-                    trainingDayRepository = airportRepository
-                )
+                TrainingListViewModel(trainingDayRepository)
             }
         }
     }
