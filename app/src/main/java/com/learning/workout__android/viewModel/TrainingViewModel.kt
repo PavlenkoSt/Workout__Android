@@ -35,7 +35,6 @@ typealias Reducer<S> = (S) -> S
 
 private inline fun <S, T> Flow<T>.toReducer(
     crossinline update: S.(T) -> S
-
 ): Flow<Reducer<S>> = distinctUntilChanged().map { v -> { s: S -> s.update(v) } }
 
 class TrainingViewModel(

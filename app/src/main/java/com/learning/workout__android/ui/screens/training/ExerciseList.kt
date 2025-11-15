@@ -1,27 +1,18 @@
 package com.learning.workout__android.ui.screens.training
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.learning.workout__android.R
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingExercise
+import com.learning.workout__android.ui.components.DraggableHandler
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -99,20 +90,6 @@ fun ExerciseList(
             footer()
         }
     }
-}
-
-@Composable
-private fun DraggableHandler(modifier: Modifier = Modifier) {
-    Icon(
-        painter = painterResource(R.drawable.hand),
-        contentDescription = "Handle",
-        tint = Color.Gray.copy(alpha = 0.6f),
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .size(24.dp)
-            .clip(ShapeDefaults.Large)
-            .background(MaterialTheme.colorScheme.surface)
-    )
 }
 
 @Composable

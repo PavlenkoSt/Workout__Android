@@ -22,8 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.TrainingExercise
+import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseType
 
@@ -65,6 +66,8 @@ fun ExerciseForm(
     }
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+        ModalHeader(if (exerciseToEdit == null) "Add exercise" else "Edit exercise")
+
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },

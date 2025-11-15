@@ -13,7 +13,8 @@ import androidx.room.Relation
 )
 data class Preset(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "name") val name: String
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "order") val order: Long
 )
 
 data class PresetWithExercises(
