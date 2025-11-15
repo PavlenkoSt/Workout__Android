@@ -51,13 +51,10 @@ interface TrainingDayDao {
     suspend fun getExerciseById(exerciseId: Long): TrainingExercise?
 
     @Query("DELETE FROM training_days WHERE date = :date")
-    fun deleteByDate(date: String)
+    suspend fun deleteByDate(date: String)
 
     @Insert
     suspend fun create(trainingDay: TrainingDay): Long
-
-    @Update
-    suspend fun update(trainingDay: TrainingDay)
 
     @Insert
     suspend fun insertExercise(exercise: TrainingExercise): Long
@@ -80,20 +77,5 @@ interface TrainingDayDao {
         // Perform atomic swap
         updateExerciseOrder(fromExercise.id, toExercise.order)
         updateExerciseOrder(toExercise.id, fromExercise.order)
-    }
-
-    @Query("DELETE FROM training_exercises WHERE trainingDayId = :trainingDayId")
-    fun deleteExercisesByTrainingDayId(trainingDayId: Long)
-
-    @Query("SELECT id FROM training_days WHERE date = :date")
-    suspend fun getTrainingDayIdByDate(date: String): Long?
-
-    @Transaction
-    suspend fun deleteTrainingDayWithExercises(date: String) {
-        val trainingDayId = getTrainingDayIdByDate(date)
-        trainingDayId?.let {
-            deleteExercisesByTrainingDayId(it)
-            deleteByDate(date)
-        }
     }
 }

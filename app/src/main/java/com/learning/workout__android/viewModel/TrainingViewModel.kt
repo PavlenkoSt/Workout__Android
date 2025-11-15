@@ -282,7 +282,7 @@ class TrainingViewModel(
 
     fun deleteTrainingDay(selectedDate: LocalDate) {
         viewModelScope.launch {
-            trainingDayRepository.deleteTrainingDayWithExercises(selectedDate.toString())
+            trainingDayRepository.deleteTrainingDayByDate(selectedDate.toString())
         }
     }
 
