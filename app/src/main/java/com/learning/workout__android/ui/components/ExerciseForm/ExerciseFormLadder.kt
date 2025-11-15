@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseFormLadderViewModel
 import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
@@ -36,7 +36,7 @@ import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
 @Composable
 fun ExerciseFormLadder(
     onLadderExerciseSubmit: (result: ExerciseLadderFormResult) -> Unit,
-    exerciseToEdit: Exercise?,
+    exerciseToEdit: TrainingExercise?,
     vm: ExerciseFormLadderViewModel = viewModel(),
     seed: SharedSeed,
     onSaveSeed: (seed: SharedSeed) -> Unit

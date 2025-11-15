@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
 @Entity(
-    tableName = "exercises",
+    tableName = "training_exercises",
     foreignKeys = [
         ForeignKey(
             entity = TrainingDay::class,
@@ -19,7 +19,7 @@ import androidx.room.TypeConverter
     ],
     indices = [Index("trainingDayId")]
 )
-data class Exercise(
+data class TrainingExercise(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "trainingDayId") val trainingDayId: Long,
     @ColumnInfo(name = "name") val name: String,

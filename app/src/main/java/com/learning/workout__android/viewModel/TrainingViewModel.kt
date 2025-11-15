@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
@@ -69,8 +69,8 @@ class TrainingViewModel(
     private val isLoadingFlow: Flow<Boolean> =
         allTrainingDaysWithLoading.map { it is LoadState.Loading }
 
-    private val exerciseToEdit = MutableStateFlow<Exercise?>(null)
-    private val localReorderReducer = MutableStateFlow<Pair<Exercise, Exercise>?>(null)
+    private val exerciseToEdit = MutableStateFlow<TrainingExercise?>(null)
+    private val localReorderReducer = MutableStateFlow<Pair<TrainingExercise, TrainingExercise>?>(null)
 
     private val calendarUiFlow: Flow<CalendarUiModel> =
         combine(_visibleWeekStart, _selectedDate) { start, selected ->
@@ -108,14 +108,14 @@ class TrainingViewModel(
     private val dayReducers = currentDayFlow.toReducer<TrainingUiState, TrainingDayWithExercises?> {
         copy(currentDay = it, currentDayStatistics = buildStats(it))
     }
-    private val editReducers = exerciseToEdit.toReducer<TrainingUiState, Exercise?> {
+    private val editReducers = exerciseToEdit.toReducer<TrainingUiState, TrainingExercise?> {
         copy(exerciseToEdit = it)
     }
     private val isLoadingReducer = isLoadingFlow.toReducer<TrainingUiState, Boolean> {
         copy(isLoading = it)
     }
     private val localReorderReducers =
-        localReorderReducer.toReducer<TrainingUiState, Pair<Exercise, Exercise>?> {
+        localReorderReducer.toReducer<TrainingUiState, Pair<TrainingExercise, TrainingExercise>?> {
             if (it == null) return@toReducer this
             val (from, to) = it
             // Update currentDay locally by swapping exercise orders
@@ -191,7 +191,7 @@ class TrainingViewModel(
     fun addDefaultExercise(formResult: ExerciseDefaultFormResult) {
         viewModelScope.launch {
             val selectedDate = _selectedDate.value.toString()
-            val exercise = Exercise(
+            val exercise = TrainingExercise(
                 trainingDayId = 0, // Will be set by repository
                 name = formResult.name,
                 reps = formResult.reps.toInt(),
@@ -213,11 +213,11 @@ class TrainingViewModel(
             val rest = formResult.rest.toInt()
 
             // Generate exercises for each rung of the ladder
-            val exercises = mutableListOf<Exercise>()
+            val exercises = mutableListOf<TrainingExercise>()
             var currentReps = from
             while (currentReps <= to) {
                 exercises.add(
-                    Exercise(
+                    TrainingExercise(
                         trainingDayId = 0, // Will be set by repository
                         name = formResult.name,
                         reps = currentReps,
@@ -238,7 +238,7 @@ class TrainingViewModel(
         viewModelScope.launch {
             val selectedDate = _selectedDate.value.toString()
 
-            val exercise = Exercise(
+            val exercise = TrainingExercise(
                 trainingDayId = 0, // Will be set by repository
                 name = "",
                 reps = 1,
@@ -252,19 +252,19 @@ class TrainingViewModel(
         }
     }
 
-    fun updateExercise(exercise: Exercise) {
+    fun updateExercise(exercise: TrainingExercise) {
         viewModelScope.launch {
             trainingDayRepository.updateExercise(exercise)
         }
     }
 
-    fun deleteExercise(exercise: Exercise) {
+    fun deleteExercise(exercise: TrainingExercise) {
         viewModelScope.launch {
             trainingDayRepository.deleteExercise(exercise)
         }
     }
 
-    fun reorderExercises(from: Exercise, to: Exercise) {
+    fun reorderExercises(from: TrainingExercise, to: TrainingExercise) {
         // Update locally right away for smooth UI
         localReorderReducer.value = from to to
 
@@ -349,7 +349,7 @@ data class TrainingUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val allTrainingDays: List<TrainingDayWithExercises> = emptyList(),
     val currentDay: TrainingDayWithExercises? = null,
-    val exerciseToEdit: Exercise? = null,
+    val exerciseToEdit: TrainingExercise? = null,
     val currentDayStatistics: List<TrainingStatisticsItem> = emptyList(),
     val isLoading: Boolean = true
 )

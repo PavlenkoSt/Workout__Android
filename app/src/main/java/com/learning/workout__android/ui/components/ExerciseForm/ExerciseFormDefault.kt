@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseDefaultFormEvent
@@ -37,7 +37,7 @@ import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
 @Composable
 fun ExerciseFormDefault(
     isStatic: Boolean? = false,
-    exerciseToEdit: Exercise?,
+    exerciseToEdit: TrainingExercise?,
     onDefaultExerciseSubmit: (result: ExerciseDefaultFormResult) -> Unit,
     exerciseType: ExerciseType,
     vm: ExerciseFormDefaultViewModel = viewModel(),

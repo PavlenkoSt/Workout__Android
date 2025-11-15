@@ -1,6 +1,6 @@
 package com.learning.workout__android.utils
 
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 
 fun formatExerciseType(type: String): String {
@@ -14,7 +14,7 @@ fun formatExerciseType(type: String): String {
         }
 }
 
-fun formatExerciseName(exercise: Exercise): String {
+fun formatExerciseName(exercise: TrainingExercise): String {
     return when (exercise.type) {
         ExerciseType.FLEXIBILITY_SESSION -> "Flexibility session"
         ExerciseType.HAND_BALANCE_SESSION -> "Hand balance session"

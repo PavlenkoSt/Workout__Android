@@ -22,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseType
@@ -33,7 +33,7 @@ fun ExerciseForm(
     onDefaultExerciseSubmit: (formResult: ExerciseDefaultFormResult) -> Unit,
     onLadderExerciseSubmit: (formResult: ExerciseLadderFormResult) -> Unit,
     onSimpleExerciseSubmit: (formResult: ExerciseSimpleFormResult) -> Unit,
-    exerciseToEdit: Exercise?
+    exerciseToEdit: TrainingExercise?
 ) {
     val exerciseTypes = if (exerciseToEdit != null) listOf(
         ExerciseType.DYNAMIC,

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingDayWithExercises
@@ -105,7 +105,7 @@ private fun ExerciseItemsHeader() {
 }
 
 @Composable
-private fun ExerciseItem(exercise: Exercise) {
+private fun ExerciseItem(exercise: TrainingExercise) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 
         Box(
@@ -173,7 +173,7 @@ private fun TrainingItemDetailsPreview() {
                 exercises = List(
                     5,
                     {
-                        Exercise(
+                        TrainingExercise(
                             it.toLong(),
                             0L,
                             "Pull ups",

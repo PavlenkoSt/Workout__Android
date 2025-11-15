@@ -1,7 +1,7 @@
 package com.learning.workout__android.data.repositories
 
 import com.learning.workout__android.data.daos.TrainingDayDao
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingDayWithExercises
@@ -18,7 +18,7 @@ class TrainingDayRepository(
         trainingDayDao.deleteTrainingDayWithExercises(date)
     }
 
-    suspend fun addExerciseToDate(date: String, exercise: Exercise) {
+    suspend fun addExerciseToDate(date: String, exercise: TrainingExercise) {
         val existingDay = trainingDayDao.getDayByDate(date).first()
         if (existingDay != null) {
             val trainingDayId = existingDay.trainingDay.id
@@ -33,7 +33,7 @@ class TrainingDayRepository(
         } else {
             val createdId = trainingDayDao.create(TrainingDay(date = date))
             trainingDayDao.insertExercise(
-                Exercise(
+                TrainingExercise(
                     trainingDayId = createdId,
                     name = "Warmup",
                     type = ExerciseType.WARMUP,
@@ -48,7 +48,7 @@ class TrainingDayRepository(
         }
     }
 
-    suspend fun addExercisesToDate(date: String, exercises: List<Exercise>) {
+    suspend fun addExercisesToDate(date: String, exercises: List<TrainingExercise>) {
         val existingDay = trainingDayDao.getDayByDate(date).first()
 
         if (existingDay != null) {
@@ -67,7 +67,7 @@ class TrainingDayRepository(
             val createdTrainingDayId = trainingDayDao.create(TrainingDay(date = date))
 
             trainingDayDao.insertExercise(
-                Exercise(
+                TrainingExercise(
                     trainingDayId = createdTrainingDayId,
                     name = "Warmup",
                     type = ExerciseType.WARMUP,
@@ -87,11 +87,11 @@ class TrainingDayRepository(
         }
     }
 
-    suspend fun updateExercise(exercise: Exercise) {
+    suspend fun updateExercise(exercise: TrainingExercise) {
         trainingDayDao.updateExercise(exercise)
     }
 
-    suspend fun deleteExercise(exercise: Exercise) {
+    suspend fun deleteExercise(exercise: TrainingExercise) {
         trainingDayDao.deleteExercise(exercise)
     }
 

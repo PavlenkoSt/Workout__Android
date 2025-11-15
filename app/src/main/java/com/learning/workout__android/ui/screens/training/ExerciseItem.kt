@@ -46,8 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseName
 
@@ -55,7 +55,7 @@ import com.learning.workout__android.utils.formatExerciseName
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseItem(
-    exercise: Exercise,
+    exercise: TrainingExercise,
     index: Int,
     draggableHandler: @Composable () -> Unit,
     onDelete: () -> Unit,
@@ -158,7 +158,7 @@ private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
 
 @Composable
 private fun ExerciseHeaderRow(
-    exercise: Exercise,
+    exercise: TrainingExercise,
     draggableHandler: @Composable () -> Unit,
     index: Int
 ) {
@@ -198,7 +198,7 @@ private fun ExerciseHeaderRow(
 
 @Composable
 private fun ExerciseSetsRow(
-    exercise: Exercise,
+    exercise: TrainingExercise,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
 ) {
@@ -312,7 +312,7 @@ private fun ExerciseStatItem(
 fun ExerciseItemPreview() {
     Workout__AndroidTheme {
         ExerciseItem(
-            exercise = Exercise(
+            exercise = TrainingExercise(
                 0,
                 trainingDayId = 0,
                 name = "Exercise preview",

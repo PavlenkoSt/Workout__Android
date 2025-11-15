@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.learning.workout__android.data.models.Exercise
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import kotlinx.coroutines.flow.Flow
@@ -26,16 +26,16 @@ interface TrainingDayDao {
 
     @Query(
         """
-        SELECT * FROM exercises 
+        SELECT * FROM training_exercises 
         WHERE trainingDayId = :trainingDayId 
         ORDER BY "order" ASC
     """
     )
-    suspend fun getExercisesByTrainingDayId(trainingDayId: Long): List<Exercise>
+    suspend fun getExercisesByTrainingDayId(trainingDayId: Long): List<TrainingExercise>
 
     @Query(
         """
-        UPDATE exercises 
+        UPDATE training_exercises 
         SET "order" = :order 
         WHERE id = :exerciseId
     """
@@ -44,11 +44,11 @@ interface TrainingDayDao {
 
     @Query(
         """
-        SELECT * FROM exercises 
+        SELECT * FROM training_exercises 
         WHERE id = :exerciseId
     """
     )
-    suspend fun getExerciseById(exerciseId: Long): Exercise?
+    suspend fun getExerciseById(exerciseId: Long): TrainingExercise?
 
     @Query("DELETE FROM training_days WHERE date = :date")
     fun deleteByDate(date: String)
@@ -60,13 +60,13 @@ interface TrainingDayDao {
     suspend fun update(trainingDay: TrainingDay)
 
     @Insert
-    suspend fun insertExercise(exercise: Exercise): Long
+    suspend fun insertExercise(exercise: TrainingExercise): Long
 
     @Update
-    suspend fun updateExercise(exercise: Exercise)
+    suspend fun updateExercise(exercise: TrainingExercise)
 
     @Delete
-    suspend fun deleteExercise(exercise: Exercise)
+    suspend fun deleteExercise(exercise: TrainingExercise)
 
     @Transaction
     suspend fun swapExerciseOrder(fromExerciseId: Long, toExerciseId: Long) {
@@ -82,7 +82,7 @@ interface TrainingDayDao {
         updateExerciseOrder(toExercise.id, fromExercise.order)
     }
 
-    @Query("DELETE FROM exercises WHERE trainingDayId = :trainingDayId")
+    @Query("DELETE FROM training_exercises WHERE trainingDayId = :trainingDayId")
     fun deleteExercisesByTrainingDayId(trainingDayId: Long)
 
     @Query("SELECT id FROM training_days WHERE date = :date")

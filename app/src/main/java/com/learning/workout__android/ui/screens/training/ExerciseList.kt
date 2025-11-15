@@ -20,20 +20,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.learning.workout__android.R
-import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun ExerciseList(
-    exercisesList: List<Exercise>,
-    onReorder: (from: Exercise, to: Exercise) -> Unit,
-    onDeleteExercise: (exercise: Exercise) -> Unit,
-    onIncrementExercise: (exercise: Exercise) -> Unit,
-    onDecrementExercise: (exercise: Exercise) -> Unit,
-    onSwipeToEditExercise: (exercise: Exercise) -> Unit,
+    exercisesList: List<TrainingExercise>,
+    onReorder: (from: TrainingExercise, to: TrainingExercise) -> Unit,
+    onDeleteExercise: (exercise: TrainingExercise) -> Unit,
+    onIncrementExercise: (exercise: TrainingExercise) -> Unit,
+    onDecrementExercise: (exercise: TrainingExercise) -> Unit,
+    onSwipeToEditExercise: (exercise: TrainingExercise) -> Unit,
     footer: @Composable () -> Unit,
     header: @Composable () -> Unit,
     emptyMessage: @Composable () -> Unit,
@@ -121,7 +121,7 @@ fun ExerciseListPreview() {
     Workout__AndroidTheme {
         ExerciseList(
             exercisesList = List(10, { idx ->
-                Exercise(
+                TrainingExercise(
                     id = idx.toLong(),
                     trainingDayId = 0,
                     name = "Preview exercise",
