@@ -43,7 +43,7 @@ fun CalendarDay(
     onClick: (CalendarUiModel.Date) -> Unit,
     modifier: Modifier = Modifier,
     isActive: Boolean,
-    trainingDayStatus: TrainingDayStatus
+    trainingDayStatus: TrainingDayStatus?
 ) {
     Card(
         modifier = modifier.clickable { onClick(date) },

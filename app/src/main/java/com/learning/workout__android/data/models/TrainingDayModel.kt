@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import androidx.room.TypeConverter
+import java.time.LocalDate
 
 data class TrainingDayWithExercises(
     @Embedded val trainingDay: TrainingDay,
@@ -19,8 +20,16 @@ data class TrainingDayWithExercises(
 ) {
     val sortedExercises: List<Exercise>
         get() = exercises.sortedBy { it.order }
-    val isCompleted: Boolean
-        get() = exercises.isNotEmpty() && exercises.all { it.setsDone >= it.sets }
+    val status: TrainingDayStatus
+        get() {
+           return if(exercises.isNotEmpty() && exercises.all { it.setsDone >= it.sets }) {
+               TrainingDayStatus.COMPLETED
+            }else if (LocalDate.now().isAfter(LocalDate.parse(trainingDay.date))) {
+                TrainingDayStatus.FAILED
+            }else {
+                TrainingDayStatus.PENDING
+            }
+        }
 }
 
 @Entity(
@@ -73,7 +82,6 @@ class Converters {
 }
 
 enum class TrainingDayStatus() {
-    NONE,
     COMPLETED,
     PENDING,
     FAILED

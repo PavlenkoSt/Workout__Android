@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.dataSources.CalendarDataSource
-import com.learning.workout__android.data.models.TrainingDayStatus
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.navigation.LocalNavController
 import com.learning.workout__android.navigation.Screen
@@ -130,6 +129,7 @@ fun DaysRow(
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         data.week.forEach { date ->
+            val targetDay = allTrainingDays.find { it.trainingDay.date == date.date.toString() }
             CalendarDay(
                 date = date,
                 onClick = onDateClick,
@@ -137,28 +137,8 @@ fun DaysRow(
                     .padding(vertical = 4.dp, horizontal = 2.dp)
                     .weight(1f),
                 isActive = activeDate == date.date,
-                trainingDayStatus = getTrainingDayStatus(
-                    allTrainingDays.find { it.trainingDay.date == date.date.toString() }
-                )
+                trainingDayStatus = targetDay?.status
             )
         }
     }
-}
-
-fun getTrainingDayStatus(day: TrainingDayWithExercises?): TrainingDayStatus {
-    if (day == null) {
-        return TrainingDayStatus.NONE
-    }
-
-    if (day.isCompleted) {
-        return TrainingDayStatus.COMPLETED
-    }
-
-    val isInPast = LocalDate.parse(day.trainingDay.date).isBefore(LocalDate.now())
-
-    if (isInPast) {
-        return TrainingDayStatus.FAILED
-    }
-
-    return TrainingDayStatus.PENDING
 }
