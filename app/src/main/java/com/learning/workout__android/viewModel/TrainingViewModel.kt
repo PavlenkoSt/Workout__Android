@@ -14,6 +14,7 @@ import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.repositories.TrainingDayRepository
+import com.learning.workout__android.utils.LoadState
 import com.learning.workout__android.utils.formatExerciseType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,26 +114,27 @@ class TrainingViewModel(
     private val isLoadingReducer = isLoadingFlow.toReducer<TrainingUiState, Boolean> {
         copy(isLoading = it)
     }
-    private val localReorderReducers = localReorderReducer.toReducer<TrainingUiState, Pair<Exercise, Exercise>?> {
-        if (it == null) return@toReducer this
-        val (from, to) = it
-        // Update currentDay locally by swapping exercise orders
-        val updatedDay = this.currentDay?.let { day ->
-            val updatedExercises = day.exercises.map { exercise ->
-                when (exercise.id) {
-                    from.id -> exercise.copy(order = to.order)
-                    to.id -> exercise.copy(order = from.order)
-                    else -> exercise
+    private val localReorderReducers =
+        localReorderReducer.toReducer<TrainingUiState, Pair<Exercise, Exercise>?> {
+            if (it == null) return@toReducer this
+            val (from, to) = it
+            // Update currentDay locally by swapping exercise orders
+            val updatedDay = this.currentDay?.let { day ->
+                val updatedExercises = day.exercises.map { exercise ->
+                    when (exercise.id) {
+                        from.id -> exercise.copy(order = to.order)
+                        to.id -> exercise.copy(order = from.order)
+                        else -> exercise
+                    }
                 }
+                // Create new TrainingDayWithExercises with updated exercises
+                TrainingDayWithExercises(
+                    trainingDay = day.trainingDay,
+                    exercises = updatedExercises
+                )
             }
-            // Create new TrainingDayWithExercises with updated exercises
-            TrainingDayWithExercises(
-                trainingDay = day.trainingDay,
-                exercises = updatedExercises
-            )
+            copy(currentDay = updatedDay, currentDayStatistics = buildStats(updatedDay))
         }
-        copy(currentDay = updatedDay, currentDayStatistics = buildStats(updatedDay))
-    }
 
     val uiState: StateFlow<TrainingUiState> =
         merge(
@@ -379,8 +381,3 @@ data class TrainingStatisticsItem(
     val repsToDo: Int,
     val repsDone: Int
 )
-
-sealed interface LoadState<out T> {
-    data object Loading : LoadState<Nothing>
-    data class Success<T>(val data: T) : LoadState<T>
-}

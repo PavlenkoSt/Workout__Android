@@ -12,11 +12,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.viewModel.TrainingListFilterEnum
+import com.learning.workout__android.viewModel.TrainingStatusSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingListHeader(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    filter: TrainingListFilterEnum,
+    onFilterChange: (TrainingListFilterEnum) -> Unit,
+    summary: TrainingStatusSummary
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -35,7 +40,7 @@ fun TrainingListHeader(
             }
         },
         actions = {
-            TrainingListFilter()
+            TrainingListFilter(filter, onFilterChange, summary)
         }
     )
 }
@@ -45,7 +50,10 @@ fun TrainingListHeader(
 private fun TrainingListHeaderPreview() {
     Workout__AndroidTheme {
         TrainingListHeader(
-            onBack = {}
+            onBack = {},
+            filter = TrainingListFilterEnum.All,
+            onFilterChange = {},
+            summary = TrainingStatusSummary()
         )
     }
 }

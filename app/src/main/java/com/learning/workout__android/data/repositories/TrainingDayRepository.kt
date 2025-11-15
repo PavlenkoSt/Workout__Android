@@ -14,7 +14,6 @@ class TrainingDayRepository(
     fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>> {
         return trainingDayDao.getAllTrainingDays()
     }
-
     suspend fun deleteTrainingDayWithExercises(date: String) {
         trainingDayDao.deleteTrainingDayWithExercises(date)
     }

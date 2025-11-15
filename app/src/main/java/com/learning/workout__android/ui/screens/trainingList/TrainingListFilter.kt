@@ -22,28 +22,46 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.viewModel.TrainingListFilterEnum
+import com.learning.workout__android.viewModel.TrainingStatusSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainingListFilter() {
-    val filterValues = listOf("All", "Completed", "Incompleted")
+fun TrainingListFilter(
+    filter: TrainingListFilterEnum,
+    onFilterChange: (TrainingListFilterEnum) -> Unit,
+    summary: TrainingStatusSummary
+) {
+    val filterValues = listOf(
+        TrainingListFilterEnum.All,
+        TrainingListFilterEnum.Completed,
+        TrainingListFilterEnum.Pending,
+        TrainingListFilterEnum.Failed
+    )
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedFilter by remember { mutableStateOf(filterValues[0]) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
-        Row (
+        Row(
             modifier = Modifier
-                .border(2.dp, color = MaterialTheme.colorScheme.onBackground, shape = ShapeDefaults.Small)
+                .border(
+                    2.dp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    shape = ShapeDefaults.Small
+                )
                 .padding(horizontal = 12.dp, vertical = 6.dp)
                 .menuAnchor()
                 .defaultMinSize(100.dp),
             horizontalArrangement = Arrangement.Center
-        ){
-            Text(selectedFilter, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
+        ) {
+            Text(
+                "$filter (${getSummaryForFilter(filter, summary)})",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded, modifier = Modifier)
         }
 
@@ -54,9 +72,9 @@ fun TrainingListFilter() {
         ) {
             filterValues.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(item) },
+                    text = { Text("$item (${getSummaryForFilter(item, summary)})") },
                     onClick = {
-                        selectedFilter = item
+                        onFilterChange(item)
                         expanded = false
                     }
                 )
@@ -65,10 +83,26 @@ fun TrainingListFilter() {
     }
 }
 
+private fun getSummaryForFilter(
+    filter: TrainingListFilterEnum,
+    summary: TrainingStatusSummary
+): Int {
+    return when (filter) {
+        TrainingListFilterEnum.All -> summary.total
+        TrainingListFilterEnum.Completed -> summary.completed
+        TrainingListFilterEnum.Failed -> summary.failed
+        TrainingListFilterEnum.Pending -> summary.pending
+    }
+}
+
 @Composable
 @Preview()
 private fun TrainingListFilterPreview() {
     Workout__AndroidTheme {
-        TrainingListFilter()
+        TrainingListFilter(
+            filter = TrainingListFilterEnum.All,
+            onFilterChange = {},
+            summary = TrainingStatusSummary()
+        )
     }
 }

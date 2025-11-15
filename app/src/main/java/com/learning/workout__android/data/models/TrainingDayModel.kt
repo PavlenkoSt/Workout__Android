@@ -23,11 +23,11 @@ data class TrainingDayWithExercises(
     val status: TrainingDayStatus
         get() {
            return if(exercises.isNotEmpty() && exercises.all { it.setsDone >= it.sets }) {
-               TrainingDayStatus.COMPLETED
+               TrainingDayStatus.Completed
             }else if (LocalDate.now().isAfter(LocalDate.parse(trainingDay.date))) {
-                TrainingDayStatus.FAILED
+                TrainingDayStatus.Failed
             }else {
-                TrainingDayStatus.PENDING
+                TrainingDayStatus.Pending
             }
         }
 }
@@ -82,7 +82,7 @@ class Converters {
 }
 
 enum class TrainingDayStatus() {
-    COMPLETED,
-    PENDING,
-    FAILED
+    Completed,
+    Pending,
+    Failed
 }

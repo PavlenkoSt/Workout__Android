@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.learning.workout__android.data.models.Exercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
+import com.learning.workout__android.utils.formatExerciseName
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -168,7 +169,7 @@ private fun ExerciseHeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "${index + 1}. ${getExerciseName(exercise)}",
+            text = "${index + 1}. ${formatExerciseName(exercise)}",
             modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -303,15 +304,6 @@ private fun ExerciseStatItem(
             lineHeight = 14.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
-    }
-}
-
-private fun getExerciseName(exercise: Exercise): String {
-    return when (exercise.type) {
-        ExerciseType.FLEXIBILITY_SESSION -> "Flexibility session"
-        ExerciseType.HAND_BALANCE_SESSION -> "Hand balance session"
-        ExerciseType.WARMUP -> "Warmup"
-        else -> exercise.name
     }
 }
 

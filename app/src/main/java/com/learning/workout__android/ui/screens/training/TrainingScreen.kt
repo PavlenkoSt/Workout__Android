@@ -8,12 +8,9 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,6 +32,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.navigation.LocalNavController
+import com.learning.workout__android.navigation.SaveStateHandleEnum
 import com.learning.workout__android.ui.components.Calendar.Calendar
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
@@ -54,6 +53,13 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     )
     val ui by vm.uiState.collectAsState()
 
+    val localNavController = LocalNavController.current
+
+    val trainingDayPicked = localNavController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow(SaveStateHandleEnum.TrainingDayDate, "")
+        ?.collectAsState()
+
     val initialPage = Int.MAX_VALUE / 2
     val initialWeekStart = remember { LocalDate.now().with(DayOfWeek.MONDAY) }
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
@@ -66,6 +72,36 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         val start =
             LocalDate.now().with(DayOfWeek.MONDAY).plusWeeks(weeksFromStart.toLong())
         vm.onWeekVisible(start)
+    }
+
+    // handle a picking date from another screen
+    LaunchedEffect(trainingDayPicked?.value) {
+        if (trainingDayPicked?.value?.isNotEmpty() == true) {
+            val dateStr = trainingDayPicked?.value
+            if (!dateStr.isNullOrEmpty()) {
+                val pickedDate = LocalDate.parse(dateStr)
+                vm.onDateSelected(pickedDate)
+
+                // Monday of picked week
+                val pickedWeekStart = pickedDate.with(DayOfWeek.MONDAY)
+
+                // Your base Monday (same as in pager + Today button)
+                val baseWeekStart = initialWeekStart
+
+                val deltaWeeks = ChronoUnit.WEEKS.between(
+                    baseWeekStart,
+                    pickedWeekStart
+                ).toInt()
+
+                val targetPage = initialPage + deltaWeeks
+
+                pagerState.animateScrollToPage(targetPage)
+
+                localNavController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(SaveStateHandleEnum.TrainingDayDate, "")
+            }
+        }
     }
 
     if (ui.isLoading) {
@@ -102,7 +138,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                 ) { date ->
                     ExerciseList(
                         exercisesList = ui.currentDay?.sortedExercises ?: emptyList(),
-                        onReorder = { from, to -> vm.reorderExercises(from, to)},
+                        onReorder = { from, to -> vm.reorderExercises(from, to) },
                         footer = {
                             TrainingFooter(
                                 text = if (ui.currentDay != null) {

@@ -80,7 +80,7 @@ fun CalendarDay(
             }
 
             when (trainingDayStatus) {
-                TrainingDayStatus.COMPLETED -> {
+                TrainingDayStatus.Completed -> {
                     DayStatusMark(
                         imageVector = Icons.Default.Check,
                         color = Color(0xFF14B8A6),
@@ -88,7 +88,7 @@ fun CalendarDay(
                     )
                 }
 
-                TrainingDayStatus.FAILED -> {
+                TrainingDayStatus.Failed -> {
                     DayStatusMark(
                         imageVector = Icons.Default.Close,
                         color = Color.Red,
@@ -96,7 +96,7 @@ fun CalendarDay(
                     )
                 }
 
-                TrainingDayStatus.PENDING -> {
+                TrainingDayStatus.Pending -> {
                     DayStatusMark(
                         imageVector = Icons.Default.PlayArrow,
                         color = Color(0xFFffb800),
@@ -160,7 +160,7 @@ private fun CalendarTodayDayPreview() {
             onClick = {},
             isActive = true,
             modifier = Modifier.width(64.dp),
-            trainingDayStatus = TrainingDayStatus.COMPLETED
+            trainingDayStatus = TrainingDayStatus.Completed
         )
     }
 }
@@ -178,7 +178,7 @@ private fun CalendarPendingDayPreview() {
             onClick = {},
             isActive = false,
             modifier = Modifier.width(64.dp),
-            trainingDayStatus = TrainingDayStatus.PENDING
+            trainingDayStatus = TrainingDayStatus.Pending
         )
     }
 }
@@ -196,7 +196,7 @@ private fun CalendarCompletedDayPreview() {
             onClick = {},
             isActive = false,
             modifier = Modifier.width(64.dp),
-            trainingDayStatus = TrainingDayStatus.COMPLETED
+            trainingDayStatus = TrainingDayStatus.Completed
         )
     }
 }
@@ -214,7 +214,7 @@ private fun CalendarFailedDayPreview() {
             onClick = {},
             isActive = false,
             modifier = Modifier.width(64.dp),
-            trainingDayStatus = TrainingDayStatus.FAILED
+            trainingDayStatus = TrainingDayStatus.Failed
         )
     }
 }

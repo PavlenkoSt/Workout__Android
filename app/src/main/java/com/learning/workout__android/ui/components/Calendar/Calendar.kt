@@ -53,7 +53,7 @@ fun Calendar(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 8.dp, end = 16.dp, start = 8.dp)
         )
 
         HorizontalPager(

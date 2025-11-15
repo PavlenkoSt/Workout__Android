@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingDayDao {
-    @Query("SELECT * FROM training_days")
+    @Query("SELECT * FROM training_days ORDER BY id DESC")
     @Transaction
     fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>>
 
