@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +34,6 @@ import com.learning.workout__android.navigation.LocalNavController
 import com.learning.workout__android.navigation.SaveStateHandleEnum
 import com.learning.workout__android.ui.components.Calendar.Calendar
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseEditingFields
-import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.TrainingViewModel
 import kotlinx.coroutines.launch
@@ -65,8 +62,8 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     val initialWeekStart = remember { LocalDate.now().with(DayOfWeek.MONDAY) }
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { Int.MAX_VALUE })
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var exerciseModalVisible by remember { mutableStateOf(false) }
+    var saveAsPresetModalVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(pagerState.currentPage) {
         val weeksFromStart = pagerState.currentPage - initialPage
@@ -147,7 +144,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                                 } else {
                                     "Create training"
                                 },
-                                onClick = { showBottomSheet = true },
+                                onClick = { exerciseModalVisible = true },
                                 statistics = ui.currentDayStatistics
                             )
                         },
@@ -160,7 +157,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                                     vm.deleteTrainingDay(date)
                                 },
                                 onSaveAsPresetClick = {
-                                    // TODO add this after implemented presets
+                                    saveAsPresetModalVisible = true
                                 },
                                 hasExercises = ui.currentDay?.sortedExercises?.isNotEmpty() ?: false
                             )
@@ -182,7 +179,7 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                         onDeleteExercise = { vm.deleteExercise(it) },
                         onSwipeToEditExercise = {
                             vm.setExerciseToEdit(it.id)
-                            showBottomSheet = true
+                            exerciseModalVisible = true
                         },
                         onDecrementExercise = {
                             vm.updateExercise(
@@ -223,73 +220,66 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    if (showBottomSheet) {
-        fun onHide() {
-            coroutineScope.launch {
-                sheetState.hide()
-                showBottomSheet = false
-            }
-        }
-
-        ModalBottomSheet(
-            onDismissRequest = {
+    if (exerciseModalVisible) {
+        ExerciseModal(
+            onDismiss = {
                 vm.setExerciseToEdit(null)
-                showBottomSheet = false
+                exerciseModalVisible = false
             },
-            sheetState = sheetState
-        ) {
-            ExerciseForm(
-                onDefaultExerciseSubmit = { result ->
-                    onHide()
-                    ui.exerciseToEdit?.let {
-                        val exerciseToUpdate = it.copy(
-                            type = result.type,
-                            name = result.name,
-                            reps = result.reps.toInt(),
-                            rest = result.rest.toInt(),
-                            sets = result.sets.toInt()
-                        )
-                        vm.setExerciseToEdit(null)
-                        vm.updateExercise(exercise = exerciseToUpdate)
-
-                        return@ExerciseForm
-                    }
-
-                    vm.addDefaultExercise(result)
-                },
-                onSimpleExerciseSubmit = { result ->
-                    onHide()
-                    // edit
-                    ui.exerciseToEdit?.let {
-                        val exerciseToUpdate = it.copy(
-                            type = result.type,
-                            name = "",
-                            rest = 0,
-                            reps = 1,
-                            sets = 1
-                        )
-                        vm.setExerciseToEdit(null)
-                        vm.updateExercise(exercise = exerciseToUpdate)
-
-                        return@ExerciseForm
-                    }
-                    vm.addSimpleExercise(result)
-                },
-                onLadderExerciseSubmit = { result ->
-                    onHide()
-                    vm.addLadderExercise(result)
-                },
-                exerciseEditingFields = ui.exerciseToEdit?.let {
-                    ExerciseEditingFields(
-                        name = it.name,
-                        reps = it.reps,
-                        sets = it.sets,
-                        rest = it.rest,
-                        type = it.type
+            onDefaultExerciseSubmit = { result ->
+                ui.exerciseToEdit?.let {
+                    val exerciseToUpdate = it.copy(
+                        type = result.type,
+                        name = result.name,
+                        reps = result.reps.toInt(),
+                        rest = result.rest.toInt(),
+                        sets = result.sets.toInt()
                     )
+                    vm.setExerciseToEdit(null)
+                    vm.updateExercise(exercise = exerciseToUpdate)
+
+                    return@ExerciseModal
                 }
-            )
-        }
+
+                vm.addDefaultExercise(result)
+            },
+            onSimpleExerciseSubmit = { result ->
+                // edit
+                ui.exerciseToEdit?.let {
+                    val exerciseToUpdate = it.copy(
+                        type = result.type,
+                        name = "",
+                        rest = 0,
+                        reps = 1,
+                        sets = 1
+                    )
+                    vm.setExerciseToEdit(null)
+                    vm.updateExercise(exercise = exerciseToUpdate)
+
+                    return@ExerciseModal
+                }
+                vm.addSimpleExercise(result)
+            },
+            onLadderExerciseSubmit = { result ->
+                vm.addLadderExercise(result)
+            },
+            exerciseEditingFields = ui.exerciseToEdit?.let {
+                ExerciseEditingFields(
+                    name = it.name,
+                    reps = it.reps,
+                    sets = it.sets,
+                    rest = it.rest,
+                    type = it.type
+                )
+            }
+        )
+    }
+
+    if (saveAsPresetModalVisible) {
+        SaveAsPresetModal(
+            onDismiss = { saveAsPresetModalVisible = false },
+            onSubmit = { vm.saveAsPreset(it) }
+        )
     }
 }
 

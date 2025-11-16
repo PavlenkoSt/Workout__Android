@@ -21,6 +21,10 @@ class PresetsRepository(
         presetDao.insertPreset(preset)
     }
 
+    suspend fun createPresetWithExercises(presetWithExercises: PresetWithExercises) {
+        presetDao.createPresetWithExercises(presetWithExercises)
+    }
+
     suspend fun updatePreset(preset: Preset) {
         presetDao.updatePreset(preset)
     }

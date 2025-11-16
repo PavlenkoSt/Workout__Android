@@ -35,7 +35,7 @@ interface PresetDao {
     fun getPresetByIdWithExercises(presetId: Long): Flow<PresetWithExercises?>
 
     @Insert
-    suspend fun insertPreset(preset: Preset)
+    suspend fun insertPreset(preset: Preset): Long
 
     @Delete
     suspend fun deletePreset(preset: Preset)
@@ -48,6 +48,9 @@ interface PresetDao {
 
     @Query("SELECT * from preset_exercises WHERE id = :id")
     suspend fun getExerciseById(id: Long): PresetExercise?
+
+    @Insert()
+    suspend fun insertExercises(exercises: List<PresetExercise>)
 
     @Insert()
     suspend fun insertExercise(exercise: PresetExercise)
@@ -102,5 +105,15 @@ interface PresetDao {
         // Perform atomic swap
         updateExerciseOrder(fromExercise.id, toExercise.order)
         updateExerciseOrder(toExercise.id, fromExercise.order)
+    }
+
+    @Transaction
+    suspend fun createPresetWithExercises(presetWithExercises: PresetWithExercises) {
+        val createdPresetId = insertPreset(presetWithExercises.preset)
+
+        val exercisesWithPresetRelation =
+            presetWithExercises.exercises.map { it.copy(presetId = createdPresetId) }
+
+        insertExercises(exercisesWithPresetRelation)
     }
 }

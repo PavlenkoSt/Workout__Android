@@ -11,8 +11,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.Preset
+import com.learning.workout__android.data.models.PresetExercise
+import com.learning.workout__android.data.models.PresetWithExercises
 import com.learning.workout__android.data.models.TrainingDayWithExercises
 import com.learning.workout__android.data.models.TrainingExercise
+import com.learning.workout__android.data.repositories.PresetsRepository
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.utils.LoadState
 import com.learning.workout__android.utils.formatExerciseType
@@ -38,7 +42,8 @@ private inline fun <S, T> Flow<T>.toReducer(
 ): Flow<Reducer<S>> = distinctUntilChanged().map { v -> { s: S -> s.update(v) } }
 
 class TrainingViewModel(
-    private val trainingDayRepository: TrainingDayRepository
+    private val trainingDayRepository: TrainingDayRepository,
+    private val presetsRepository: PresetsRepository
 ) : ViewModel() {
     // Calendar baseline: Monday of "today" week
     private val initialWeekStart: LocalDate =
@@ -286,6 +291,31 @@ class TrainingViewModel(
         }
     }
 
+    fun saveAsPreset(name: String) {
+        viewModelScope.launch {
+            val exercises = uiState.value.currentDay?.exercises ?: return@launch
+
+            presetsRepository.createPresetWithExercises(
+                PresetWithExercises(
+                    preset = Preset(
+                        name = name,
+                        order = System.currentTimeMillis()
+                    ),
+                    exercises = exercises.map {
+                        PresetExercise(
+                            presetId = 0,
+                            name = it.name,
+                            reps = it.reps,
+                            rest = it.rest,
+                            sets = it.sets,
+                            type = it.type,
+                            order = it.order
+                        )
+                    }
+                ))
+        }
+    }
+
     // ---- Helpers ----
 
     private fun makeCalendarUi(start: LocalDate, selected: LocalDate): CalendarUiModel {
@@ -317,8 +347,9 @@ class TrainingViewModel(
                 val db = AppDatabase.getDatabase(context)
                 val trainingDayRepository =
                     TrainingDayRepository(trainingDayDao = db.trainingDayDao())
+                val presetsRepository = PresetsRepository(presetDao = db.presetDao())
 
-                TrainingViewModel(trainingDayRepository)
+                TrainingViewModel(trainingDayRepository, presetsRepository)
             }
         }
     }
