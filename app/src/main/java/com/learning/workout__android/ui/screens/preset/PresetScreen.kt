@@ -79,8 +79,18 @@ fun PresetScreen(
                 } else {
                     PresetExerciseList(
                         modifier = modifier,
-                        exercises = state.data.exercises,
-                        footer = { PresetFooter(onAddExerciseClick = { onAddExerciseClick() }) }
+                        exercises = state.data.sortedExercises,
+                        footer = { PresetFooter(onAddExerciseClick = { onAddExerciseClick() }) },
+                        onSwipeToEdit = {
+                            vm.setExerciseToEdit(it)
+                            showBottomSheet = true
+                        },
+                        onSwipeToDelete = {
+                            vm.deleteExerciseFromPreset(it)
+                        },
+                        reorderExercises = { from, to ->
+                            vm.reorderExercises(from, to)
+                        }
                     )
                 }
 

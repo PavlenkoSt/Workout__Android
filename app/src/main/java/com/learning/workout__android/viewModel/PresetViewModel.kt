@@ -29,6 +29,9 @@ class PresetViewModel(
 ) : ViewModel() {
     val targetPreset = presetsRepository.getPresetByIdWithExercises(presetId).distinctUntilChanged()
 
+    private val _localSwap =
+        MutableStateFlow<Pair<PresetExercise, PresetExercise>?>(null)
+
     private var _exerciseToEdit = MutableStateFlow<PresetExercise?>(null)
     val exerciseToEdit = _exerciseToEdit.value
 
@@ -44,7 +47,7 @@ class PresetViewModel(
                 sets = formResult.sets.toInt(),
                 rest = formResult.rest.toInt(),
                 type = formResult.type,
-                presetId = presetId
+                presetId = presetId,
             )
 
             presetsRepository.addExercise(exercise)
@@ -67,8 +70,7 @@ class PresetViewModel(
                     sets = 1,
                     rest = rest,
                     type = ExerciseType.DYNAMIC,
-                    presetId = presetId
-
+                    presetId = presetId,
                 )
                 currentReps += step
 
@@ -85,7 +87,7 @@ class PresetViewModel(
                 sets = 1,
                 rest = 0,
                 type = formResult.type,
-                presetId = presetId
+                presetId = presetId,
             )
 
             presetsRepository.addExercise(exercise)
@@ -104,15 +106,44 @@ class PresetViewModel(
         }
     }
 
+    fun reorderExercises(from: PresetExercise, to: PresetExercise) {
+        _localSwap.value = from to to  // optimistic
+
+        viewModelScope.launch {
+            if (from.order != to.order) {
+                presetsRepository.reorderExercises(
+                    fromExerciseId = from.id,
+                    toExerciseId = to.id,
+                )
+            }
+            _localSwap.value = null
+        }
+    }
+
     val uiState = combine(
         targetPreset,
-        _exerciseToEdit
-    ) { preset, exerciseToEdit ->
+        _exerciseToEdit,
+        _localSwap
+    ) { preset, exerciseToEdit, swap ->
         val loadState: LoadState<PresetWithExercises> =
             if (preset == null) {
                 LoadState.Loading
             } else {
-                LoadState.Success(preset)
+                val exercises = if (swap != null) {
+                    val (from, to) = swap
+
+                    preset.exercises.map { exercise ->
+                        when (exercise.id) {
+                            from.id -> exercise.copy(order = to.order)
+                            to.id -> exercise.copy(order = from.order)
+                            else -> exercise
+                        }
+                    }
+                } else {
+                    preset.exercises
+                }
+
+                LoadState.Success(preset.copy(exercises = exercises))
             }
 
         PresetUiState(preset = loadState, exerciseToEdit = exerciseToEdit)

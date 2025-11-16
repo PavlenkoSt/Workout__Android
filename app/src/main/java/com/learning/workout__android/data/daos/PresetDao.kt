@@ -43,6 +43,12 @@ interface PresetDao {
     @Update()
     suspend fun updatePreset(preset: Preset)
 
+    @Query("SELECT * from preset_exercises WHERE presetId = :presetId")
+    suspend fun getExercisesByPresetId(presetId: Long): List<PresetExercise>
+
+    @Query("SELECT * from preset_exercises WHERE id = :id")
+    suspend fun getExerciseById(id: Long): PresetExercise?
+
     @Insert()
     suspend fun insertExercise(exercise: PresetExercise)
 
@@ -61,6 +67,15 @@ interface PresetDao {
     )
     suspend fun updatePresetOrder(presetId: Long, order: Long)
 
+    @Query(
+        """
+        UPDATE preset_exercises 
+        SET "order" = :order 
+        WHERE id = :id
+    """
+    )
+    suspend fun updateExerciseOrder(id: Long, order: Int)
+
     @Transaction
     suspend fun swapPresetOrder(fromPresetId: Long, toPresetId: Long) {
         // Fetch current state from database to avoid stale data
@@ -73,5 +88,19 @@ interface PresetDao {
         // Perform atomic swap
         updatePresetOrder(fromPreset.id, toPreset.order)
         updatePresetOrder(toPreset.id, fromPreset.order)
+    }
+
+    @Transaction
+    suspend fun swapExercisesOrder(fromExerciseId: Long, toExerciseId: Long) {
+        // Fetch current state from database to avoid stale data
+        val fromExercise = getExerciseById(fromExerciseId) ?: return
+        val toExercise = getExerciseById(toExerciseId) ?: return
+
+        // Only swap if orders are different
+        if (fromExercise.order == toExercise.order) return
+
+        // Perform atomic swap
+        updateExerciseOrder(fromExercise.id, toExercise.order)
+        updateExerciseOrder(toExercise.id, fromExercise.order)
     }
 }

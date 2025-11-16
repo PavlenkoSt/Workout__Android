@@ -2,7 +2,6 @@ package com.learning.workout__android.ui.screens.training
 
 import DrawingCheckmark
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,22 +9,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
@@ -38,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -48,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingExercise
+import com.learning.workout__android.ui.components.SwipeToDismissItemBackground
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseName
 
@@ -64,7 +57,7 @@ fun ExerciseItem(
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
 ) {
-    val swipeToDismissBoxState = key(exercise.id) {
+    val swipeToDismissBoxState = key(exercise) {
         rememberSwipeToDismissBoxState(
             confirmValueChange = {
                 if (it == SwipeToDismissBoxValue.EndToStart) {
@@ -91,7 +84,7 @@ fun ExerciseItem(
             state = swipeToDismissBoxState,
             modifier = Modifier.fillMaxWidth(),
             backgroundContent = {
-                BackgroundContent(swipeToDismissBoxState.dismissDirection)
+                SwipeToDismissItemBackground(swipeToDismissBoxState.dismissDirection)
             }
         ) {
             Card(
@@ -117,42 +110,6 @@ fun ExerciseItem(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BackgroundContent(dismissDirection: SwipeToDismissBoxValue) {
-    when (dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Edit exercise",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(ShapeDefaults.Medium)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 24.dp)
-                    .wrapContentSize(Alignment.CenterStart),
-                tint = Color.White
-            )
-        }
-
-        SwipeToDismissBoxValue.EndToStart -> {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Remove exercise",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(ShapeDefaults.Medium)
-                    .background(Color.Red)
-                    .padding(horizontal = 24.dp)
-                    .wrapContentSize(Alignment.CenterEnd),
-                tint = Color.White
-            )
-        }
-
-        SwipeToDismissBoxValue.Settled -> {}
     }
 }
 

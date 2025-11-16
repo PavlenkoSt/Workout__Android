@@ -44,7 +44,7 @@ fun PresetForm(
     }
 
     Column(Modifier.padding(horizontal = 8.dp)) {
-        ModalHeader("Add new preset")
+        ModalHeader(if(isEditing) "Update preset" else "Add new preset")
 
         OutlinedTextField(
             value = ui.name.value,

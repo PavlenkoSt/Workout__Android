@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDayWithExercises
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.utils.LoadState
 import com.learning.workout__android.utils.formatExerciseType
@@ -198,7 +198,7 @@ class TrainingViewModel(
                 sets = formResult.sets.toInt(),
                 rest = formResult.rest.toInt(),
                 type = formResult.type,
-                setsDone = 0
+                setsDone = 0,
             )
             trainingDayRepository.addExerciseToDate(selectedDate, exercise)
         }

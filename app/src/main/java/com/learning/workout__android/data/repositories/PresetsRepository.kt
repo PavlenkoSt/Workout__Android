@@ -30,7 +30,9 @@ class PresetsRepository(
     }
 
     suspend fun addExercise(exercise: PresetExercise) {
-        presetDao.insertExercise(exercise)
+        val exercises = presetDao.getExercisesByPresetId(exercise.presetId)
+        val maxOrder = exercises.maxOfOrNull { it.order } ?: -1
+        presetDao.insertExercise(exercise.copy(order = maxOrder + 1))
     }
 
     suspend fun updateExercise(exercise: PresetExercise) {
@@ -43,5 +45,9 @@ class PresetsRepository(
 
     suspend fun reorderPresets(fromPresetId: Long, toPresetId: Long) {
         presetDao.swapPresetOrder(fromPresetId, toPresetId)
+    }
+
+    suspend fun reorderExercises(fromExerciseId: Long, toExerciseId: Long) {
+        presetDao.swapExercisesOrder(fromExerciseId, toExerciseId)
     }
 }
