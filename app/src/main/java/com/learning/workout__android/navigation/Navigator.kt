@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,6 +28,12 @@ sealed class Screen {
     data object RecordsScreen : Screen()
 
     @Serializable
+    data object PresetsStack : Screen()
+
+    @Serializable
+    data class PresetScreen(val presetId: Long) : Screen()
+
+    @Serializable
     data object PresetsScreen : Screen()
 }
 
@@ -42,6 +49,7 @@ fun Navigator(
     goalsScreen: @Composable () -> Unit,
     recordsScreen: @Composable () -> Unit,
     presetsScreen: @Composable () -> Unit,
+    presetScreen: @Composable (presetId: Long) -> Unit,
 ) {
     CompositionLocalProvider(LocalNavController provides navState.navHostController) {
         NavHost(
@@ -54,8 +62,16 @@ fun Navigator(
             }
 
             composable<Screen.GoalsScreen> { goalsScreen() }
+
             composable<Screen.RecordsScreen> { recordsScreen() }
-            composable<Screen.PresetsScreen> { presetsScreen() }
+
+            navigation<Screen.PresetsStack>(Screen.PresetsScreen) {
+                composable<Screen.PresetsScreen> { presetsScreen() }
+                composable<Screen.PresetScreen> { backStackEntry ->
+                    val args = backStackEntry.toRoute<Screen.PresetScreen>()
+                    presetScreen(args.presetId)
+                }
+            }
         }
     }
 }

@@ -27,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseFormLadderViewModel
 import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
@@ -36,7 +35,7 @@ import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
 @Composable
 fun ExerciseFormLadder(
     onLadderExerciseSubmit: (result: ExerciseLadderFormResult) -> Unit,
-    exerciseToEdit: TrainingExercise?,
+    exerciseEditingFields: ExerciseEditingFields?,
     vm: ExerciseFormLadderViewModel = viewModel(),
     seed: SharedSeed,
     onSaveSeed: (seed: SharedSeed) -> Unit
@@ -50,14 +49,14 @@ fun ExerciseFormLadder(
     val stepFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(seed, exerciseToEdit) {
-        if (exerciseToEdit != null) {
+    LaunchedEffect(seed, exerciseEditingFields) {
+        if (exerciseEditingFields != null) {
             vm.seed(
                 SharedSeed(
-                    name = exerciseToEdit.name,
-                    rest = exerciseToEdit.rest.toString(),
-                    sets = exerciseToEdit.sets.toString(),
-                    reps = exerciseToEdit.reps.toString()
+                    name = exerciseEditingFields.name,
+                    rest = exerciseEditingFields.rest.toString(),
+                    sets = exerciseEditingFields.sets.toString(),
+                    reps = exerciseEditingFields.reps.toString()
                 )
             )
             return@LaunchedEffect
@@ -213,7 +212,7 @@ fun ExerciseFormLadder(
                 rest = ui.rest.value.trim().toInt()
             )
             onLadderExerciseSubmit(result)
-        }, isEditing = exerciseToEdit != null)
+        }, isEditing = exerciseEditingFields != null)
     }
 }
 
@@ -225,7 +224,7 @@ private fun ExerciseFormLadderPreview() {
             onLadderExerciseSubmit = {},
             onSaveSeed = {},
             seed = SharedSeed(),
-            exerciseToEdit = null
+            exerciseEditingFields = null
         )
     }
 }

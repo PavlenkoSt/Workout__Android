@@ -48,5 +48,5 @@ val botBarRoutes = listOf(
     BotBarRoute("Training", Screen.TrainingStack, Icons.Filled.Home),
     BotBarRoute("Goals", Screen.GoalsScreen, Icons.Filled.Done),
     BotBarRoute("Records", Screen.RecordsScreen, Icons.Filled.Star),
-    BotBarRoute("Presets", Screen.PresetsScreen, Icons.Filled.Favorite),
+    BotBarRoute("Presets", Screen.PresetsStack, Icons.Filled.Favorite),
 )

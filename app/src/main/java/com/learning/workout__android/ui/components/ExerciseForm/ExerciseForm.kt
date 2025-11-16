@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.learning.workout__android.data.models.ExerciseType
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseType
@@ -34,9 +33,9 @@ fun ExerciseForm(
     onDefaultExerciseSubmit: (formResult: ExerciseDefaultFormResult) -> Unit,
     onLadderExerciseSubmit: (formResult: ExerciseLadderFormResult) -> Unit,
     onSimpleExerciseSubmit: (formResult: ExerciseSimpleFormResult) -> Unit,
-    exerciseToEdit: TrainingExercise?
+    exerciseEditingFields: ExerciseEditingFields?
 ) {
-    val exerciseTypes = if (exerciseToEdit != null) listOf(
+    val exerciseTypes = if (exerciseEditingFields != null) listOf(
         ExerciseType.DYNAMIC,
         ExerciseType.STATIC,
         ExerciseType.HAND_BALANCE_SESSION,
@@ -59,14 +58,14 @@ fun ExerciseForm(
         sharedSeed = seed
     }
 
-    LaunchedEffect(exerciseToEdit?.type) {
-        if (exerciseToEdit != null) {
-            selectedType = exerciseToEdit.type
+    LaunchedEffect(exerciseEditingFields?.type) {
+        if (exerciseEditingFields != null) {
+            selectedType = exerciseEditingFields.type
         }
     }
 
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-        ModalHeader(if (exerciseToEdit == null) "Add exercise" else "Edit exercise")
+        ModalHeader(if (exerciseEditingFields == null) "Add exercise" else "Edit exercise")
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -103,7 +102,7 @@ fun ExerciseForm(
         when (selectedType) {
             ExerciseType.DYNAMIC -> {
                 ExerciseFormDefault(
-                    exerciseToEdit = exerciseToEdit,
+                    exerciseEditingFields = exerciseEditingFields,
                     exerciseType = selectedType,
                     onDefaultExerciseSubmit = onDefaultExerciseSubmit,
                     seed = sharedSeed,
@@ -114,7 +113,7 @@ fun ExerciseForm(
             ExerciseType.STATIC -> {
                 ExerciseFormDefault(
                     isStatic = true,
-                    exerciseToEdit = exerciseToEdit,
+                    exerciseEditingFields = exerciseEditingFields,
                     exerciseType = selectedType,
                     onDefaultExerciseSubmit = onDefaultExerciseSubmit,
                     seed = sharedSeed,
@@ -125,7 +124,7 @@ fun ExerciseForm(
             ExerciseType.LADDER -> {
                 ExerciseFormLadder(
                     onLadderExerciseSubmit = onLadderExerciseSubmit,
-                    exerciseToEdit = exerciseToEdit,
+                    exerciseEditingFields = exerciseEditingFields,
                     seed = sharedSeed,
                     onSaveSeed = { onSaveSeed(it) }
                 )
@@ -140,12 +139,20 @@ fun ExerciseForm(
                     onClick = {
                         onSimpleExerciseSubmit(ExerciseSimpleFormResult(selectedType))
                     },
-                    isEditing = exerciseToEdit != null,
+                    isEditing = exerciseEditingFields != null,
                 )
             }
         }
     }
 }
+
+data class ExerciseEditingFields(
+    val name: String,
+    val reps: Int,
+    val sets: Int,
+    val rest: Int,
+    val type: ExerciseType
+)
 
 @Preview(showBackground = true)
 @Composable
@@ -155,7 +162,7 @@ private fun ExerciseFormPreview() {
             onLadderExerciseSubmit = {},
             onSimpleExerciseSubmit = {},
             onDefaultExerciseSubmit = {},
-            exerciseToEdit = null
+            exerciseEditingFields = null
         )
     }
 }

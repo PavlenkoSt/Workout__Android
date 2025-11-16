@@ -120,7 +120,7 @@ private fun ExerciseItem(exercise: TrainingExercise) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                Text(formatExerciseName(exercise), fontSize = 12.sp)
+                Text(formatExerciseName(exercise.name, exercise.type), fontSize = 12.sp)
 
                 Spacer(modifier = Modifier.width(4.dp))
 

@@ -6,9 +6,9 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingDayWithExercises
+import com.learning.workout__android.data.models.TrainingExercise
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -28,7 +28,7 @@ interface TrainingDayDao {
         """
         SELECT * FROM training_exercises 
         WHERE trainingDayId = :trainingDayId 
-        ORDER BY "order" ASC
+        ORDER BY "order" DESC
     """
     )
     suspend fun getExercisesByTrainingDayId(trainingDayId: Long): List<TrainingExercise>
@@ -70,10 +70,10 @@ interface TrainingDayDao {
         // Fetch current state from database to avoid stale data
         val fromExercise = getExerciseById(fromExerciseId) ?: return
         val toExercise = getExerciseById(toExerciseId) ?: return
-        
+
         // Only swap if orders are different
         if (fromExercise.order == toExercise.order) return
-        
+
         // Perform atomic swap
         updateExerciseOrder(fromExercise.id, toExercise.order)
         updateExerciseOrder(toExercise.id, fromExercise.order)

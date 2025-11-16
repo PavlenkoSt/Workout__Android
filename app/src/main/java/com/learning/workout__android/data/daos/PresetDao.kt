@@ -25,6 +25,15 @@ interface PresetDao {
     )
     suspend fun getPresetById(presetId: Long): Preset?
 
+    @Query(
+        """
+        SELECT * FROM presets 
+        WHERE id = :presetId
+    """
+    )
+    @Transaction
+    fun getPresetByIdWithExercises(presetId: Long): Flow<PresetWithExercises?>
+
     @Insert
     suspend fun insertPreset(preset: Preset)
 

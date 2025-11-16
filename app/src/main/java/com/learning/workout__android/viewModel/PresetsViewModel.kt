@@ -28,18 +28,11 @@ class PresetsViewModel(
     private val _localSwap =
         MutableStateFlow<Pair<PresetWithExercises, PresetWithExercises>?>(null)
 
-    private var _selectedPresetId = MutableStateFlow<Long?>(null)
-    val selectedPresetId: StateFlow<Long?> = _selectedPresetId
-
     private var _search = MutableStateFlow("")
     val search: StateFlow<String> = _search
 
     private var _presetToEdit = MutableStateFlow<PresetWithExercises?>(null)
     val presetToEdit = _presetToEdit
-
-    fun selectPresetId(presetId: Long?) {
-        _selectedPresetId.value = presetId
-    }
 
     fun onSearch(value: String) {
         _search.value = value
@@ -91,11 +84,10 @@ class PresetsViewModel(
     val uiState: StateFlow<PresetsUiState> =
         combine(
             allPresets,
-            selectedPresetId,
             _localSwap,
             _search,
             _presetToEdit
-        ) { presets, selectedId, swap, search, presetToEdit ->
+        ) { presets, swap, search, presetToEdit ->
             val baseList = presets
 
             val displayList = if (swap != null) {
@@ -111,7 +103,7 @@ class PresetsViewModel(
                 }
             } else {
                 baseList
-            }.sortedBy { it.preset.order } // if you rely on order
+            }.sortedByDescending { it.preset.order }
 
             PresetsUiState(
                 allPresets = LoadState.Success(displayList.filter {
@@ -120,9 +112,6 @@ class PresetsViewModel(
                         true
                     )
                 }),
-                selectedPreset = selectedId?.let { id ->
-                    displayList.find { it.preset.id == id }
-                },
                 presetToEdit = presetToEdit
             )
         }
@@ -147,6 +136,5 @@ class PresetsViewModel(
 
 data class PresetsUiState(
     val allPresets: LoadState<List<PresetWithExercises>> = LoadState.Loading,
-    val selectedPreset: PresetWithExercises? = null,
     val presetToEdit: PresetWithExercises? = null
 )

@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.models.ExerciseType
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseDefaultFormEvent
 import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
@@ -37,8 +36,8 @@ import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
 @Composable
 fun ExerciseFormDefault(
     isStatic: Boolean? = false,
-    exerciseToEdit: TrainingExercise?,
     onDefaultExerciseSubmit: (result: ExerciseDefaultFormResult) -> Unit,
+    exerciseEditingFields: ExerciseEditingFields?,
     exerciseType: ExerciseType,
     vm: ExerciseFormDefaultViewModel = viewModel(),
     seed: SharedSeed,
@@ -52,14 +51,14 @@ fun ExerciseFormDefault(
     val setsFocusRequester = remember { FocusRequester() }
     val restFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(seed, exerciseToEdit) {
-        if (exerciseToEdit != null) {
+    LaunchedEffect(seed, exerciseEditingFields) {
+        if (exerciseEditingFields != null) {
             vm.seed(
                 SharedSeed(
-                    name = exerciseToEdit.name,
-                    rest = exerciseToEdit.rest.toString(),
-                    sets = exerciseToEdit.sets.toString(),
-                    reps = exerciseToEdit.reps.toString()
+                    name = exerciseEditingFields.name,
+                    rest = exerciseEditingFields.rest.toString(),
+                    sets = exerciseEditingFields.sets.toString(),
+                    reps = exerciseEditingFields.reps.toString()
                 )
             )
             return@LaunchedEffect
@@ -198,7 +197,7 @@ fun ExerciseFormDefault(
                 rest = ui.rest.value.trim().toInt(),
             )
             onDefaultExerciseSubmit(result)
-        }, isEditing = exerciseToEdit != null)
+        }, isEditing = exerciseEditingFields != null)
     }
 }
 
@@ -210,7 +209,7 @@ private fun ExerciseFormDefaultPreview() {
             onDefaultExerciseSubmit = {},
             seed = SharedSeed(),
             onSaveSeed = {},
-            exerciseToEdit = null,
+            exerciseEditingFields = null,
             exerciseType = ExerciseType.DYNAMIC
         )
     }

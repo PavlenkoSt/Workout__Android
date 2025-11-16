@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.navigation.LocalNavController
 import com.learning.workout__android.navigation.SaveStateHandleEnum
 import com.learning.workout__android.ui.components.Calendar.Calendar
+import com.learning.workout__android.ui.components.ExerciseForm.ExerciseEditingFields
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.TrainingViewModel
@@ -278,7 +279,15 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
                     onHide()
                     vm.addLadderExercise(result)
                 },
-                exerciseToEdit = ui.exerciseToEdit
+                exerciseEditingFields = ui.exerciseToEdit?.let {
+                    ExerciseEditingFields(
+                        name = it.name,
+                        reps = it.reps,
+                        sets = it.sets,
+                        rest = it.rest,
+                        type = it.type
+                    )
+                }
             )
         }
     }

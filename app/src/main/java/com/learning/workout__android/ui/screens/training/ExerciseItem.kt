@@ -169,7 +169,7 @@ private fun ExerciseHeaderRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "${index + 1}. ${formatExerciseName(exercise)}",
+            text = "${index + 1}. ${formatExerciseName(exercise.name, exercise.type)}",
             modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
             color = MaterialTheme.colorScheme.onSurface
         )

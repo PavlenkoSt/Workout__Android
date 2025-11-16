@@ -13,6 +13,10 @@ class PresetsRepository(
         return presetDao.getAllPresets()
     }
 
+    fun getPresetByIdWithExercises(presetId: Long): Flow<PresetWithExercises?> {
+        return presetDao.getPresetByIdWithExercises(presetId)
+    }
+
     suspend fun createPreset(preset: Preset) {
         presetDao.insertPreset(preset)
     }

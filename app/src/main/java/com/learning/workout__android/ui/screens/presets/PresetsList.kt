@@ -1,7 +1,6 @@
 package com.learning.workout__android.ui.screens.presets
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -50,7 +49,6 @@ fun PresetsList(
                 reorderableLazyListState,
                 key = it.preset.id,
                 enabled = canReorder,
-                modifier = Modifier.padding(bottom = 8.dp)
             ) { isDragging ->
                 PresetItem(
                     preset = it,
