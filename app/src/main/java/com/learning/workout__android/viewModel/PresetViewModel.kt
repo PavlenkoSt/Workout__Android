@@ -13,27 +13,34 @@ import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.PresetExercise
 import com.learning.workout__android.data.models.PresetWithExercises
+import com.learning.workout__android.data.models.TrainingDay
+import com.learning.workout__android.data.models.TrainingDayWithExercises
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.repositories.PresetsRepository
+import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.utils.LoadState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class PresetViewModel(
     private val presetsRepository: PresetsRepository,
+    private val trainingDayRepository: TrainingDayRepository,
     private val presetId: Long
 ) : ViewModel() {
     val targetPreset = presetsRepository.getPresetByIdWithExercises(presetId).distinctUntilChanged()
+
+    val trainingDayDates = trainingDayRepository.getTrainingDaysDates().distinctUntilChanged()
 
     private val _localSwap =
         MutableStateFlow<Pair<PresetExercise, PresetExercise>?>(null)
 
     private var _exerciseToEdit = MutableStateFlow<PresetExercise?>(null)
-    val exerciseToEdit = _exerciseToEdit.value
 
     fun setExerciseToEdit(exercise: PresetExercise?) {
         _exerciseToEdit.value = exercise
@@ -120,11 +127,42 @@ class PresetViewModel(
         }
     }
 
+    fun usePreset(date: String) {
+        viewModelScope.launch {
+            val trainingDay = trainingDayRepository.getTrainingDayByDate(date).first()
+            if (trainingDay != null) return@launch
+
+            val targetExercises = targetPreset.first()?.exercises ?: return@launch
+
+            val presetExercises = targetExercises.map {
+                TrainingExercise(
+                    name = it.name,
+                    reps = it.reps,
+                    rest = it.rest,
+                    sets = it.sets,
+                    type = it.type,
+                    order = it.order,
+                    setsDone = 0,
+                    trainingDayId = 0 // will be set automatically
+                )
+            }
+
+            trainingDayRepository.addTrainingDayWithExercises(
+                TrainingDayWithExercises(
+                    trainingDay = TrainingDay(date = date),
+                    exercises = presetExercises
+                )
+            )
+        }
+
+    }
+
     val uiState = combine(
         targetPreset,
         _exerciseToEdit,
-        _localSwap
-    ) { preset, exerciseToEdit, swap ->
+        _localSwap,
+        trainingDayDates
+    ) { preset, exerciseToEdit, swap, trainingDayDates ->
         val loadState: LoadState<PresetWithExercises> =
             if (preset == null) {
                 LoadState.Loading
@@ -146,7 +184,11 @@ class PresetViewModel(
                 LoadState.Success(preset.copy(exercises = exercises))
             }
 
-        PresetUiState(preset = loadState, exerciseToEdit = exerciseToEdit)
+        PresetUiState(
+            preset = loadState,
+            exerciseToEdit = exerciseToEdit,
+            trainingDayDates = trainingDayDates
+        )
     }
         .stateIn(
             viewModelScope,
@@ -160,8 +202,10 @@ class PresetViewModel(
                 initializer {
                     val db = AppDatabase.getDatabase(context)
                     val presetsRepository = PresetsRepository(presetDao = db.presetDao())
+                    val trainingDayRepository =
+                        TrainingDayRepository(trainingDayDao = db.trainingDayDao())
 
-                    PresetViewModel(presetsRepository, presetId)
+                    PresetViewModel(presetsRepository, trainingDayRepository, presetId)
                 }
             }
     }
@@ -169,5 +213,6 @@ class PresetViewModel(
 
 data class PresetUiState(
     val preset: LoadState<PresetWithExercises> = LoadState.Loading,
-    val exerciseToEdit: PresetExercise? = null
+    val exerciseToEdit: PresetExercise? = null,
+    val trainingDayDates: List<String> = emptyList()
 )

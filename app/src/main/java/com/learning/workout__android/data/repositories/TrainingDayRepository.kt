@@ -1,10 +1,10 @@
 package com.learning.workout__android.data.repositories
 
 import com.learning.workout__android.data.daos.TrainingDayDao
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingDayWithExercises
+import com.learning.workout__android.data.models.TrainingExercise
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -14,6 +14,19 @@ class TrainingDayRepository(
     fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>> {
         return trainingDayDao.getAllTrainingDays()
     }
+
+    fun getTrainingDaysDates(): Flow<List<String>> {
+        return trainingDayDao.getTrainingDaysDates()
+    }
+
+    fun getTrainingDayByDate(date: String): Flow<TrainingDayWithExercises?> {
+        return trainingDayDao.getDayByDate(date)
+    }
+
+    suspend fun addTrainingDayWithExercises(trainingDayWithExercises: TrainingDayWithExercises) {
+        trainingDayDao.addTrainingDayWithExercises(trainingDayWithExercises)
+    }
+
     suspend fun deleteTrainingDayByDate(date: String) {
         trainingDayDao.deleteByDate(date)
     }

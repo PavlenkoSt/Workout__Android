@@ -25,7 +25,11 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PresetHeader(preset: Preset, canUse: Boolean) {
+fun PresetHeader(
+    preset: Preset,
+    canUse: Boolean,
+    onUseClick: () -> Unit
+) {
     val navController = LocalNavController.current
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -44,9 +48,8 @@ fun PresetHeader(preset: Preset, canUse: Boolean) {
                     Spacer(modifier = Modifier.width(16.dp))
 
                     OutlinedButton(
-                        onClick = {
-                            // TODO on use press
-                        }, modifier = Modifier.height(48.dp),
+                        onClick = onUseClick,
+                        modifier = Modifier.height(48.dp),
                         shape = ShapeDefaults.Small,
                         border = ButtonDefaults.outlinedButtonBorder.copy(
                             brush = SolidColor(MaterialTheme.colorScheme.onBackground),
@@ -72,7 +75,8 @@ private fun PresetHeaderPreview() {
                 name = "Preset",
                 order = 1L
             ),
-            canUse = true
+            canUse = true,
+            onUseClick = {}
         )
     }
 }

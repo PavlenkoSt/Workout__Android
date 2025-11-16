@@ -24,6 +24,9 @@ interface TrainingDayDao {
     )
     fun getDayByDate(date: String): Flow<TrainingDayWithExercises?>
 
+    @Query("SELECt date FROM training_days")
+    fun getTrainingDaysDates(): Flow<List<String>>
+
     @Query(
         """
         SELECT * FROM training_exercises 
@@ -57,6 +60,9 @@ interface TrainingDayDao {
     suspend fun create(trainingDay: TrainingDay): Long
 
     @Insert
+    suspend fun insertExercises(exercises: List<TrainingExercise>)
+
+    @Insert
     suspend fun insertExercise(exercise: TrainingExercise): Long
 
     @Update
@@ -64,6 +70,17 @@ interface TrainingDayDao {
 
     @Delete
     suspend fun deleteExercise(exercise: TrainingExercise)
+
+    @Transaction
+    suspend fun addTrainingDayWithExercises(trainingDayWithExercises: TrainingDayWithExercises) {
+        val trainingDayId = create(trainingDayWithExercises.trainingDay)
+
+        val exercisesWithDayId = trainingDayWithExercises.exercises.map { ex ->
+            ex.copy(trainingDayId = trainingDayId)
+        }
+
+        insertExercises(exercisesWithDayId)
+    }
 
     @Transaction
     suspend fun swapExerciseOrder(fromExerciseId: Long, toExerciseId: Long) {

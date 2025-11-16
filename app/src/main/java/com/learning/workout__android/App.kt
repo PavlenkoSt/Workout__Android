@@ -22,7 +22,7 @@ fun App() {
     val navState = rememberNavigationState()
 
     Scaffold(
-        bottomBar = { BottomNavBar(navState) },
+        bottomBar = { BottomNavBar(navState) }
     ) { paddingValues ->
         Navigator(
             navState = navState,

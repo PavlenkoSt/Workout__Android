@@ -29,12 +29,14 @@ import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.utils.LoadState
 import com.learning.workout__android.viewModel.PresetViewModel
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PresetScreen(
     modifier: Modifier,
-    presetId: Long
+    presetId: Long,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -45,6 +47,8 @@ fun PresetScreen(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    var showDatePickerModal by remember { mutableStateOf(false) }
 
     fun onAddExerciseClick() {
         showBottomSheet = true
@@ -61,7 +65,11 @@ fun PresetScreen(
             }
 
             is LoadState.Success -> {
-                PresetHeader(preset = state.data.preset, canUse = state.data.exercises.isNotEmpty())
+                PresetHeader(
+                    preset = state.data.preset,
+                    canUse = state.data.exercises.isNotEmpty(),
+                    onUseClick = { showDatePickerModal = true }
+                )
 
                 if (state.data.exercises.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -162,6 +170,23 @@ fun PresetScreen(
                         )
                     }
 
+                }
+
+                if (showDatePickerModal) {
+                    DatePickerModal(
+                        onDismiss = { showDatePickerModal = false },
+                        trainingDayDates = ui.trainingDayDates,
+                        onDateSelected = {
+                            if (it == null) return@DatePickerModal
+                            vm.usePreset(
+                                Instant.ofEpochMilli(it)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate().toString()
+                            )
+
+                            showDatePickerModal = false
+                        },
+                    )
                 }
             }
         }
