@@ -25,6 +25,9 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,20 +44,25 @@ fun PresetItem(
     preset: PresetWithExercises,
     isDragging: Boolean,
     draggableHandler: @Composable () -> Unit,
+    onSwipeToEdit: () -> Unit,
+    onSwipeToDelete: () -> Unit,
 ) {
+    var openAlertDialog by remember { mutableStateOf(false) }
+
     val swipeToDismissBoxState = key(preset.preset.id) {
         rememberSwipeToDismissBoxState(
             confirmValueChange = {
                 if (it == SwipeToDismissBoxValue.EndToStart) {
-                    // TODO on delete
+                    openAlertDialog = true
                 } else if (it == SwipeToDismissBoxValue.StartToEnd) {
-                    // TODO on edit
+                    onSwipeToEdit()
                 }
                 false
             },
             positionalThreshold = { totalDistance -> totalDistance * 0.3f },
         )
     }
+
 
     val scale by animateFloatAsState(
         targetValue = if (isDragging) 1.05f else 1f,
@@ -74,24 +82,32 @@ fun PresetItem(
                 BackgroundContent(swipeToDismissBoxState.dismissDirection)
             }
         ) {
-        Card(
-            border = CardDefaults.outlinedCardBorder(enabled = true)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Card(
+                border = CardDefaults.outlinedCardBorder(enabled = true)
             ) {
-                Text(
-                    "${preset.preset.name} (${preset.sortedExercises.size} exercise${if (preset.sortedExercises.size == 1) "" else "s"})"
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "${preset.preset.name} (${preset.sortedExercises.size} exercise${if (preset.sortedExercises.size == 1) "" else "s"})"
+                    )
 
-                draggableHandler()
+                    draggableHandler()
+                }
             }
         }
-        }
+    }
+
+   if(openAlertDialog) {
+        DeletePresetConfirmDialog(
+            onDelete = onSwipeToDelete,
+            onCancel = { openAlertDialog = false },
+            presetName = preset.preset.name
+        )
     }
 }
 
@@ -141,7 +157,9 @@ private fun PresetItemPreview() {
                 exercises = emptyList()
             ),
             isDragging = false,
-            draggableHandler = {}
+            draggableHandler = {},
+            onSwipeToEdit = {},
+            onSwipeToDelete = {}
         )
     }
 }

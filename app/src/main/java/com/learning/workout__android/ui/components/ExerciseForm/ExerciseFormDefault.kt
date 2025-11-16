@@ -27,8 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.models.ExerciseType
+import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.ExerciseDefaultFormEvent
 import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
@@ -191,11 +191,11 @@ fun ExerciseFormDefault(
             val isValid = vm.submit()
             if (!isValid) return@ExerciseFormSubmitBtn
             val result = ExerciseDefaultFormResult(
-                ui.name.value,
+                ui.name.value.trim(),
                 type = exerciseType,
-                reps = ui.reps.value.toInt(),
-                sets = ui.sets.value.toInt(),
-                rest = ui.rest.value.toInt(),
+                reps = ui.reps.value.trim().toInt(),
+                sets = ui.sets.value.trim().toInt(),
+                rest = ui.rest.value.trim().toInt(),
             )
             onDefaultExerciseSubmit(result)
         }, isEditing = exerciseToEdit != null)
@@ -207,7 +207,7 @@ fun ExerciseFormDefault(
 private fun ExerciseFormDefaultPreview() {
     Workout__AndroidTheme {
         ExerciseFormDefault(
-           onDefaultExerciseSubmit = {},
+            onDefaultExerciseSubmit = {},
             seed = SharedSeed(),
             onSaveSeed = {},
             exerciseToEdit = null,

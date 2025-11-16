@@ -17,8 +17,12 @@ class PresetsRepository(
         presetDao.insertPreset(preset)
     }
 
-    suspend fun deletePresetById(id: Long) {
-        presetDao.deletePresetById(id)
+    suspend fun updatePreset(preset: Preset) {
+        presetDao.updatePreset(preset)
+    }
+
+    suspend fun deletePreset(preset: Preset) {
+        presetDao.deletePreset(preset)
     }
 
     suspend fun addExercise(exercise: PresetExercise) {

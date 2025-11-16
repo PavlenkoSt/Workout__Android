@@ -206,11 +206,11 @@ fun ExerciseFormLadder(
             val isValid = vm.submit()
             if (!isValid) return@ExerciseFormSubmitBtn
             val result = ExerciseLadderFormResult(
-                name = ui.name.value,
-                from = ui.from.value.toInt(),
-                to = ui.to.value.toInt(),
-                step = ui.step.value.toInt(),
-                rest = ui.rest.value.toInt()
+                name = ui.name.value.trim(),
+                from = ui.from.value.trim().toInt(),
+                to = ui.to.value.trim().toInt(),
+                step = ui.step.value.trim().toInt(),
+                rest = ui.rest.value.trim().toInt()
             )
             onLadderExerciseSubmit(result)
         }, isEditing = exerciseToEdit != null)

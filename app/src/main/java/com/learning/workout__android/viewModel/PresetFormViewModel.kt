@@ -1,6 +1,5 @@
 package com.learning.workout__android.viewModel
 
-import SharedSeed
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +37,7 @@ class PresetFormViewModel : ViewModel() {
         return current.isValid
     }
 
-    fun seed(seed: SharedSeed) {
+    fun seed(seed: PresetFormSeed) {
         _ui.update { s ->
             s.copy(
                 name = s.name.copy(
@@ -107,3 +106,7 @@ sealed interface PresetFormEvent {
     data class NameChanged(val v: String) : PresetFormEvent
     data object NameBlur : PresetFormEvent
 }
+
+data class PresetFormSeed (
+    val name: String = ""
+)

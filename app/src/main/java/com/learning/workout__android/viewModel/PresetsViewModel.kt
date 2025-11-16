@@ -34,6 +34,9 @@ class PresetsViewModel(
     private var _search = MutableStateFlow("")
     val search: StateFlow<String> = _search
 
+    private var _presetToEdit = MutableStateFlow<PresetWithExercises?>(null)
+    val presetToEdit = _presetToEdit
+
     fun selectPresetId(presetId: Long?) {
         _selectedPresetId.value = presetId
     }
@@ -42,12 +45,34 @@ class PresetsViewModel(
         _search.value = value
     }
 
+    fun setPresetToEdit(preset: PresetWithExercises?) {
+        _presetToEdit.value = preset
+    }
+
     fun createPreset(name: String) {
         viewModelScope.launch {
             presetsRepository.createPreset(Preset(name = name, order = System.currentTimeMillis()))
         }
     }
 
+    fun updatePreset(name: String) {
+        val presetToUpdate = presetToEdit.value?.preset
+        if (presetToUpdate != null) {
+            viewModelScope.launch {
+                presetsRepository.updatePreset(
+                    presetToUpdate.copy(
+                        name = name
+                    )
+                )
+            }
+        }
+    }
+
+    fun deletePreset(preset: Preset) {
+        viewModelScope.launch {
+            presetsRepository.deletePreset(preset)
+        }
+    }
 
     fun reorderPresets(from: PresetWithExercises, to: PresetWithExercises) {
         _localSwap.value = from to to  // optimistic
@@ -67,8 +92,10 @@ class PresetsViewModel(
         combine(
             allPresets,
             selectedPresetId,
-            _localSwap
-        ) { presets, selectedId, swap ->
+            _localSwap,
+            _search,
+            _presetToEdit
+        ) { presets, selectedId, swap, search, presetToEdit ->
             val baseList = presets
 
             val displayList = if (swap != null) {
@@ -87,10 +114,16 @@ class PresetsViewModel(
             }.sortedBy { it.preset.order } // if you rely on order
 
             PresetsUiState(
-                allPresets = LoadState.Success(displayList),
+                allPresets = LoadState.Success(displayList.filter {
+                    it.preset.name.contains(
+                        search.trim(),
+                        true
+                    )
+                }),
                 selectedPreset = selectedId?.let { id ->
                     displayList.find { it.preset.id == id }
-                }
+                },
+                presetToEdit = presetToEdit
             )
         }
             .stateIn(
@@ -114,5 +147,6 @@ class PresetsViewModel(
 
 data class PresetsUiState(
     val allPresets: LoadState<List<PresetWithExercises>> = LoadState.Loading,
-    val selectedPreset: PresetWithExercises? = null
+    val selectedPreset: PresetWithExercises? = null,
+    val presetToEdit: PresetWithExercises? = null
 )

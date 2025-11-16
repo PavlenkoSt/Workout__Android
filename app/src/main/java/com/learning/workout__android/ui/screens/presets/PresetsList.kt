@@ -23,7 +23,9 @@ fun PresetsList(
     reorderPresets: (
         from: PresetWithExercises,
         to: PresetWithExercises
-    ) -> Unit
+    ) -> Unit,
+    onSwipeToEdit: (PresetWithExercises) -> Unit,
+    onSwipeToDelete: (PresetWithExercises) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -53,6 +55,8 @@ fun PresetsList(
                 PresetItem(
                     preset = it,
                     isDragging = isDragging,
+                    onSwipeToEdit = { onSwipeToEdit(it) },
+                    onSwipeToDelete = { onSwipeToDelete(it) },
                     draggableHandler = {
                         if (canReorder) {
                             DraggableHandler(
@@ -79,7 +83,9 @@ private fun PresetsListPreview() {
                 )
             }),
             modifier = Modifier,
-            reorderPresets = {from, to ->}
+            reorderPresets = { from, to -> },
+            onSwipeToEdit = {},
+            onSwipeToDelete = {}
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.LoadState
+import com.learning.workout__android.viewModel.PresetFormSeed
 import com.learning.workout__android.viewModel.PresetsViewModel
 import kotlinx.coroutines.launch
 
@@ -39,10 +41,9 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         PresetsHeader(
-            search = vm.search.value,
+            search = vm.search.collectAsState().value,
             onSearchChange = { vm.onSearch(it) },
-            onAddPresetClick = { showBottomSheet = true }
-        )
+            onAddPresetClick = { showBottomSheet = true })
 
         when (val state = ui.allPresets) {
             is LoadState.Loading -> {
@@ -52,10 +53,24 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
             }
 
             is LoadState.Success -> {
-                PresetsList(
-                    presets = state.data,
-                    modifier = modifier,
-                    reorderPresets = { from, to -> vm.reorderPresets(from, to) })
+                if (state.data.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(text = "No presets found", modifier = Modifier.align(Alignment.Center))
+                    }
+                } else {
+                    PresetsList(
+                        presets = state.data,
+                        modifier = modifier,
+                        reorderPresets = { from, to -> vm.reorderPresets(from, to) },
+                        onSwipeToEdit = { preset ->
+                            vm.setPresetToEdit(preset)
+                            showBottomSheet = true
+                        },
+                        onSwipeToDelete = { preset ->
+                            vm.deletePreset(preset.preset)
+                        }
+                    )
+                }
             }
         }
 
@@ -64,17 +79,29 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
                 coroutineScope.launch {
                     sheetState.hide()
                     showBottomSheet = false
+                    vm.setPresetToEdit(null)
                 }
             }
 
             ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
+                onDismissRequest = {
+                    showBottomSheet = false
+                    vm.setPresetToEdit(null)
+                },
                 sheetState = sheetState
             ) {
-                PresetForm(onSubmit = {
-                    vm.createPreset(it)
-                    onHide()
-                })
+                PresetForm(
+                    onSubmit = {
+                        if (ui.presetToEdit != null) {
+                            vm.updatePreset(it)
+                        } else {
+                            vm.createPreset(it)
+                        }
+                        onHide()
+                    },
+                    seed = PresetFormSeed(name = ui.presetToEdit?.preset?.name ?: ""),
+                    isEditing = ui.presetToEdit != null
+                )
             }
         }
     }
