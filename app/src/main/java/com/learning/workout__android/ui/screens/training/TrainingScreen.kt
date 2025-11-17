@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +44,10 @@ import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainingScreen(modifier: Modifier = Modifier) {
+fun TrainingScreen(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState?
+) {
     val coroutineScope = rememberCoroutineScope()
 
     val vm: TrainingViewModel = viewModel(
@@ -278,7 +282,14 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
     if (saveAsPresetModalVisible) {
         SaveAsPresetModal(
             onDismiss = { saveAsPresetModalVisible = false },
-            onSubmit = { vm.saveAsPreset(it) }
+            onSubmit = {
+                vm.saveAsPreset(it)
+                if (snackbarHostState != null) {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Training day saved as preset")
+                    }
+                }
+            }
         )
     }
 }
@@ -287,6 +298,6 @@ fun TrainingScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 fun TrainingScreenPreview() {
     Workout__AndroidTheme {
-        TrainingScreen()
+        TrainingScreen(snackbarHostState = null)
     }
 }
