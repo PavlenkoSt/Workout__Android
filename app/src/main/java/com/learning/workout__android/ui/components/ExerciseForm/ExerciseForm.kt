@@ -2,8 +2,8 @@ package com.learning.workout__android.ui.components.ExerciseForm
 
 import ExerciseDefaultFormResult
 import ExerciseLadderFormResult
+import ExerciseSharedSeed
 import ExerciseSimpleFormResult
-import SharedSeed
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,9 +52,9 @@ fun ExerciseForm(
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf(exerciseTypes[0]) }
 
-    var sharedSeed by remember { mutableStateOf(SharedSeed()) }
+    var sharedSeed by remember { mutableStateOf(ExerciseSharedSeed()) }
 
-    fun onSaveSeed(seed: SharedSeed) {
+    fun onSaveSeed(seed: ExerciseSharedSeed) {
         sharedSeed = seed
     }
 
@@ -132,7 +132,7 @@ fun ExerciseForm(
 
             else -> {
                 LaunchedEffect(Unit) {
-                    onSaveSeed(SharedSeed())
+                    onSaveSeed(ExerciseSharedSeed())
                 }
 
                 ExerciseFormSubmitBtn(

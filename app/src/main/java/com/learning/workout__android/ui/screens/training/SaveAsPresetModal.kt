@@ -23,8 +23,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.components.ModalHeader
-import com.learning.workout__android.viewModel.SaveAsPresetFormEvent
-import com.learning.workout__android.viewModel.SaveAsPresetFormViewModel
+import com.learning.workout__android.viewModel.forms.SaveAsPresetFormEvent
+import com.learning.workout__android.viewModel.forms.SaveAsPresetFormViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

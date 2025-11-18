@@ -22,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.LoadState
-import com.learning.workout__android.viewModel.PresetFormSeed
 import com.learning.workout__android.viewModel.PresetsViewModel
+import com.learning.workout__android.viewModel.forms.PresetFormSeed
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

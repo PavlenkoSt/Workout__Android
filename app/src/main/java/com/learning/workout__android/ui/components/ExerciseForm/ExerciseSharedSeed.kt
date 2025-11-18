@@ -1,4 +1,4 @@
-data class SharedSeed(
+data class ExerciseSharedSeed(
     val name: String = "",
     val rest: String = "",
     val sets: String = "",

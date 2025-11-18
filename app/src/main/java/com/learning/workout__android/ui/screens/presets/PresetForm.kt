@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import com.learning.workout__android.viewModel.PresetFormEvent
-import com.learning.workout__android.viewModel.PresetFormSeed
-import com.learning.workout__android.viewModel.PresetFormViewModel
+import com.learning.workout__android.viewModel.forms.PresetFormEvent
+import com.learning.workout__android.viewModel.forms.PresetFormSeed
+import com.learning.workout__android.viewModel.forms.PresetFormViewModel
 
 @Composable
 fun PresetForm(
@@ -44,7 +44,7 @@ fun PresetForm(
     }
 
     Column(Modifier.padding(horizontal = 8.dp)) {
-        ModalHeader(if(isEditing) "Update preset" else "Add new preset")
+        ModalHeader(if (isEditing) "Update preset" else "Add new preset")
 
         OutlinedTextField(
             value = ui.name.value,
@@ -67,7 +67,7 @@ fun PresetForm(
             if (!isValid) return@Button
             onSubmit(ui.name.value.trim())
         }, modifier = Modifier.fillMaxWidth()) {
-            Text(if(isEditing) "Update" else "Create")
+            Text(if (isEditing) "Update" else "Create")
         }
     }
 }

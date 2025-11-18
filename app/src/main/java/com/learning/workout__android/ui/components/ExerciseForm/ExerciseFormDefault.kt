@@ -1,7 +1,7 @@
 package com.learning.workout__android.ui.components.ExerciseForm
 
 import ExerciseDefaultFormResult
-import SharedSeed
+import ExerciseSharedSeed
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import com.learning.workout__android.viewModel.ExerciseDefaultFormEvent
-import com.learning.workout__android.viewModel.ExerciseFormDefaultViewModel
+import com.learning.workout__android.viewModel.forms.ExerciseDefaultFormEvent
+import com.learning.workout__android.viewModel.forms.ExerciseFormDefaultViewModel
 
 
 @Composable
@@ -40,8 +40,8 @@ fun ExerciseFormDefault(
     exerciseEditingFields: ExerciseEditingFields?,
     exerciseType: ExerciseType,
     vm: ExerciseFormDefaultViewModel = viewModel(),
-    seed: SharedSeed,
-    onSaveSeed: (seed: SharedSeed) -> Unit
+    seed: ExerciseSharedSeed,
+    onSaveSeed: (seed: ExerciseSharedSeed) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -54,7 +54,7 @@ fun ExerciseFormDefault(
     LaunchedEffect(seed, exerciseEditingFields) {
         if (exerciseEditingFields != null) {
             vm.seed(
-                SharedSeed(
+                ExerciseSharedSeed(
                     name = exerciseEditingFields.name,
                     rest = exerciseEditingFields.rest.toString(),
                     sets = exerciseEditingFields.sets.toString(),
@@ -69,7 +69,7 @@ fun ExerciseFormDefault(
     DisposableEffect(Unit) {
         onDispose {
             onSaveSeed(
-                SharedSeed(
+                ExerciseSharedSeed(
                     name = ui.name.value,
                     rest = ui.rest.value,
                     sets = ui.sets.value,
@@ -207,7 +207,7 @@ private fun ExerciseFormDefaultPreview() {
     Workout__AndroidTheme {
         ExerciseFormDefault(
             onDefaultExerciseSubmit = {},
-            seed = SharedSeed(),
+            seed = ExerciseSharedSeed(),
             onSaveSeed = {},
             exerciseEditingFields = null,
             exerciseType = ExerciseType.DYNAMIC

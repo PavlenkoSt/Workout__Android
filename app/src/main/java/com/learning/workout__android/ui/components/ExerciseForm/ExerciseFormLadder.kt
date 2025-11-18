@@ -1,7 +1,7 @@
 package com.learning.workout__android.ui.components.ExerciseForm
 
 import ExerciseLadderFormResult
-import SharedSeed
+import ExerciseSharedSeed
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import com.learning.workout__android.viewModel.ExerciseFormLadderViewModel
-import com.learning.workout__android.viewModel.ExerciseLadderFormEvent
+import com.learning.workout__android.viewModel.forms.ExerciseFormLadderViewModel
+import com.learning.workout__android.viewModel.forms.ExerciseLadderFormEvent
 
 
 @Composable
@@ -37,8 +37,8 @@ fun ExerciseFormLadder(
     onLadderExerciseSubmit: (result: ExerciseLadderFormResult) -> Unit,
     exerciseEditingFields: ExerciseEditingFields?,
     vm: ExerciseFormLadderViewModel = viewModel(),
-    seed: SharedSeed,
-    onSaveSeed: (seed: SharedSeed) -> Unit
+    seed: ExerciseSharedSeed,
+    onSaveSeed: (seed: ExerciseSharedSeed) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -52,7 +52,7 @@ fun ExerciseFormLadder(
     LaunchedEffect(seed, exerciseEditingFields) {
         if (exerciseEditingFields != null) {
             vm.seed(
-                SharedSeed(
+                ExerciseSharedSeed(
                     name = exerciseEditingFields.name,
                     rest = exerciseEditingFields.rest.toString(),
                     sets = exerciseEditingFields.sets.toString(),
@@ -67,7 +67,7 @@ fun ExerciseFormLadder(
     DisposableEffect(Unit) {
         onDispose {
             onSaveSeed(
-                SharedSeed(
+                ExerciseSharedSeed(
                     name = ui.name.value,
                     rest = ui.rest.value
                 )
@@ -223,7 +223,7 @@ private fun ExerciseFormLadderPreview() {
         ExerciseFormLadder(
             onLadderExerciseSubmit = {},
             onSaveSeed = {},
-            seed = SharedSeed(),
+            seed = ExerciseSharedSeed(),
             exerciseEditingFields = null
         )
     }
