@@ -13,28 +13,41 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.data.models.RecordUnits
 import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
-import com.learning.workout__android.viewModel.forms.PresetFormEvent
-import com.learning.workout__android.viewModel.forms.PresetFormSeed
-import com.learning.workout__android.viewModel.forms.PresetFormViewModel
+import com.learning.workout__android.viewModel.forms.RecordFormEvent
+import com.learning.workout__android.viewModel.forms.RecordFormSeed
+import com.learning.workout__android.viewModel.forms.RecordFormViewModel
+
+data class RecordFormResult(
+    val name: String,
+    val count: Number,
+    val units: RecordUnits
+)
 
 @Composable
-fun PresetForm(
-    vm: PresetFormViewModel = viewModel(),
-    onSubmit: (name: String) -> Unit,
-    seed: PresetFormSeed,
+fun RecordForm(
+    vm: RecordFormViewModel = viewModel(),
+    onSubmit: (result: RecordFormResult) -> Unit,
+    seed: RecordFormSeed,
     isEditing: Boolean
 ) {
     val focusManager = LocalFocusManager.current
-    
+
     val ui by vm.ui.collectAsState()
+
+    val countFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(seed) {
         vm.seed(seed)
@@ -47,11 +60,11 @@ fun PresetForm(
     }
 
     Column(Modifier.padding(horizontal = 8.dp)) {
-        ModalHeader(if (isEditing) "Update preset" else "Add new preset")
+        ModalHeader(if (isEditing) "Update record" else "Add new record")
 
         OutlinedTextField(
             value = ui.name.value,
-            onValueChange = { vm.onEvent(PresetFormEvent.NameChanged(it)) },
+            onValueChange = { vm.onEvent(RecordFormEvent.NameChanged(it)) },
             isError = ui.name.touched && ui.name.error != null,
             supportingText = {
                 if (ui.name.touched && ui.name.error != null) Text(ui.name.error!!)
@@ -59,17 +72,50 @@ fun PresetForm(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = "Name") },
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    countFocusRequester.requestFocus()
+                    vm.onEvent(RecordFormEvent.NameBlur)
+                }
+            )
+        )
+
+        OutlinedTextField(
+            value = ui.count.value,
+            onValueChange = { vm.onEvent(RecordFormEvent.CountChanged(it)) },
+            isError = ui.count.touched && ui.count.error != null,
+            supportingText = {
+                if (ui.count.touched && ui.count.error != null) Text(ui.count.error!!)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(countFocusRequester),
+            label = { Text(text = "Count") },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Number
             ),
             keyboardActions = KeyboardActions {
-                vm.onEvent(PresetFormEvent.NameBlur)
+                vm.onEvent(RecordFormEvent.CountBlur)
                 focusManager.clearFocus()
             }
         )
+
+        // TODO add selector here
+
+
         Button(onClick = {
             val isValid = vm.submit()
             if (!isValid) return@Button
-            onSubmit(ui.name.value.trim())
+            onSubmit(
+                RecordFormResult(
+                    name = ui.name.value,
+                    count = ui.count.value.toInt(),
+                    units = RecordUnits.REPS // TODO use value from selector
+                )
+            )
         }, modifier = Modifier.fillMaxWidth()) {
             Text(if (isEditing) "Update" else "Create")
         }
@@ -78,11 +124,11 @@ fun PresetForm(
 
 @Composable
 @Preview(showBackground = true)
-private fun PresetFormPreview() {
+private fun RecordFormPreview() {
     Workout__AndroidTheme {
-        PresetForm(
+        RecordForm(
             onSubmit = {},
-            seed = PresetFormSeed(),
+            seed = RecordFormSeed(),
             isEditing = false
         )
     }
