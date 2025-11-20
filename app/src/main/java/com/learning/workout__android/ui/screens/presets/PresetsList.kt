@@ -18,7 +18,6 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 @Composable
 fun PresetsList(
     presets: List<PresetWithExercises>,
-    modifier: Modifier,
     reorderPresets: (
         from: PresetWithExercises,
         to: PresetWithExercises
@@ -41,7 +40,7 @@ fun PresetsList(
     LazyColumn(
         state = lazyListState,
         contentPadding = PaddingValues(
-            end = 8.dp, start = 8.dp, bottom = 12.dp, top = 12.dp
+            end = 8.dp, start = 8.dp, bottom = 80.dp, top = 12.dp
         ),
     ) {
         items(items = presets, key = { it.preset.id }) {
@@ -80,7 +79,6 @@ private fun PresetsListPreview() {
                     exercises = emptyList()
                 )
             }),
-            modifier = Modifier,
             reorderPresets = { from, to -> },
             onSwipeToEdit = {},
             onSwipeToDelete = {}

@@ -3,9 +3,18 @@ package com.learning.workout__android.ui.screens.presets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -19,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.LoadState
@@ -39,39 +49,59 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        PresetsHeader(
-            search = vm.search.collectAsState().value,
-            onSearchChange = { vm.onSearch(it) },
-            onAddPresetClick = { showBottomSheet = true })
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PresetsHeader(
+                search = vm.search.collectAsState().value,
+                onSearchChange = { vm.onSearch(it) }
+            )
 
-        when (val state = ui.allPresets) {
-            is LoadState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            }
-
-            is LoadState.Success -> {
-                if (state.data.isEmpty()) {
+            when (val state = ui.allPresets) {
+                is LoadState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Text(text = "No presets found", modifier = Modifier.align(Alignment.Center))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
-                } else {
-                    PresetsList(
-                        presets = state.data,
-                        modifier = modifier,
-                        reorderPresets = { from, to -> vm.reorderPresets(from, to) },
-                        onSwipeToEdit = { preset ->
-                            vm.setPresetToEdit(preset)
-                            showBottomSheet = true
-                        },
-                        onSwipeToDelete = { preset ->
-                            vm.deletePreset(preset.preset)
+                }
+
+                is LoadState.Success -> {
+                    if (state.data.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                text = "No presets found",
+                                modifier = Modifier.align(Alignment.Center)
+                            )
                         }
-                    )
+                    } else {
+                        PresetsList(
+                            presets = state.data,
+                            reorderPresets = { from, to -> vm.reorderPresets(from, to) },
+                            onSwipeToEdit = { preset ->
+                                vm.setPresetToEdit(preset)
+                                showBottomSheet = true
+                            },
+                            onSwipeToDelete = { preset ->
+                                vm.deletePreset(preset.preset)
+                            }
+                        )
+                    }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { showBottomSheet = true },
+            shape = ShapeDefaults.ExtraLarge,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(all = 16.dp)
+                .height(50.dp)
+                .width(50.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(26.dp)
+            )
         }
 
         if (showBottomSheet) {

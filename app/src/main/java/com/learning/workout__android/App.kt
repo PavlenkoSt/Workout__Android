@@ -44,12 +44,12 @@ fun App() {
             },
             recordsScreen = {
                 RecordsScreen(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
                 )
             },
             presetsScreen = {
                 PresetsScreen(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
                 )
             },
             presetScreen = {
