@@ -131,7 +131,6 @@ class PresetsViewModel(
             }
         }
     }
-
 }
 
 data class PresetsUiState(

@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.learning.workout__android.navigation.Navigator
 import com.learning.workout__android.navigation.rememberNavigationState
 import com.learning.workout__android.ui.components.BottomNavBar
-import com.learning.workout__android.ui.screens.GoalsScreen
-import com.learning.workout__android.ui.screens.RecordsScreen
+import com.learning.workout__android.ui.screens.goals.GoalsScreen
 import com.learning.workout__android.ui.screens.preset.PresetScreen
 import com.learning.workout__android.ui.screens.presets.PresetsScreen
+import com.learning.workout__android.ui.screens.records.RecordsScreen
 import com.learning.workout__android.ui.screens.training.TrainingScreen
 import com.learning.workout__android.ui.screens.trainingList.TrainingListScreen
 
