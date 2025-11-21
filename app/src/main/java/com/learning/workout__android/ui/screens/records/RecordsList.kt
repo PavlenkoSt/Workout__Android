@@ -19,7 +19,7 @@ fun RecordsList(
 ) {
     LazyColumn(
         contentPadding = PaddingValues(
-            end = 8.dp, start = 8.dp, bottom = 12.dp, top = 12.dp
+            end = 8.dp, start = 8.dp, bottom = 80.dp, top = 12.dp
         )
     ) {
         items(items = records, key = { it.id }) {
