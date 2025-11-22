@@ -15,7 +15,9 @@ import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 
 @Composable
 fun RecordsList(
-    records: List<RecordModel>
+    records: List<RecordModel>,
+    onDeleteRecord: (record: RecordModel) -> Unit,
+    onSwipeToEdit: (record: RecordModel) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(
@@ -23,7 +25,11 @@ fun RecordsList(
         )
     ) {
         items(items = records, key = { it.id }) {
-            RecordItem(it)
+            RecordItem(
+                record = it,
+                onDelete = { onDeleteRecord(it) },
+                onSwipeToEdit = { onSwipeToEdit(it) }
+            )
             Spacer(modifier = Modifier.height(6.dp))
         }
     }
@@ -43,7 +49,9 @@ private fun RecordsListPreview() {
                     count = 20,
                     units = RecordUnits.REPS
                 )
-            })
+            }),
+            onSwipeToEdit = {},
+            onDeleteRecord = {}
         )
     }
 }

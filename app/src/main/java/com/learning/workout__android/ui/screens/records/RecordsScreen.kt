@@ -67,7 +67,14 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
                             Text(text = "No records yet", modifier = Modifier.align(Alignment.Center))
                         }
                     } else {
-                        RecordsList(records = state.data)
+                        RecordsList(
+                            records = state.data,
+                            onDeleteRecord = { vm.deleteRecord(it) },
+                            onSwipeToEdit = {
+                                vm.setRecordToEdit(it)
+                                showBottomSheet = true
+                            }
+                        )
                     }
                 }
             }
