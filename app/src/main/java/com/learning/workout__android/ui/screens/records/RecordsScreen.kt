@@ -52,7 +52,10 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            RecordsHeader()
+            RecordsHeader(
+                onSortChange = { vm.onSortChange(it) },
+                sortState = ui.sortState
+            )
 
             when (val state = ui.records) {
                 is LoadState.Loading -> {
@@ -64,7 +67,10 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
                 is LoadState.Success -> {
                     if (state.data.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            Text(text = "No records yet", modifier = Modifier.align(Alignment.Center))
+                            Text(
+                                text = "No records yet",
+                                modifier = Modifier.align(Alignment.Center)
+                            )
                         }
                     } else {
                         RecordsList(
@@ -119,7 +125,8 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
                                 ui.recordToEdit!!.copy(
                                     name = it.name,
                                     count = it.count.toInt(),
-                                    units = it.units
+                                    units = it.units,
+                                    createdAt = System.currentTimeMillis() // update timestamp
                                 )
                             )
                         } else {
