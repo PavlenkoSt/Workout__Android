@@ -23,17 +23,17 @@ class RecordFormViewModel : BaseFormViewModel<RecordFormUiState, RecordFormEvent
                 validator = FormValidators::validateName
             )
 
+            is RecordFormEvent.CountChanged -> updateField(
+                get = { it.count },
+                set = { s, f -> s.copy(count = f) },
+                value = e.v.filter { ch -> ch.isDigit() }, // allow digits only
+                validator = FormValidators::validatePositiveInt
+            )
+
             RecordFormEvent.NameBlur -> blur(
                 "name",
                 FormValidators::validateName
             ) { it.copy(name = it.name.copy(touched = true)) }
-
-            is RecordFormEvent.CountChanged -> updateField(
-                get = { it.count },
-                set = { s, f -> s.copy(count = f) },
-                value = e.v,
-                validator = FormValidators::validatePositiveInt
-            )
 
             RecordFormEvent.CountBlur -> blur(
                 "count",

@@ -25,8 +25,8 @@ class RecordConverters {
 }
 
 enum class RecordUnits(val label: String) {
-    REPS("reps"),
-    SEC("sec"),
-    MIN("min"),
-    KM("km")
+    REPS("Reps"),
+    SEC("Sec"),
+    MIN("Min"),
+    KM("Km")
 }

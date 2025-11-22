@@ -1,6 +1,7 @@
 package com.learning.workout__android.ui.screens.records
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.data.models.RecordModel
 import com.learning.workout__android.ui.screens.presets.RecordForm
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.LoadState
@@ -49,22 +51,24 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize()) {
-        RecordsHeader()
+        Column(modifier = Modifier.fillMaxSize()) {
+            RecordsHeader()
 
-        when (val state = ui.records) {
-            is LoadState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            }
-
-            is LoadState.Success -> {
-                if (state.data.isEmpty()) {
+            when (val state = ui.records) {
+                is LoadState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Text(text = "No records yet", modifier = Modifier.align(Alignment.Center))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
-                } else {
-                    RecordsList(records = state.data)
+                }
+
+                is LoadState.Success -> {
+                    if (state.data.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "No records yet", modifier = Modifier.align(Alignment.Center))
+                        }
+                    } else {
+                        RecordsList(records = state.data)
+                    }
                 }
             }
         }
@@ -103,12 +107,23 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
             ) {
                 RecordForm(
                     onSubmit = {
-                        // TODO action here
-//                        if (ui.recordToEdit != null) {
-//                            vm.updateRecord(it)
-//                        } else {
-//                            vm.createRecord(it)
-//                        }
+                        if (ui.recordToEdit != null) {
+                            vm.updateRecord(
+                                ui.recordToEdit!!.copy(
+                                    name = it.name,
+                                    count = it.count.toInt(),
+                                    units = it.units
+                                )
+                            )
+                        } else {
+                            vm.createRecord(
+                                RecordModel(
+                                    name = it.name,
+                                    count = it.count.toInt(),
+                                    units = it.units
+                                )
+                            )
+                        }
                         onHide()
                     },
                     seed = RecordFormSeed(

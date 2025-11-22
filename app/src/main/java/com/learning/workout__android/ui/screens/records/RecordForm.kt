@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,7 +17,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -36,6 +42,7 @@ data class RecordFormResult(
     val units: RecordUnits
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordForm(
     vm: RecordFormViewModel = viewModel(),
@@ -48,6 +55,11 @@ fun RecordForm(
     val ui by vm.ui.collectAsState()
 
     val countFocusRequester = remember { FocusRequester() }
+
+    var dropdownExpanded by remember { mutableStateOf(false) }
+
+    val units = RecordUnits.entries.toList()
+    var selectedUnits by remember { mutableStateOf(RecordUnits.REPS) }
 
     LaunchedEffect(seed) {
         vm.seed(seed)
@@ -103,8 +115,37 @@ fun RecordForm(
             }
         )
 
-        // TODO add selector here
+        ExposedDropdownMenuBox(
+            expanded = dropdownExpanded,
+            onExpandedChange = { dropdownExpanded = !dropdownExpanded },
+        ) {
+            OutlinedTextField(
+                value = selectedUnits.label,
+                onValueChange = {},
+                supportingText = {},
+                readOnly = true,
+                label = { Text("Units") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
 
+            ExposedDropdownMenu(
+                expanded = dropdownExpanded,
+                onDismissRequest = { dropdownExpanded = false }
+            ) {
+                units.forEach { unit ->
+                    DropdownMenuItem(
+                        text = { Text(unit.label) },
+                        onClick = {
+                            selectedUnits = unit
+                            dropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         Button(onClick = {
             val isValid = vm.submit()
@@ -113,7 +154,7 @@ fun RecordForm(
                 RecordFormResult(
                     name = ui.name.value,
                     count = ui.count.value.toInt(),
-                    units = RecordUnits.REPS // TODO use value from selector
+                    units = selectedUnits
                 )
             )
         }, modifier = Modifier.fillMaxWidth()) {

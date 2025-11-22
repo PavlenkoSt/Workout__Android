@@ -11,15 +11,15 @@ class RecordsRepository(
         return recordDao.getAll()
     }
 
-    fun createRecord(record: RecordModel) {
+    suspend fun createRecord(record: RecordModel) {
         recordDao.create(record)
     }
 
-    fun updateRecord(record: RecordModel) {
+    suspend fun updateRecord(record: RecordModel) {
         recordDao.update(record)
     }
 
-    fun deleteRecord(record: RecordModel) {
+    suspend fun deleteRecord(record: RecordModel) {
         recordDao.delete(record)
     }
 }

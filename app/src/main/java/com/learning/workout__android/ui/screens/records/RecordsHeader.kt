@@ -32,7 +32,7 @@ fun RecordsHeader() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(x = (-6).dp),
+                    .offset((-2).dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -62,7 +62,7 @@ fun RecordsHeader() {
             }
         },
         actions = {
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(12.dp))
         }
     )
 

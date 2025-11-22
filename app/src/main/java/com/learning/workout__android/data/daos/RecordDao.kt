@@ -14,11 +14,11 @@ interface RecordDao {
     fun getAll(): Flow<List<RecordModel>>
 
     @Insert
-    fun create(record: RecordModel)
+    suspend fun create(record: RecordModel)
 
     @Update
-    fun update(record: RecordModel)
+    suspend fun update(record: RecordModel)
 
     @Delete
-    fun delete(record: RecordModel)
+    suspend fun delete(record: RecordModel)
 }

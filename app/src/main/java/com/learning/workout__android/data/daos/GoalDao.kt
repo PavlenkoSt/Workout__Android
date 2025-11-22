@@ -14,11 +14,11 @@ interface GoalDao {
     fun getAll(): Flow<List<Goal>>
 
     @Insert
-    fun create(goal: Goal)
+    suspend fun create(goal: Goal)
 
     @Update
-    fun update(goal: Goal)
+    suspend fun update(goal: Goal)
 
     @Delete
-    fun delete(goal: Goal)
+    suspend fun delete(goal: Goal)
 }

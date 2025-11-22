@@ -11,15 +11,15 @@ class GoalsRepository(
         return goalsDao.getAll()
     }
 
-    fun createGoal(goal: Goal) {
+    suspend fun createGoal(goal: Goal) {
         goalsDao.create(goal)
     }
 
-    fun updateGoal(goal: Goal) {
+    suspend fun updateGoal(goal: Goal) {
         goalsDao.update(goal)
     }
 
-    fun deleteGoal(goal: Goal) {
+    suspend fun deleteGoal(goal: Goal) {
         goalsDao.delete(goal)
     }
 }
