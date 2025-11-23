@@ -45,7 +45,6 @@ abstract class AppDatabase : RoomDatabase() {
         fun getDatabase(context: Context): AppDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, AppDatabase::class.java, "workout_database")
-                    .fallbackToDestructiveMigration(false) // For development - in production use proper migrations
                     .build()
                     .also { Instance = it }
             }
