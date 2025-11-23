@@ -84,7 +84,12 @@ class GoalsViewModel(
         val grouped = goals.groupingBy { it.status }.eachCount()
 
         GoalsUiState(
-            goals = LoadState.Success(filteredGoals),
+            goals = LoadState.Success(filteredGoals.sortedBy {
+                when (it.status) {
+                    GoalsStatusEnum.Pending -> 0
+                    GoalsStatusEnum.Completed -> 1
+                }
+            }),
             goalToEdit = goalsToEdit,
             filter = filter,
             summary = GoalsStatusSummary(
