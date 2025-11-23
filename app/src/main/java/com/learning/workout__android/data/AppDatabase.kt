@@ -28,7 +28,7 @@ import com.learning.workout__android.data.models.TrainingExercise
         RecordModel::class,
         Goal::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(

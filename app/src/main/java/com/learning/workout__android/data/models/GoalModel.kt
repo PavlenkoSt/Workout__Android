@@ -12,10 +12,16 @@ import androidx.room.TypeConverter
 data class Goal(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "count") val count: Int,
-    @ColumnInfo(name = "units") val units: RecordUnits,
+    @ColumnInfo(name = "count") val count: Int = 0,
+    @ColumnInfo(name = "targetCount") val targetCount: Int,
+    @ColumnInfo(name = "units") val units: GoalUnits,
     @ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis()
-)
+) {
+    val status
+        get() = if (count >= targetCount) {
+            GoalsStatusEnum.Completed
+        } else GoalsStatusEnum.Pending
+}
 
 class GoalConverters {
     @TypeConverter
@@ -30,4 +36,9 @@ enum class GoalUnits(val label: String) {
     SEC("sec"),
     MIN("min"),
     KM("km")
+}
+
+enum class GoalsStatusEnum {
+    Completed,
+    Pending
 }

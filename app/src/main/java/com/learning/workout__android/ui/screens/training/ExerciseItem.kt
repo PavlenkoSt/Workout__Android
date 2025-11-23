@@ -5,23 +5,17 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -32,14 +26,14 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.learning.workout__android.data.models.ExerciseType
 import com.learning.workout__android.data.models.TrainingExercise
+import com.learning.workout__android.ui.components.ExerciseAnimatedProgressBar
+import com.learning.workout__android.ui.components.ExerciseCountUpdateBtn
 import com.learning.workout__android.ui.components.SwipeToDismissItemBackground
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseName
@@ -163,7 +157,7 @@ private fun ExerciseSetsRow(
         modifier = Modifier.padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        SetsUpdateBtn(onClick = onDecrement, text = "-")
+        ExerciseCountUpdateBtn(onClick = onDecrement, text = "-")
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -171,8 +165,8 @@ private fun ExerciseSetsRow(
             val isCheckMarkVisible = exercise.setsDone >= exercise.sets
 
             ExerciseAnimatedProgressBar(
-                setsDone = exercise.setsDone,
-                sets = exercise.sets
+                count = exercise.setsDone,
+                targetCount = exercise.sets
             )
 
             if (isCheckMarkVisible) {
@@ -189,55 +183,10 @@ private fun ExerciseSetsRow(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        SetsUpdateBtn(onClick = onIncrement, text = "+")
+        ExerciseCountUpdateBtn(onClick = onIncrement, text = "+")
     }
 }
 
-// Keep existing helper composables but optimize DrawingCheckmark call
-@Composable
-private fun RowScope.SetsUpdateBtn(
-    onClick: () -> Unit,
-    text: String
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.weight(1f),
-        shape = ShapeDefaults.Medium,
-        colors = ButtonDefaults.buttonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.primary,
-        ),
-        contentPadding = PaddingValues(vertical = 0.dp)
-    ) {
-        Text(text, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-private fun ExerciseAnimatedProgressBar(
-    setsDone: Int,
-    sets: Int
-) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = (setsDone.toFloat() / sets.toFloat()),
-        label = "progress"
-    )
-
-    Spacer(modifier = Modifier.width(16.dp))
-    Column(
-        modifier = Modifier.width(80.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("${setsDone}/${sets}")
-        LinearProgressIndicator(
-            progress = { animatedProgress },
-            modifier = Modifier.fillMaxWidth(),
-            trackColor = MaterialTheme.colorScheme.surface,
-            color = MaterialTheme.colorScheme.primary,
-            strokeCap = StrokeCap.Round,
-        )
-    }
-}
 
 @Composable
 private fun ExerciseStatItem(

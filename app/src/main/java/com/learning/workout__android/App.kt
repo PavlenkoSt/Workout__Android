@@ -39,7 +39,7 @@ fun App() {
             },
             goalsScreen = {
                 GoalsScreen(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
                 )
             },
             recordsScreen = {
