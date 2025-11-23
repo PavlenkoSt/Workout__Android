@@ -16,7 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -70,40 +69,28 @@ fun GoalsScreen(
                 }
 
                 is LoadState.Success -> {
-                    if (state.data.completed.isEmpty() && state.data.pending.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Text(
-                                text = "No goals found",
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    } else {
-                        GoalsList(
-                            goals = state.data,
-                            filter = ui.filter,
-                            onIncrementGoal = { goal -> vm.updateGoal(goal.copy(count = goal.count + 1)) },
-                            onDecrementGoal = { goal -> vm.updateGoal(goal.copy(count = if (goal.count > 0) goal.count - 1 else 0)) },
-                            onEditGoalClick = {
-                                vm.setGoalToEdit(it)
-                                showBottomSheet = true
-                            },
-                            onDeleteGoalClick = { vm.deleteGoal(it) },
-                            onSaveGoalAsRecordClick = {
-                                vm.saveGoalAsRecord(it, onResult = { status ->
-                                    if (status) {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("Added to records successfully")
-                                        }
-                                    } else {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("This is less than current record")
-                                        }
-                                    }
-                                })
-                            },
-                            summary = ui.summary
-                        )
-                    }
+                    GoalsList(
+                        goals = state.data,
+                        filter = ui.filter,
+                        onIncrementGoal = { goal -> vm.updateGoal(goal.copy(count = goal.count + 1)) },
+                        onDecrementGoal = { goal -> vm.updateGoal(goal.copy(count = if (goal.count > 0) goal.count - 1 else 0)) },
+                        onEditGoalClick = {
+                            vm.setGoalToEdit(it)
+                            showBottomSheet = true
+                        },
+                        onDeleteGoalClick = { vm.deleteGoal(it) },
+                        onSaveGoalAsRecordClick = {
+                            vm.saveGoalAsRecord(it, onResult = { status ->
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        if (status) "Added to records successfully"
+                                        else "This is less than current record"
+                                    )
+                                }
+                            })
+                        },
+                        summary = ui.summary
+                    )
                 }
             }
         }

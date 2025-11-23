@@ -3,16 +3,20 @@ package com.learning.workout__android.ui.screens.goals
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,47 +39,62 @@ fun GoalsList(
     onDeleteGoalClick: (goal: Goal) -> Unit,
     summary: GoalsStatusSummary
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(bottom = 80.dp, end = 8.dp, start = 8.dp, top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if ((filter == GoalsFilterEnum.All || filter == GoalsFilterEnum.Pending) && goals.pending.isNotEmpty()) {
-            if (filter == GoalsFilterEnum.All) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    GoalListHeader("Pending (${summary.pending})")
-                }
-            }
 
-            items(items = goals.pending, key = { it.id }) {
-                GoalItem(
-                    goal = it,
-                    onDecrement = { onDecrementGoal(it) },
-                    onIncrement = { onIncrementGoal(it) },
-                    onDeleteClick = { onDeleteGoalClick(it) },
-                    onSaveAsRecordClick = { onSaveGoalAsRecordClick(it) },
-                    onEditClick = { onEditGoalClick(it) }
-                )
-            }
+    if (filter == GoalsFilterEnum.Completed && goals.completed.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text("No completed goals yet", modifier = Modifier.align(Alignment.Center))
         }
+    } else if (filter == GoalsFilterEnum.Pending && goals.pending.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text("No pending goals", modifier = Modifier.align(Alignment.Center))
+        }
+    } else if (filter == GoalsFilterEnum.All && goals.pending.isEmpty() && goals.completed.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text("No goals yet", modifier = Modifier.align(Alignment.Center))
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(bottom = 80.dp, end = 8.dp, start = 8.dp, top = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if ((filter == GoalsFilterEnum.All || filter == GoalsFilterEnum.Pending) && goals.pending.isNotEmpty()) {
+                if (filter == GoalsFilterEnum.All) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        GoalListHeader("Pending (${summary.pending})")
+                    }
+                }
 
-        if ((filter == GoalsFilterEnum.All || filter == GoalsFilterEnum.Completed) && goals.completed.isNotEmpty()) {
-            if (filter == GoalsFilterEnum.All) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    GoalListHeader("Completed (${summary.completed})")
+                items(items = goals.pending, key = { it.id }) {
+                    GoalItem(
+                        goal = it,
+                        onDecrement = { onDecrementGoal(it) },
+                        onIncrement = { onIncrementGoal(it) },
+                        onDeleteClick = { onDeleteGoalClick(it) },
+                        onSaveAsRecordClick = { onSaveGoalAsRecordClick(it) },
+                        onEditClick = { onEditGoalClick(it) }
+                    )
                 }
             }
 
-            items(items = goals.completed, key = { it.id }) {
-                GoalItem(
-                    goal = it,
-                    onDecrement = { onDecrementGoal(it) },
-                    onIncrement = { onIncrementGoal(it) },
-                    onDeleteClick = { onDeleteGoalClick(it) },
-                    onSaveAsRecordClick = { onSaveGoalAsRecordClick(it) },
-                    onEditClick = { onEditGoalClick(it) }
-                )
+            if ((filter == GoalsFilterEnum.All || filter == GoalsFilterEnum.Completed) && goals.completed.isNotEmpty()) {
+                if (filter == GoalsFilterEnum.All) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        GoalListHeader("Completed (${summary.completed})")
+                    }
+                }
+
+                items(items = goals.completed, key = { it.id }) {
+                    GoalItem(
+                        goal = it,
+                        onDecrement = { onDecrementGoal(it) },
+                        onIncrement = { onIncrementGoal(it) },
+                        onDeleteClick = { onDeleteGoalClick(it) },
+                        onSaveAsRecordClick = { onSaveGoalAsRecordClick(it) },
+                        onEditClick = { onEditGoalClick(it) }
+                    )
+                }
             }
         }
     }
@@ -85,11 +104,11 @@ fun GoalsList(
 private fun GoalListHeader(text: String) {
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
             .clip(ShapeDefaults.Medium)
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .border(1.dp, MaterialTheme.colorScheme.onSecondaryContainer, ShapeDefaults.Medium)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(CardDefaults.outlinedCardBorder(enabled = true), ShapeDefaults.Medium)
             .padding(horizontal = 8.dp, vertical = 8.dp)
     )
 }

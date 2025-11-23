@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +48,14 @@ fun GoalItem(
     var expanded by remember { mutableStateOf(false) }
     var openAlertDialog by remember { mutableStateOf(false) }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        border = CardDefaults.outlinedCardBorder(enabled = true)
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
@@ -128,7 +137,7 @@ fun GoalItem(
         }
     }
 
-    if(openAlertDialog) {
+    if (openAlertDialog) {
         DeleteGoalConfirmDialog(
             onDelete = onDeleteClick,
             onCancel = { openAlertDialog = false },
