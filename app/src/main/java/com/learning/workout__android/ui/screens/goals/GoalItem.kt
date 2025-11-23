@@ -44,6 +44,7 @@ fun GoalItem(
     onSaveAsRecordClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var openAlertDialog by remember { mutableStateOf(false) }
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -77,7 +78,7 @@ fun GoalItem(
                         text = { Text("Delete", color = Color.Red) },
                         onClick = {
                             expanded = false
-                            onDeleteClick()
+                            openAlertDialog = true
                         }
                     )
 
@@ -125,6 +126,14 @@ fun GoalItem(
                 ExerciseCountUpdateBtn(onClick = onIncrement, text = "+")
             }
         }
+    }
+
+    if(openAlertDialog) {
+        DeleteGoalConfirmDialog(
+            onDelete = onDeleteClick,
+            onCancel = { openAlertDialog = false },
+            goalName = goal.name
+        )
     }
 }
 

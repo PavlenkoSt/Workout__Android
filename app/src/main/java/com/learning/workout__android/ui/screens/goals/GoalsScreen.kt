@@ -86,21 +86,20 @@ fun GoalsScreen(
                                 vm.setGoalToEdit(it)
                                 showBottomSheet = true
                             },
-                            onDeleteGoalClick = {
-                                // TODO
-                            },
-                            onSaveGoalAsRecordClick = { vm.saveGoalAsRecord(it, onResult = {
-                                status ->
-                                if(status) {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Added to records successfully")
+                            onDeleteGoalClick = { vm.deleteGoal(it) },
+                            onSaveGoalAsRecordClick = {
+                                vm.saveGoalAsRecord(it, onResult = { status ->
+                                    if (status) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Added to records successfully")
+                                        }
+                                    } else {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("This is less than current record")
+                                        }
                                     }
-                                }else {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("This is less than current record")
-                                    }
-                                }
-                            }) }
+                                })
+                            }
                         )
                     }
                 }
