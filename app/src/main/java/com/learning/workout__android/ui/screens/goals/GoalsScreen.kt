@@ -70,7 +70,7 @@ fun GoalsScreen(
                 }
 
                 is LoadState.Success -> {
-                    if (state.data.isEmpty()) {
+                    if (state.data.completed.isEmpty() && state.data.pending.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = "No goals found",
@@ -80,6 +80,7 @@ fun GoalsScreen(
                     } else {
                         GoalsList(
                             goals = state.data,
+                            filter = ui.filter,
                             onIncrementGoal = { goal -> vm.updateGoal(goal.copy(count = goal.count + 1)) },
                             onDecrementGoal = { goal -> vm.updateGoal(goal.copy(count = if (goal.count > 0) goal.count - 1 else 0)) },
                             onEditGoalClick = {
@@ -99,7 +100,8 @@ fun GoalsScreen(
                                         }
                                     }
                                 })
-                            }
+                            },
+                            summary = ui.summary
                         )
                     }
                 }

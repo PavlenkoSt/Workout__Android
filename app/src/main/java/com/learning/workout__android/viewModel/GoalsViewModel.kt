@@ -75,21 +75,15 @@ class GoalsViewModel(
         _goalToEdit,
         _filter
     ) { goals, goalsToEdit, filter ->
-        val filteredGoals = when (filter) {
-            GoalsFilterEnum.Pending -> goals.filter { it.status == GoalsStatusEnum.Pending }
-            GoalsFilterEnum.Completed -> goals.filter { it.status == GoalsStatusEnum.Completed }
-            GoalsFilterEnum.All -> goals
-        }
-
         val grouped = goals.groupingBy { it.status }.eachCount()
 
         GoalsUiState(
-            goals = LoadState.Success(filteredGoals.sortedBy {
-                when (it.status) {
-                    GoalsStatusEnum.Pending -> 0
-                    GoalsStatusEnum.Completed -> 1
-                }
-            }),
+            goals = LoadState.Success(
+                GroupedGoals(
+                    completed = goals.filter { it.status == GoalsStatusEnum.Completed },
+                    pending = goals.filter { it.status == GoalsStatusEnum.Pending }
+                )
+            ),
             goalToEdit = goalsToEdit,
             filter = filter,
             summary = GoalsStatusSummary(
@@ -118,10 +112,15 @@ class GoalsViewModel(
 }
 
 data class GoalsUiState(
-    val goals: LoadState<List<Goal>> = LoadState.Loading,
+    val goals: LoadState<GroupedGoals> = LoadState.Loading,
     val goalToEdit: Goal? = null,
     val filter: GoalsFilterEnum = GoalsFilterEnum.All,
     val summary: GoalsStatusSummary = GoalsStatusSummary()
+)
+
+data class GroupedGoals(
+    val completed: List<Goal> = emptyList(),
+    val pending: List<Goal> = emptyList()
 )
 
 enum class GoalsFilterEnum {
