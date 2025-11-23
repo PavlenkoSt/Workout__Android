@@ -40,10 +40,27 @@ enum class ExerciseType(val label: String) {
     HAND_BALANCE_SESSION("hand_balance_session")
 }
 
-class ExerciseConverters {
+
+enum class ExerciseUnits(val label: String) {
+    REPS("reps"),
+    SEC("sec"),
+    MIN("min"),
+    KM("km")
+}
+
+class ExerciseTypeConverters {
     @TypeConverter
     fun fromType(type: ExerciseType): String = type.name
 
     @TypeConverter
     fun toType(value: String): ExerciseType = ExerciseType.valueOf(value)
 }
+
+class ExerciseUnitsConverters {
+    @TypeConverter
+    fun fromUnits(units: ExerciseUnits): String = units.name
+
+    @TypeConverter
+    fun toUnits(name: String): ExerciseUnits = ExerciseUnits.valueOf(name)
+}
+

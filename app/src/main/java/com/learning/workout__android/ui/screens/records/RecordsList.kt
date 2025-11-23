@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.data.models.RecordModel
-import com.learning.workout__android.data.models.RecordUnits
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 
 @Composable
@@ -47,7 +47,7 @@ private fun RecordsListPreview() {
                     id = it.toLong(),
                     name = "Pull ups",
                     count = 20,
-                    units = RecordUnits.REPS
+                    units = ExerciseUnits.REPS
                 )
             }),
             onSwipeToEdit = {},

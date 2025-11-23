@@ -9,12 +9,11 @@ import com.learning.workout__android.data.daos.GoalDao
 import com.learning.workout__android.data.daos.PresetDao
 import com.learning.workout__android.data.daos.RecordDao
 import com.learning.workout__android.data.daos.TrainingDayDao
-import com.learning.workout__android.data.models.ExerciseConverters
+import com.learning.workout__android.data.models.ExerciseTypeConverters
+import com.learning.workout__android.data.models.ExerciseUnitsConverters
 import com.learning.workout__android.data.models.Goal
-import com.learning.workout__android.data.models.GoalConverters
 import com.learning.workout__android.data.models.Preset
 import com.learning.workout__android.data.models.PresetExercise
-import com.learning.workout__android.data.models.RecordConverters
 import com.learning.workout__android.data.models.RecordModel
 import com.learning.workout__android.data.models.TrainingDay
 import com.learning.workout__android.data.models.TrainingExercise
@@ -32,9 +31,8 @@ import com.learning.workout__android.data.models.TrainingExercise
     exportSchema = false
 )
 @TypeConverters(
-    ExerciseConverters::class,
-    RecordConverters::class,
-    GoalConverters::class
+    ExerciseTypeConverters::class,
+    ExerciseUnitsConverters::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun trainingDayDao(): TrainingDayDao

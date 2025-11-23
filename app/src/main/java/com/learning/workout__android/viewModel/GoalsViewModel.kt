@@ -9,7 +9,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.learning.workout__android.data.AppDatabase
 import com.learning.workout__android.data.models.Goal
 import com.learning.workout__android.data.models.GoalsStatusEnum
+import com.learning.workout__android.data.models.RecordModel
 import com.learning.workout__android.data.repositories.GoalsRepository
+import com.learning.workout__android.data.repositories.RecordsRepository
 import com.learning.workout__android.utils.LoadState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +21,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class GoalsViewModel(
-    private val goalsRepository: GoalsRepository
+    private val goalsRepository: GoalsRepository,
+    private val recordsRepository: RecordsRepository
 ) : ViewModel() {
     val goals = goalsRepository.getAllGoals().distinctUntilChanged()
 
@@ -50,6 +53,20 @@ class GoalsViewModel(
     fun createGoal(goal: Goal) {
         viewModelScope.launch {
             goalsRepository.createGoal(goal)
+        }
+    }
+
+    fun saveGoalAsRecord(goal: Goal, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val success = recordsRepository.createRecordWithCheck(
+                RecordModel(
+                    name = goal.name,
+                    count = goal.count,
+                    units = goal.units
+                )
+            )
+
+            onResult(success)
         }
     }
 
@@ -87,8 +104,9 @@ class GoalsViewModel(
             initializer {
                 val db = AppDatabase.getDatabase(context)
                 val goalsRepository = GoalsRepository(goalsDao = db.goalDao())
+                val recordsRepository = RecordsRepository(recordDao = db.recordDao())
 
-                GoalsViewModel(goalsRepository)
+                GoalsViewModel(goalsRepository, recordsRepository)
             }
         }
     }

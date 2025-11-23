@@ -11,6 +11,10 @@ class RecordsRepository(
         return recordDao.getAll()
     }
 
+    suspend fun createRecordWithCheck(record: RecordModel): Boolean {
+        return recordDao.createRecordWithCheck(record)
+    }
+
     suspend fun createRecord(record: RecordModel) {
         recordDao.create(record)
     }

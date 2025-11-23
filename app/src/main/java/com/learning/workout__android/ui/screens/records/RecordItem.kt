@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.data.models.RecordModel
-import com.learning.workout__android.data.models.RecordUnits
 import com.learning.workout__android.ui.components.SwipeToDismissItemBackground
 import com.learning.workout__android.ui.screens.presets.DeleteRecordConfirmDialog
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
@@ -112,7 +112,7 @@ fun RecordItem(
 private fun RecordItemPreview() {
     Workout__AndroidTheme {
         RecordItem(
-            RecordModel(name = "Pull ups", count = 20, units = RecordUnits.REPS),
+            RecordModel(name = "Pull ups", count = 20, units = ExerciseUnits.REPS),
             onSwipeToEdit = {},
             onDelete = {}
         )

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.GoalUnits
+import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.formatExerciseType
@@ -51,10 +51,10 @@ fun GoalForm(
 
     val countFocusRequester = remember { FocusRequester() }
 
-    val units = GoalUnits.entries.toTypedArray()
+    val units = ExerciseUnits.entries.toTypedArray()
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedUnits by remember { mutableStateOf(GoalUnits.REPS) }
+    var selectedUnits by remember { mutableStateOf(ExerciseUnits.REPS) }
 
     LaunchedEffect(seed) {
         vm.seed(seed)
@@ -160,7 +160,7 @@ fun GoalForm(
 data class GoalFormResult(
     val name: String,
     val targetCount: Int,
-    val units: GoalUnits
+    val units: ExerciseUnits
 )
 
 @Composable

@@ -1,6 +1,7 @@
 package com.learning.workout__android.viewModel.forms
 
-import com.learning.workout__android.data.models.GoalUnits
+import com.learning.workout__android.data.models.ExerciseUnits
+
 
 class GoalFormViewModel : BaseFormViewModel<GoalFormUiState, GoalFormEvent>() {
     override fun createInitialState() = GoalFormUiState()
@@ -90,5 +91,5 @@ sealed interface GoalFormEvent : BaseFormEvent {
 data class GoalFormSeed(
     val name: String = "",
     val targetCount: String = "",
-    val units: GoalUnits = GoalUnits.REPS
+    val units: ExerciseUnits = ExerciseUnits.REPS
 )

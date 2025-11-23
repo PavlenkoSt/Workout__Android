@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.learning.workout__android.data.models.RecordUnits
+import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.ui.components.ModalHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.viewModel.forms.RecordFormEvent
@@ -39,7 +39,7 @@ import com.learning.workout__android.viewModel.forms.RecordFormViewModel
 data class RecordFormResult(
     val name: String,
     val count: Number,
-    val units: RecordUnits
+    val units: ExerciseUnits
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,8 +58,8 @@ fun RecordForm(
 
     var dropdownExpanded by remember { mutableStateOf(false) }
 
-    val units = RecordUnits.entries.toList()
-    var selectedUnits by remember { mutableStateOf(RecordUnits.REPS) }
+    val units = ExerciseUnits.entries.toList()
+    var selectedUnits by remember { mutableStateOf(ExerciseUnits.REPS) }
 
     LaunchedEffect(seed) {
         vm.seed(seed)

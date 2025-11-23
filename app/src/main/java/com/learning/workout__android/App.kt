@@ -39,7 +39,8 @@ fun App() {
             },
             goalsScreen = {
                 GoalsScreen(
-                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()),
+                    snackbarHostState = snackbarHostState
                 )
             },
             recordsScreen = {

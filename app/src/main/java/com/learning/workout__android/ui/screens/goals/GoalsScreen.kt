@@ -15,6 +15,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,8 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.data.models.Goal
-import com.learning.workout__android.data.models.GoalUnits
 import com.learning.workout__android.ui.screens.records.GoalsHeader
 import com.learning.workout__android.ui.theme.Workout__AndroidTheme
 import com.learning.workout__android.utils.LoadState
@@ -41,7 +42,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalsScreen(modifier: Modifier = Modifier) {
+fun GoalsScreen(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState
+) {
     val vm: GoalsViewModel =
         viewModel(factory = GoalsViewModel.provideFactory(LocalContext.current))
     val ui by vm.uiState.collectAsState()
@@ -77,7 +81,26 @@ fun GoalsScreen(modifier: Modifier = Modifier) {
                         GoalsList(
                             goals = state.data,
                             onIncrementGoal = { goal -> vm.updateGoal(goal.copy(count = goal.count + 1)) },
-                            onDecrementGoal = { goal -> vm.updateGoal(goal.copy(count = if (goal.count > 0) goal.count - 1 else 0)) }
+                            onDecrementGoal = { goal -> vm.updateGoal(goal.copy(count = if (goal.count > 0) goal.count - 1 else 0)) },
+                            onEditGoalClick = {
+                                vm.setGoalToEdit(it)
+                                showBottomSheet = true
+                            },
+                            onDeleteGoalClick = {
+                                // TODO
+                            },
+                            onSaveGoalAsRecordClick = { vm.saveGoalAsRecord(it, onResult = {
+                                status ->
+                                if(status) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Added to records successfully")
+                                    }
+                                }else {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("This is less than current record")
+                                    }
+                                }
+                            }) }
                         )
                     }
                 }
@@ -141,7 +164,7 @@ fun GoalsScreen(modifier: Modifier = Modifier) {
                     seed = GoalFormSeed(
                         name = ui.goalToEdit?.name ?: "",
                         targetCount = if (ui.goalToEdit != null) ui.goalToEdit?.targetCount.toString() else "",
-                        units = ui.goalToEdit?.units ?: GoalUnits.REPS
+                        units = ui.goalToEdit?.units ?: ExerciseUnits.REPS
                     ),
                     isEditing = ui.goalToEdit != null
                 )
@@ -155,6 +178,6 @@ fun GoalsScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 private fun GoalsScreenPreview() {
     Workout__AndroidTheme {
-        GoalsScreen()
+        GoalsScreen(snackbarHostState = SnackbarHostState())
     }
 }
