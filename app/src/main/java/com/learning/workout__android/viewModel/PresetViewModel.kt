@@ -19,28 +19,39 @@ import com.learning.workout__android.data.models.TrainingExercise
 import com.learning.workout__android.data.repositories.PresetsRepository
 import com.learning.workout__android.data.repositories.TrainingDayRepository
 import com.learning.workout__android.utils.LoadState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+typealias PresetReducer<S> = (S) -> S
+
+private inline fun <S, T> Flow<T>.toPresetReducer(
+    crossinline update: S.(T) -> S
+): Flow<PresetReducer<S>> = distinctUntilChanged().map { v -> { s: S -> s.update(v) } }
 
 class PresetViewModel(
     private val presetsRepository: PresetsRepository,
     private val trainingDayRepository: TrainingDayRepository,
     private val presetId: Long
 ) : ViewModel() {
-    val targetPreset = presetsRepository.getPresetByIdWithExercises(presetId).distinctUntilChanged()
+    private val targetPresetFlow: Flow<PresetWithExercises?> =
+        presetsRepository.getPresetByIdWithExercises(presetId).distinctUntilChanged()
 
     val trainingDayDates = trainingDayRepository.getTrainingDaysDates().distinctUntilChanged()
 
-    private val _localSwap =
-        MutableStateFlow<Pair<PresetExercise, PresetExercise>?>(null)
+    private val _exerciseToEdit = MutableStateFlow<PresetExercise?>(null)
 
-    private var _exerciseToEdit = MutableStateFlow<PresetExercise?>(null)
+    private val _localReorderReducer =
+        MutableStateFlow<Pair<PresetExercise, PresetExercise>?>(null)
 
     fun setExerciseToEdit(exercise: PresetExercise?) {
         _exerciseToEdit.value = exercise
@@ -114,7 +125,8 @@ class PresetViewModel(
     }
 
     fun reorderExercises(from: PresetExercise, to: PresetExercise) {
-        _localSwap.value = from to to  // optimistic
+        // Update locally right away for smooth UI
+        _localReorderReducer.value = from to to
 
         viewModelScope.launch {
             if (from.order != to.order) {
@@ -122,7 +134,8 @@ class PresetViewModel(
                     fromExerciseId = from.id,
                     toExerciseId = to.id,
                 )
-                _localSwap.value = null
+                // Clear local reorder after DB update completes
+                _localReorderReducer.value = null
             }
         }
     }
@@ -132,7 +145,10 @@ class PresetViewModel(
             val trainingDay = trainingDayRepository.getTrainingDayByDate(date).first()
             if (trainingDay != null) return@launch
 
-            val targetExercises = targetPreset.first()?.exercises ?: return@launch
+            val targetExercises = targetPresetFlow.filterIsInstance<PresetWithExercises>()
+                .map { it.exercises }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+                .value
 
             val presetExercises = targetExercises.map {
                 TrainingExercise(
@@ -154,47 +170,61 @@ class PresetViewModel(
                 )
             )
         }
-
     }
 
-    val uiState = combine(
-        targetPreset,
-        _exerciseToEdit,
-        _localSwap,
-        trainingDayDates
-    ) { preset, exerciseToEdit, swap, trainingDayDates ->
-        val loadState: LoadState<PresetWithExercises> =
-            if (preset == null) {
-                LoadState.Loading
-            } else {
-                val exercises = if (swap != null) {
-                    val (from, to) = swap
+    private val presetReducers =
+        targetPresetFlow.toPresetReducer<PresetUiState, PresetWithExercises?> {
+            copy(preset = LoadState.Success(it ?: return@toPresetReducer this))
+        }
 
-                    preset.exercises.map { exercise ->
-                        when (exercise.id) {
-                            from.id -> exercise.copy(order = to.order)
-                            to.id -> exercise.copy(order = from.order)
-                            else -> exercise
+    private val editReducers = _exerciseToEdit.toPresetReducer<PresetUiState, PresetExercise?> {
+        copy(exerciseToEdit = it)
+    }
+
+    private val localReorderReducers =
+        _localReorderReducer.toPresetReducer<PresetUiState, Pair<PresetExercise, PresetExercise>?> {
+            if (it == null) return@toPresetReducer this
+            val (from, to) = it
+            // Update preset locally by swapping exercise orders
+            val updatedPreset = this.preset.let { state ->
+                when (state) {
+                    is LoadState.Success -> {
+                        val updatedExercises = state.data.exercises.map { exercise ->
+                            when (exercise.id) {
+                                from.id -> exercise.copy(order = to.order)
+                                to.id -> exercise.copy(order = from.order)
+                                else -> exercise
+                            }
                         }
+                        LoadState.Success(state.data.copy(exercises = updatedExercises))
                     }
-                } else {
-                    preset.exercises
+
+                    else -> state
                 }
-
-                LoadState.Success(preset.copy(exercises = exercises))
             }
+            copy(preset = updatedPreset)
+        }
 
-        PresetUiState(
-            preset = loadState,
-            exerciseToEdit = exerciseToEdit,
-            trainingDayDates = trainingDayDates
+    private val trainingDayDatesReducers =
+        trainingDayDates.toPresetReducer<PresetUiState, List<String>> {
+            copy(trainingDayDates = it)
+        }
+
+    val uiState: StateFlow<PresetUiState> =
+        merge(
+            presetReducers,
+            editReducers,
+            localReorderReducers,
+            trainingDayDatesReducers
         )
-    }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            PresetUiState()
-        )
+            .scan(PresetUiState()) { state, reduce ->
+                reduce(state)
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                PresetUiState()
+            )
 
     companion object {
         fun provideFactory(context: Context, presetId: Long): ViewModelProvider.Factory =

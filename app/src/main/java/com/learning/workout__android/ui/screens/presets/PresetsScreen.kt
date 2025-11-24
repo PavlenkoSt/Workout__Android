@@ -52,7 +52,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             PresetsHeader(
-                search = vm.search.collectAsState().value,
+                search = ui.search,
                 onSearchChange = { vm.onSearch(it) }
             )
 
@@ -64,7 +64,9 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
                 }
 
                 is LoadState.Success -> {
-                    if (state.data.isEmpty()) {
+                    val filteredPresets = ui.getFilteredAndSortedPresets()
+
+                    if (filteredPresets.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = "No presets found",
@@ -73,7 +75,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
                         }
                     } else {
                         PresetsList(
-                            presets = state.data,
+                            presets = filteredPresets,
                             reorderPresets = { from, to -> vm.reorderPresets(from, to) },
                             onSwipeToEdit = { preset ->
                                 vm.setPresetToEdit(preset)
