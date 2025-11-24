@@ -15,7 +15,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.LocalSnackbarHostState
 import com.learning.workout__android.data.models.ExerciseUnits
 import com.learning.workout__android.data.models.Goal
 import com.learning.workout__android.ui.screens.records.GoalsHeader
@@ -43,13 +43,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun GoalsScreen(
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState
 ) {
     val vm: GoalsViewModel =
         viewModel(factory = GoalsViewModel.provideFactory(LocalContext.current))
     val ui by vm.uiState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
+
+    val localSnackbarHostState = LocalSnackbarHostState.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -82,7 +83,7 @@ fun GoalsScreen(
                         onSaveGoalAsRecordClick = {
                             vm.saveGoalAsRecord(it, onResult = { status ->
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
+                                    localSnackbarHostState.showSnackbar(
                                         if (status) "Added to records successfully"
                                         else "This is less than current record"
                                     )
@@ -166,6 +167,6 @@ fun GoalsScreen(
 @Preview(showBackground = true)
 private fun GoalsScreenPreview() {
     Workout__AndroidTheme {
-        GoalsScreen(snackbarHostState = SnackbarHostState())
+        GoalsScreen()
     }
 }

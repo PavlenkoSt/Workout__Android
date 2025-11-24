@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -25,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.LocalSnackbarHostState
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseEditingFields
 import com.learning.workout__android.ui.components.ExerciseForm.ExerciseForm
 import com.learning.workout__android.utils.LoadState
@@ -38,7 +38,6 @@ import java.time.ZoneId
 fun PresetScreen(
     modifier: Modifier,
     presetId: Long,
-    snackbarHostState: SnackbarHostState?
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -46,6 +45,8 @@ fun PresetScreen(
         factory = PresetViewModel.provideFactory(LocalContext.current, presetId)
     )
     val ui by vm.uiState.collectAsState()
+
+    val localSnackbarHostState = LocalSnackbarHostState.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -188,10 +189,8 @@ fun PresetScreen(
 
                             showDatePickerModal = false
 
-                            if (snackbarHostState != null) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Training day has been created")
-                                }
+                            coroutineScope.launch {
+                                localSnackbarHostState.showSnackbar("Training day has been created")
                             }
                         },
                     )

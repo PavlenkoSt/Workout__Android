@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learning.workout__android.LocalSnackbarHostState
 import com.learning.workout__android.navigation.LocalNavController
 import com.learning.workout__android.navigation.SaveStateHandleEnum
 import com.learning.workout__android.ui.components.Calendar.Calendar
@@ -46,7 +46,6 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun TrainingScreen(
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState?
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -56,6 +55,7 @@ fun TrainingScreen(
     val ui by vm.uiState.collectAsState()
 
     val localNavController = LocalNavController.current
+    val localStackbarHostState = LocalSnackbarHostState.current
 
     val trainingDayPicked = localNavController.currentBackStackEntry
         ?.savedStateHandle
@@ -284,10 +284,8 @@ fun TrainingScreen(
             onDismiss = { saveAsPresetModalVisible = false },
             onSubmit = {
                 vm.saveAsPreset(it)
-                if (snackbarHostState != null) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Training day saved as preset")
-                    }
+                coroutineScope.launch {
+                    localStackbarHostState.showSnackbar("Training day saved as preset")
                 }
             }
         )
@@ -298,6 +296,6 @@ fun TrainingScreen(
 @Preview(showBackground = true)
 fun TrainingScreenPreview() {
     Workout__AndroidTheme {
-        TrainingScreen(snackbarHostState = null)
+        TrainingScreen()
     }
 }
