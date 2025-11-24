@@ -77,7 +77,7 @@ class PresetsViewModel(
                     toPresetId = to.preset.id,
                 )
             }
-            _localSwap.value = null      // clear when done
+            _localSwap.value = null
         }
     }
 

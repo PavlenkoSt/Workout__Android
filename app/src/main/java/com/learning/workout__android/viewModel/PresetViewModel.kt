@@ -122,8 +122,8 @@ class PresetViewModel(
                     fromExerciseId = from.id,
                     toExerciseId = to.id,
                 )
+                _localSwap.value = null
             }
-            _localSwap.value = null
         }
     }
 
