@@ -91,9 +91,19 @@ fun PresetExerciseItem(
                         "${index + 1}. ${formatExerciseName(exercise.name, exercise.type)}",
                         modifier = Modifier.weight(1f)
                     )
-                    StatColumn(title = "Reps", value = exercise.reps.toString())
-                    StatColumn(title = "Sets", value = exercise.sets.toString())
-                    StatColumn(title = "Rest", value = exercise.rest.toString())
+                    when (exercise.type) {
+                        ExerciseType.DYNAMIC, ExerciseType.STATIC, ExerciseType.LADDER -> {
+                            StatColumn(title = "Reps", value = exercise.reps.toString())
+                            StatColumn(title = "Sets", value = exercise.sets.toString())
+                            StatColumn(title = "Rest", value = exercise.rest.toString())
+                        }
+
+                        else -> {
+                            // to keep same height for card
+                            StatColumn(title = "", value = "")
+                        }
+                    }
+
                     draggableHandler()
                 }
             }
