@@ -357,7 +357,12 @@ class TrainingViewModel(
 
 private fun buildStats(day: TrainingDayWithExercises?): List<TrainingStatisticsItem> =
     day?.sortedExercises
-        ?.groupBy { it.name }
+        ?.groupBy {
+            when (it.type) {
+                ExerciseType.STATIC, ExerciseType.DYNAMIC, ExerciseType.LADDER -> it.name
+                else -> it.type.label
+            }
+        }
         ?.map { (name, exercises) ->
             val exerciseType = exercises.first().type
             TrainingStatisticsItem(
@@ -369,8 +374,10 @@ private fun buildStats(day: TrainingDayWithExercises?): List<TrainingStatisticsI
         } ?: emptyList()
 
 private fun getStatItemName(name: String, exerciseType: ExerciseType): String {
-    if (name.isNotEmpty()) return name
-    return formatExerciseType(exerciseType.toString())
+    return when (exerciseType) {
+        ExerciseType.DYNAMIC, ExerciseType.STATIC, ExerciseType.LADDER -> name
+        else -> formatExerciseType(exerciseType.toString())
+    }
 }
 
 data class TrainingUiState(
