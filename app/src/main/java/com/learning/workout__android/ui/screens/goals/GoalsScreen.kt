@@ -117,6 +117,8 @@ fun GoalsScreen(
                 coroutineScope.launch {
                     sheetState.hide()
                     showBottomSheet = false
+                }.invokeOnCompletion {
+                    vm.setGoalToEdit(null)
                 }
             }
 
