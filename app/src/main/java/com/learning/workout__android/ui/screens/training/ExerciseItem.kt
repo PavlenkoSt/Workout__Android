@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,18 +121,21 @@ private fun ExerciseHeaderRow(
             .padding(end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        val withStats = exercise.type in setOf(
+            ExerciseType.DYNAMIC,
+            ExerciseType.STATIC,
+            ExerciseType.LADDER
+        )
+
         Text(
             text = "${index + 1}. ${formatExerciseName(exercise.name, exercise.type)}",
-            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
+            modifier = Modifier
+                .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                .weight(if (withStats) 0.6f else 1f),
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        if (exercise.type in setOf(
-                ExerciseType.DYNAMIC,
-                ExerciseType.STATIC,
-                ExerciseType.LADDER
-            )
-        ) {
+        if (withStats) {
             when (exercise.type) {
                 ExerciseType.DYNAMIC, ExerciseType.LADDER ->
                     ExerciseStatItem("Reps:", exercise.reps.toString())
@@ -189,12 +194,14 @@ private fun ExerciseSetsRow(
 
 
 @Composable
-private fun ExerciseStatItem(
+private fun RowScope.ExerciseStatItem(
     stat: String,
     value: String
 ) {
     Column(
-        modifier = Modifier.padding(top = 4.dp),
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .weight(0.15f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
@@ -202,13 +209,15 @@ private fun ExerciseStatItem(
             stat,
             fontSize = 12.sp,
             lineHeight = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
         Text(
             value,
             fontSize = 12.sp,
             lineHeight = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -221,7 +230,7 @@ fun ExerciseItemPreview() {
             exercise = TrainingExercise(
                 0,
                 trainingDayId = 0,
-                name = "Exercise preview",
+                name = "Exercise preview Exercise preview Exercise preview Exercise preview",
                 reps = 10,
                 sets = 10,
                 setsDone = 2,
