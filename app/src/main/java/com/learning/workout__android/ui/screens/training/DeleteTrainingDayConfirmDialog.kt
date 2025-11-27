@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun DeleteTrainingDayConfirmDialog(
@@ -19,7 +20,7 @@ fun DeleteTrainingDayConfirmDialog(
             Icon(Icons.Default.Delete, contentDescription = "Delete")
         },
         title = {
-            Text(text = "Do you really want to delete this training day?")
+            Text(text = "Do you really want to delete this training day?", textAlign = TextAlign.Center)
         },
         onDismissRequest = onCancel,
         confirmButton = {

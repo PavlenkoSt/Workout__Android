@@ -24,6 +24,9 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,15 +56,17 @@ fun ExerciseItem(
     onIncrement: () -> Unit,
     onDecrement: () -> Unit
 ) {
+    var showAlertDialog by remember { mutableStateOf(false) }
+
     val swipeToDismissBoxState = key(exercise) {
         rememberSwipeToDismissBoxState(
             confirmValueChange = {
                 if (it == SwipeToDismissBoxValue.EndToStart) {
-                    onDelete()
+                    showAlertDialog = true
                 } else if (it == SwipeToDismissBoxValue.StartToEnd) {
                     onEdit()
                 }
-                it != SwipeToDismissBoxValue.StartToEnd
+                false
             },
             positionalThreshold = { totalDistance -> totalDistance * 0.3f },
         )
@@ -106,6 +111,13 @@ fun ExerciseItem(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
+    }
+
+    if (showAlertDialog) {
+        DeleteExerciseConfirmDialog(
+            exerciseName = formatExerciseName(exercise.name, exercise.type),
+            onDelete,
+            onCancel = { showAlertDialog = false })
     }
 }
 

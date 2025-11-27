@@ -1,4 +1,4 @@
-package com.learning.workout__android.ui.screens.presets
+package com.learning.workout__android.ui.screens.training
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -11,10 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun DeletePresetConfirmDialog(
+fun DeleteExerciseConfirmDialog(
+    exerciseName: String,
     onDelete: () -> Unit,
-    onCancel: () -> Unit,
-    presetName: String
+    onCancel: () -> Unit
 ) {
     AlertDialog(
         icon = {
@@ -22,7 +22,7 @@ fun DeletePresetConfirmDialog(
         },
         title = {
             Text(
-                text = "Do you really want to delete preset \"$presetName\" ?",
+                text = "Do you really want to delete \"${exerciseName}\"?",
                 textAlign = TextAlign.Center
             )
         },
