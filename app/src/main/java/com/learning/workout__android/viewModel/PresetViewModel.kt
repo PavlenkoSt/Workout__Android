@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -143,14 +142,13 @@ class PresetViewModel(
     fun usePreset(date: String) {
         viewModelScope.launch {
             val trainingDay = trainingDayRepository.getTrainingDayByDate(date).first()
-            if (trainingDay != null) return@launch
+            val preset = uiState.value.preset
 
-            val targetExercises = targetPresetFlow.filterIsInstance<PresetWithExercises>()
-                .map { it.exercises }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-                .value
+            if (trainingDay != null || preset !is LoadState.Success) {
+                return@launch
+            }
 
-            val presetExercises = targetExercises.map {
+            val presetExercises = preset.data.exercises.map {
                 TrainingExercise(
                     name = it.name,
                     reps = it.reps,
