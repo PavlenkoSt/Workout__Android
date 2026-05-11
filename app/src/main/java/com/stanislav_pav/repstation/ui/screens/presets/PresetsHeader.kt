@@ -1,8 +1,6 @@
 package com.stanislav_pav.repstation.ui.screens.presets
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
@@ -11,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.components.SearchTextField
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 
@@ -32,10 +29,6 @@ fun PresetsHeader(
                 onValueChange = onSearchChange,
                 modifier = Modifier.offset(x = (-8).dp)
             )
-        },
-        actions = {
-            ProIndicator()
-            Spacer(modifier = Modifier.width(12.dp))
         }
     )
 }

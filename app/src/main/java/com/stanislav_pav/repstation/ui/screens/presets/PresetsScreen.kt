@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.LocalMonetizationState
 import com.stanislav_pav.repstation.LocalPresentPaywall
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.LoadState
 import com.stanislav_pav.repstation.viewModel.PresetsViewModel
@@ -117,6 +118,12 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(26.dp)
             )
         }
+
+        ProIndicator(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(all = 16.dp)
+        )
 
         if (showBottomSheet) {
             fun onHide() {

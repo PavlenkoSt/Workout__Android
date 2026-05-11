@@ -38,6 +38,7 @@ import com.stanislav_pav.repstation.navigation.LocalNavController
 import com.stanislav_pav.repstation.navigation.SaveStateHandleEnum
 import com.stanislav_pav.repstation.ui.components.Calendar.Calendar
 import com.stanislav_pav.repstation.ui.components.ExerciseForm.ExerciseEditingFields
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.viewModel.TrainingViewModel
 import kotlinx.coroutines.launch
@@ -237,6 +238,12 @@ fun TrainingScreen(
                         .height(45.dp)
                 )
             }
+
+            ProIndicator(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(all = 16.dp)
+            )
         }
     }
 

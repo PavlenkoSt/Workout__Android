@@ -35,6 +35,7 @@ import com.stanislav_pav.repstation.LocalSnackbarHostState
 import com.stanislav_pav.repstation.data.models.ExerciseUnits
 import com.stanislav_pav.repstation.data.models.Goal
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.screens.records.GoalsHeader
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.LoadState
@@ -122,6 +123,12 @@ fun GoalsScreen(
                 modifier = Modifier.size(26.dp)
             )
         }
+
+        ProIndicator(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(all = 16.dp)
+        )
 
         if (showBottomSheet) {
             fun onHide() {
