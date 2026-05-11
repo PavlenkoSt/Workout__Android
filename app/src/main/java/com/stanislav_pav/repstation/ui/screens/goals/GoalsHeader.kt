@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.screens.goals.GoalsFilter
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.viewModel.GoalsFilterEnum
@@ -44,6 +45,7 @@ fun GoalsHeader(
             }
         },
         actions = {
+            ProIndicator()
             Spacer(modifier = Modifier.width(12.dp))
         }
     )

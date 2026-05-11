@@ -28,9 +28,6 @@ sealed class Screen {
     data object RecordsScreen : Screen()
 
     @Serializable
-    data object ProScreen : Screen()
-
-    @Serializable
     data object PresetsStack : Screen()
 
     @Serializable
@@ -51,7 +48,6 @@ fun Navigator(
     trainingListScreen: @Composable () -> Unit,
     goalsScreen: @Composable () -> Unit,
     recordsScreen: @Composable () -> Unit,
-    proScreen: @Composable () -> Unit,
     presetsScreen: @Composable () -> Unit,
     presetScreen: @Composable (presetId: Long) -> Unit,
 ) {
@@ -68,8 +64,6 @@ fun Navigator(
             composable<Screen.GoalsScreen> { goalsScreen() }
 
             composable<Screen.RecordsScreen> { recordsScreen() }
-
-            composable<Screen.ProScreen> { proScreen() }
 
             navigation<Screen.PresetsStack>(Screen.PresetsScreen) {
                 composable<Screen.PresetsScreen> { presetsScreen() }

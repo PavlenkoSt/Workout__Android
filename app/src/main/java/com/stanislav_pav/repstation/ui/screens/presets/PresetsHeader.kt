@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.components.SearchTextField
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 
@@ -31,6 +32,10 @@ fun PresetsHeader(
                 onValueChange = onSearchChange,
                 modifier = Modifier.offset(x = (-8).dp)
             )
+        },
+        actions = {
+            ProIndicator()
+            Spacer(modifier = Modifier.width(12.dp))
         }
     )
 }

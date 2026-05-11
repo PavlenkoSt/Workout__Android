@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -50,5 +49,4 @@ val botBarRoutes = listOf(
     BotBarRoute("Goals", Screen.GoalsScreen, Icons.Filled.Done),
     BotBarRoute("Records", Screen.RecordsScreen, Icons.Filled.Star),
     BotBarRoute("Presets", Screen.PresetsStack, Icons.Filled.Favorite),
-    BotBarRoute("Pro", Screen.ProScreen, Icons.Filled.Lock),
 )

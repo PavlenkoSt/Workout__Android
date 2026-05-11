@@ -31,10 +31,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.LocalMonetizationState
+import com.stanislav_pav.repstation.LocalPresentPaywall
 import com.stanislav_pav.repstation.data.models.RecordModel
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
-import com.stanislav_pav.repstation.navigation.LocalNavController
-import com.stanislav_pav.repstation.navigation.Screen
 import com.stanislav_pav.repstation.ui.screens.presets.RecordForm
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.LoadState
@@ -49,7 +48,7 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
         viewModel(factory = RecordsViewModel.provideFactory(LocalContext.current))
     val ui by vm.uiState.collectAsState()
     val monetizationState = LocalMonetizationState.current
-    val navController = LocalNavController.current
+    val presentPaywall = LocalPresentPaywall.current
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -96,7 +95,7 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
             onClick = {
                 val recordsCount = (ui.records as? LoadState.Success)?.data?.size ?: 0
                 if (!monetizationState.isPro && recordsCount >= MonetizationConfig.FREE_RECORD_LIMIT) {
-                    navController.navigate(Screen.ProScreen)
+                    presentPaywall()
                 } else {
                     showBottomSheet = true
                 }

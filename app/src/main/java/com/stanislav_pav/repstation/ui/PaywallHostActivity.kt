@@ -1,0 +1,89 @@
+package com.stanislav_pav.repstation.ui
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.models.StoreTransaction
+import com.revenuecat.purchases.ui.revenuecatui.Paywall
+import com.revenuecat.purchases.ui.revenuecatui.PaywallListener
+import com.revenuecat.purchases.ui.revenuecatui.PaywallOptions
+import com.stanislav_pav.repstation.ui.theme.RepStationTheme
+
+class PaywallHostActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            RepStationTheme {
+                PaywallHostContent(onClose = { finish() })
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaywallHostContent(onClose: () -> Unit) {
+    val paywallOptions = remember(onClose) {
+        PaywallOptions.Builder(dismissRequest = onClose)
+            .setListener(object : PaywallListener {
+                override fun onPurchaseCompleted(
+                    customerInfo: CustomerInfo,
+                    storeTransaction: StoreTransaction
+                ) {
+                    onClose()
+                }
+
+                override fun onRestoreCompleted(customerInfo: CustomerInfo) {
+                    onClose()
+                }
+            })
+            .build()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Paywall(options = paywallOptions)
+
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(WindowInsets.statusBars.asPaddingValues())
+                .padding(top = 4.dp, end = 4.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(Color.Black.copy(alpha = 0.45f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}

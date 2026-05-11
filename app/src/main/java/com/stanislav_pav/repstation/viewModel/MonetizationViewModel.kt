@@ -117,6 +117,10 @@ class MonetizationViewModel(
         _uiState.update { it.copy(message = null) }
     }
 
+    fun reportError(message: String?) {
+        _uiState.update { it.copy(message = message ?: "Something went wrong") }
+    }
+
     companion object {
         fun provideFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {

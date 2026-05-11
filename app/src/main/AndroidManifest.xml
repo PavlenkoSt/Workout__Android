@@ -24,6 +24,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.revenuecat.purchases.ui.revenuecatui.activity.PaywallActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RepStation.Paywall"
+            tools:replace="android:theme" />
+
+        <activity
+            android:name=".ui.PaywallHostActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RepStation.Paywall" />
     </application>
 
 </manifest>

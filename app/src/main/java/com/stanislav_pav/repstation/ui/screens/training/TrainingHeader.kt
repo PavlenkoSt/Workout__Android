@@ -2,6 +2,7 @@ package com.stanislav_pav.repstation.ui.screens.training
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.formatDate
 import java.time.LocalDate
@@ -40,17 +42,20 @@ fun TrainingHeader(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .clickable(enabled = isTrainingDay) {
-                dropdownMenuExpanded = true
-            }
-            .padding(all = 8.dp)
+        modifier = modifier.padding(all = 8.dp)
     ) {
         Text(
             text = "Workout session - ${formatDate(currentDate)}",
             style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = isTrainingDay) {
+                    dropdownMenuExpanded = true
+                }
         )
+
+        ProIndicator(modifier = Modifier.align(Alignment.CenterEnd))
 
         DropdownMenu(
             expanded = dropdownMenuExpanded,

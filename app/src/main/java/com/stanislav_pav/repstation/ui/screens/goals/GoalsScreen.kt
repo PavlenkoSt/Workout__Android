@@ -30,12 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.LocalMonetizationState
+import com.stanislav_pav.repstation.LocalPresentPaywall
 import com.stanislav_pav.repstation.LocalSnackbarHostState
 import com.stanislav_pav.repstation.data.models.ExerciseUnits
 import com.stanislav_pav.repstation.data.models.Goal
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
-import com.stanislav_pav.repstation.navigation.LocalNavController
-import com.stanislav_pav.repstation.navigation.Screen
 import com.stanislav_pav.repstation.ui.screens.records.GoalsHeader
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.LoadState
@@ -56,7 +55,7 @@ fun GoalsScreen(
 
     val localSnackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
-    val navController = LocalNavController.current
+    val presentPaywall = LocalPresentPaywall.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -105,7 +104,7 @@ fun GoalsScreen(
         FloatingActionButton(
             onClick = {
                 if (!monetizationState.isPro && ui.summary.total >= MonetizationConfig.FREE_GOAL_LIMIT) {
-                    navController.navigate(Screen.ProScreen)
+                    presentPaywall()
                 } else {
                     showBottomSheet = true
                 }

@@ -31,11 +31,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.LocalMonetizationState
+import com.stanislav_pav.repstation.LocalPresentPaywall
 import com.stanislav_pav.repstation.LocalSnackbarHostState
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
 import com.stanislav_pav.repstation.navigation.LocalNavController
 import com.stanislav_pav.repstation.navigation.SaveStateHandleEnum
-import com.stanislav_pav.repstation.navigation.Screen
 import com.stanislav_pav.repstation.ui.components.Calendar.Calendar
 import com.stanislav_pav.repstation.ui.components.ExerciseForm.ExerciseEditingFields
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
@@ -60,6 +60,7 @@ fun TrainingScreen(
     val localNavController = LocalNavController.current
     val localStackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
+    val presentPaywall = LocalPresentPaywall.current
 
     val trainingDayPicked = localNavController.currentBackStackEntry
         ?.savedStateHandle
@@ -156,7 +157,7 @@ fun TrainingScreen(
                                 statistics = ui.currentDayStatistics,
                                 statisticsLocked = !monetizationState.isPro,
                                 onStatisticsLockedClick = {
-                                    localNavController.navigate(Screen.ProScreen)
+                                    presentPaywall()
                                 }
                             )
                         },
@@ -173,7 +174,7 @@ fun TrainingScreen(
                                         !monetizationState.isPro &&
                                         ui.presetCount >= MonetizationConfig.FREE_PRESET_LIMIT
                                     ) {
-                                        localNavController.navigate(Screen.ProScreen)
+                                        presentPaywall()
                                     } else {
                                         saveAsPresetModalVisible = true
                                     }

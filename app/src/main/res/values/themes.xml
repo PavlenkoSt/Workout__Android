@@ -2,4 +2,15 @@
 <resources>
 
     <style name="Theme.RepStation" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.RepStation.Paywall" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/Animation.RepStation.Paywall</item>
+    </style>
+
+    <style name="Animation.RepStation.Paywall" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/paywall_slide_in_up</item>
+        <item name="android:activityOpenExitAnimation">@anim/paywall_no_change</item>
+        <item name="android:activityCloseEnterAnimation">@anim/paywall_no_change</item>
+        <item name="android:activityCloseExitAnimation">@anim/paywall_slide_out_down</item>
+    </style>
 </resources>

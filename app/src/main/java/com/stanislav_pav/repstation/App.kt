@@ -8,18 +8,21 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.navigation.Navigator
 import com.stanislav_pav.repstation.navigation.rememberNavigationState
 import com.stanislav_pav.repstation.ui.components.BottomNavBar
 import com.stanislav_pav.repstation.ui.screens.goals.GoalsScreen
-import com.stanislav_pav.repstation.ui.screens.pro.ProScreen
 import com.stanislav_pav.repstation.ui.screens.preset.PresetScreen
 import com.stanislav_pav.repstation.ui.screens.presets.PresetsScreen
 import com.stanislav_pav.repstation.ui.screens.records.RecordsScreen
@@ -31,13 +34,26 @@ val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
     error("No SnackbarHostState provided")
 }
 
+val LocalPresentPaywall = compositionLocalOf<() -> Unit> { {} }
+
 @Composable
-fun App() {
+fun App(presentPaywall: () -> Unit = {}) {
     val navState = rememberNavigationState()
     val snackbarHostState = remember { SnackbarHostState() }
     val monetizationViewModel: MonetizationViewModel =
         viewModel(factory = MonetizationViewModel.provideFactory())
     val monetizationState by monetizationViewModel.uiState.collectAsState()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, monetizationViewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                monetizationViewModel.refresh()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Scaffold(
         bottomBar = { BottomNavBar(navState) },
@@ -45,7 +61,8 @@ fun App() {
     ) { paddingValues ->
         CompositionLocalProvider(
             LocalSnackbarHostState provides snackbarHostState,
-            LocalMonetizationState provides monetizationState
+            LocalMonetizationState provides monetizationState,
+            LocalPresentPaywall provides presentPaywall,
         ) {
             Navigator(
                 navState = navState,
@@ -62,12 +79,6 @@ fun App() {
                 recordsScreen = {
                     RecordsScreen(
                         modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
-                    )
-                },
-                proScreen = {
-                    ProScreen(
-                        modifier = Modifier.padding(paddingValues),
-                        monetizationViewModel = monetizationViewModel
                     )
                 },
                 presetsScreen = {

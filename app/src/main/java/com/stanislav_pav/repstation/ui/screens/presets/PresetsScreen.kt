@@ -31,9 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stanislav_pav.repstation.LocalMonetizationState
+import com.stanislav_pav.repstation.LocalPresentPaywall
 import com.stanislav_pav.repstation.monetization.MonetizationConfig
-import com.stanislav_pav.repstation.navigation.LocalNavController
-import com.stanislav_pav.repstation.navigation.Screen
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.utils.LoadState
 import com.stanislav_pav.repstation.viewModel.PresetsViewModel
@@ -50,7 +49,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
     )
     val ui by vm.uiState.collectAsState()
     val monetizationState = LocalMonetizationState.current
-    val navController = LocalNavController.current
+    val presentPaywall = LocalPresentPaywall.current
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -100,7 +99,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
             onClick = {
                 val presetCount = (ui.allPresets as? LoadState.Success)?.data?.size ?: 0
                 if (!monetizationState.isPro && presetCount >= MonetizationConfig.FREE_PRESET_LIMIT) {
-                    navController.navigate(Screen.ProScreen)
+                    presentPaywall()
                 } else {
                     showBottomSheet = true
                 }

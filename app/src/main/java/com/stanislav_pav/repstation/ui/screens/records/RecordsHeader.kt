@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stanislav_pav.repstation.ui.components.ProIndicator
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 import com.stanislav_pav.repstation.viewModel.SortField
 import com.stanislav_pav.repstation.viewModel.SortOrder
@@ -75,6 +76,7 @@ fun RecordsHeader(
             }
         },
         actions = {
+            ProIndicator()
             Spacer(modifier = Modifier.width(12.dp))
         }
     )
