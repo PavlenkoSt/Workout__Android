@@ -57,6 +57,7 @@ fun GoalsScreen(
     val localSnackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
+    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -86,15 +87,24 @@ fun GoalsScreen(
                             showBottomSheet = true
                         },
                         onDeleteGoalClick = { vm.deleteGoal(it) },
-                        onSaveGoalAsRecordClick = {
-                            vm.saveGoalAsRecord(it, onResult = { status ->
-                                coroutineScope.launch {
-                                    localSnackbarHostState.showSnackbar(
-                                        if (status) "Added to records successfully"
-                                        else "This is less than current record"
-                                    )
-                                }
-                            })
+                        onSaveGoalAsRecordClick = { goal ->
+                            val wouldCreateNewRecord = goal.name !in ui.recordNames
+                            if (
+                                shouldGatePro &&
+                                wouldCreateNewRecord &&
+                                ui.recordsCount >= MonetizationConfig.FREE_RECORD_LIMIT
+                            ) {
+                                presentPaywall()
+                            } else {
+                                vm.saveGoalAsRecord(goal, onResult = { status ->
+                                    coroutineScope.launch {
+                                        localSnackbarHostState.showSnackbar(
+                                            if (status) "Added to records successfully"
+                                            else "This is less than current record"
+                                        )
+                                    }
+                                })
+                            }
                         },
                         summary = ui.summary
                     )
@@ -104,7 +114,7 @@ fun GoalsScreen(
 
         FloatingActionButton(
             onClick = {
-                if (!monetizationState.isPro && ui.summary.total >= MonetizationConfig.FREE_GOAL_LIMIT) {
+                if (shouldGatePro && ui.summary.total >= MonetizationConfig.FREE_GOAL_LIMIT) {
                     presentPaywall()
                 } else {
                     showBottomSheet = true

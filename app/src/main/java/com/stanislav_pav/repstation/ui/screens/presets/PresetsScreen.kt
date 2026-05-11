@@ -51,6 +51,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
     val ui by vm.uiState.collectAsState()
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
+    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -99,7 +100,7 @@ fun PresetsScreen(modifier: Modifier = Modifier) {
         FloatingActionButton(
             onClick = {
                 val presetCount = (ui.allPresets as? LoadState.Success)?.data?.size ?: 0
-                if (!monetizationState.isPro && presetCount >= MonetizationConfig.FREE_PRESET_LIMIT) {
+                if (shouldGatePro && presetCount >= MonetizationConfig.FREE_PRESET_LIMIT) {
                     presentPaywall()
                 } else {
                     showBottomSheet = true

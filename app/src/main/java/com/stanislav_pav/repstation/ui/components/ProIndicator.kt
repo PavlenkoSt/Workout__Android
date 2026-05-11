@@ -28,6 +28,7 @@ fun ProIndicator(modifier: Modifier = Modifier) {
     val presentPaywall = LocalPresentPaywall.current
 
     if (monetization.isLoading) return
+    if (!monetization.isRevenueCatConfigured) return
     if (monetization.isPro) return
 
     Surface(

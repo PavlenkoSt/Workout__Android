@@ -62,6 +62,7 @@ fun TrainingScreen(
     val localStackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
+    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
 
     val trainingDayPicked = localNavController.currentBackStackEntry
         ?.savedStateHandle
@@ -156,7 +157,7 @@ fun TrainingScreen(
                                 },
                                 onClick = { exerciseModalVisible = true },
                                 statistics = ui.currentDayStatistics,
-                                statisticsLocked = !monetizationState.isPro,
+                                statisticsLocked = shouldGatePro,
                                 onStatisticsLockedClick = {
                                     presentPaywall()
                                 }
@@ -172,7 +173,7 @@ fun TrainingScreen(
                                 },
                                 onSaveAsPresetClick = {
                                     if (
-                                        !monetizationState.isPro &&
+                                        shouldGatePro &&
                                         ui.presetCount >= MonetizationConfig.FREE_PRESET_LIMIT
                                     ) {
                                         presentPaywall()

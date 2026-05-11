@@ -24,15 +24,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.models.StoreTransaction
 import com.revenuecat.purchases.ui.revenuecatui.Paywall
 import com.revenuecat.purchases.ui.revenuecatui.PaywallListener
 import com.revenuecat.purchases.ui.revenuecatui.PaywallOptions
+import com.stanislav_pav.repstation.monetization.MonetizationConfig
 import com.stanislav_pav.repstation.ui.theme.RepStationTheme
 
 class PaywallHostActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!Purchases.isConfigured) {
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContent {
             RepStationTheme {
@@ -51,11 +58,15 @@ private fun PaywallHostContent(onClose: () -> Unit) {
                     customerInfo: CustomerInfo,
                     storeTransaction: StoreTransaction
                 ) {
-                    onClose()
+                    if (customerInfo.hasProEntitlement()) {
+                        onClose()
+                    }
                 }
 
                 override fun onRestoreCompleted(customerInfo: CustomerInfo) {
-                    onClose()
+                    if (customerInfo.hasProEntitlement()) {
+                        onClose()
+                    }
                 }
             })
             .build()
@@ -86,4 +97,8 @@ private fun PaywallHostContent(onClose: () -> Unit) {
             }
         }
     }
+}
+
+private fun CustomerInfo.hasProEntitlement(): Boolean {
+    return entitlements.get(MonetizationConfig.PRO_ENTITLEMENT_ID)?.isActive == true
 }

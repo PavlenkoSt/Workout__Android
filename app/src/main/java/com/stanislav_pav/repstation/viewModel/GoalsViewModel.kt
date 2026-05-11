@@ -25,6 +25,7 @@ class GoalsViewModel(
     private val recordsRepository: RecordsRepository
 ) : ViewModel() {
     val goals = goalsRepository.getAllGoals().distinctUntilChanged()
+    private val records = recordsRepository.getAllRecords().distinctUntilChanged()
 
     private var _goalToEdit = MutableStateFlow<Goal?>(null)
 
@@ -72,9 +73,10 @@ class GoalsViewModel(
 
     val uiState = combine(
         goals,
+        records,
         _goalToEdit,
         _filter
-    ) { goals, goalsToEdit, filter ->
+    ) { goals, records, goalsToEdit, filter ->
         val grouped = goals.groupingBy { it.status }.eachCount()
 
         GoalsUiState(
@@ -90,7 +92,9 @@ class GoalsViewModel(
                 total = goals.size,
                 completed = grouped[GoalsStatusEnum.Completed] ?: 0,
                 pending = grouped[GoalsStatusEnum.Pending] ?: 0
-            )
+            ),
+            recordsCount = records.size,
+            recordNames = records.map { it.name }.toSet()
         )
     }.stateIn(
         viewModelScope,
@@ -115,7 +119,9 @@ data class GoalsUiState(
     val goals: LoadState<GroupedGoals> = LoadState.Loading,
     val goalToEdit: Goal? = null,
     val filter: GoalsFilterEnum = GoalsFilterEnum.All,
-    val summary: GoalsStatusSummary = GoalsStatusSummary()
+    val summary: GoalsStatusSummary = GoalsStatusSummary(),
+    val recordsCount: Int = 0,
+    val recordNames: Set<String> = emptySet()
 )
 
 data class GroupedGoals(

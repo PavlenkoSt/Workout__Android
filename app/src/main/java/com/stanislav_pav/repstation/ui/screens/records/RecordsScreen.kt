@@ -50,6 +50,7 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
     val ui by vm.uiState.collectAsState()
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
+    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -95,7 +96,7 @@ fun RecordsScreen(modifier: Modifier = Modifier) {
         FloatingActionButton(
             onClick = {
                 val recordsCount = (ui.records as? LoadState.Success)?.data?.size ?: 0
-                if (!monetizationState.isPro && recordsCount >= MonetizationConfig.FREE_RECORD_LIMIT) {
+                if (shouldGatePro && recordsCount >= MonetizationConfig.FREE_RECORD_LIMIT) {
                     presentPaywall()
                 } else {
                     showBottomSheet = true
