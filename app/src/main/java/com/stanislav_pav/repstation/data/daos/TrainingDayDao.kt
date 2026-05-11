@@ -1,0 +1,98 @@
+package com.stanislav_pav.repstation.data.daos
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import com.stanislav_pav.repstation.data.models.TrainingDay
+import com.stanislav_pav.repstation.data.models.TrainingDayWithExercises
+import com.stanislav_pav.repstation.data.models.TrainingExercise
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface TrainingDayDao {
+    @Query("SELECT * FROM training_days ORDER BY id DESC")
+    @Transaction
+    fun getAllTrainingDays(): Flow<List<TrainingDayWithExercises>>
+
+    @Query(
+        value = """
+        SELECT * FROM training_days WHERE date = :date
+    """
+    )
+    fun getDayByDate(date: String): Flow<TrainingDayWithExercises?>
+
+    @Query("SELECt date FROM training_days")
+    fun getTrainingDaysDates(): Flow<List<String>>
+
+    @Query(
+        """
+        SELECT * FROM training_exercises 
+        WHERE trainingDayId = :trainingDayId 
+        ORDER BY "order" DESC
+    """
+    )
+    suspend fun getExercisesByTrainingDayId(trainingDayId: Long): List<TrainingExercise>
+
+    @Query(
+        """
+        UPDATE training_exercises 
+        SET "order" = :order 
+        WHERE id = :exerciseId
+    """
+    )
+    suspend fun updateExerciseOrder(exerciseId: Long, order: Int)
+
+    @Query(
+        """
+        SELECT * FROM training_exercises 
+        WHERE id = :exerciseId
+    """
+    )
+    suspend fun getExerciseById(exerciseId: Long): TrainingExercise?
+
+    @Query("DELETE FROM training_days WHERE date = :date")
+    suspend fun deleteByDate(date: String)
+
+    @Insert
+    suspend fun create(trainingDay: TrainingDay): Long
+
+    @Insert
+    suspend fun insertExercises(exercises: List<TrainingExercise>)
+
+    @Insert
+    suspend fun insertExercise(exercise: TrainingExercise): Long
+
+    @Update
+    suspend fun updateExercise(exercise: TrainingExercise)
+
+    @Delete
+    suspend fun deleteExercise(exercise: TrainingExercise)
+
+    @Transaction
+    suspend fun addTrainingDayWithExercises(trainingDayWithExercises: TrainingDayWithExercises) {
+        val trainingDayId = create(trainingDayWithExercises.trainingDay)
+
+        val exercisesWithDayId = trainingDayWithExercises.exercises.map { ex ->
+            ex.copy(trainingDayId = trainingDayId)
+        }
+
+        insertExercises(exercisesWithDayId)
+    }
+
+    @Transaction
+    suspend fun swapExerciseOrder(fromExerciseId: Long, toExerciseId: Long) {
+        // Fetch current state from database to avoid stale data
+        val fromExercise = getExerciseById(fromExerciseId) ?: return
+        val toExercise = getExerciseById(toExerciseId) ?: return
+
+        // Only swap if orders are different
+        if (fromExercise.order == toExercise.order) return
+
+        // Perform atomic swap
+        updateExerciseOrder(fromExercise.id, toExercise.order)
+        updateExerciseOrder(toExercise.id, fromExercise.order)
+    }
+}

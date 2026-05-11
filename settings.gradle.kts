@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Workout__Android"
+rootProject.name = "RepStation"
 include(":app")

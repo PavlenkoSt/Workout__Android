@@ -7,17 +7,23 @@ plugins {
 }
 
 android {
-    namespace = "com.learning.workout__android"
+    namespace = "com.stanislav_pav.repstation"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.learning.workout__android"
+        applicationId = "com.stanislav_pav.repstation"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "REVENUECAT_API_KEY",
+            "\"${providers.gradleProperty("REVENUECAT_API_KEY").orNull.orEmpty()}\""
+        )
     }
 
     buildTypes {
@@ -38,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -51,6 +58,7 @@ dependencies {
 
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.reorderable)
+    implementation(libs.revenuecat.purchases)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
