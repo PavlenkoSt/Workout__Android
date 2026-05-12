@@ -24,6 +24,11 @@ android {
             "REVENUECAT_API_KEY",
             "\"${providers.gradleProperty("REVENUECAT_API_KEY").orNull.orEmpty()}\""
         )
+        buildConfigField(
+            "String",
+            "PRO_UNLOCK_CODE",
+            "\"${providers.gradleProperty("PRO_UNLOCK_CODE").orNull.orEmpty()}\""
+        )
     }
 
     buildTypes {

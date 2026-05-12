@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -40,8 +41,9 @@ val LocalPresentPaywall = compositionLocalOf<() -> Unit> { {} }
 fun App(presentPaywall: () -> Unit = {}) {
     val navState = rememberNavigationState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     val monetizationViewModel: MonetizationViewModel =
-        viewModel(factory = MonetizationViewModel.provideFactory())
+        viewModel(factory = MonetizationViewModel.provideFactory(context))
     val monetizationState by monetizationViewModel.uiState.collectAsState()
 
     val lifecycleOwner = LocalLifecycleOwner.current

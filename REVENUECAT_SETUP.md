@@ -14,9 +14,11 @@ Add the Android public SDK key from RevenueCat to `~/.gradle/gradle.properties` 
 
 ```properties
 REVENUECAT_API_KEY=goog_xxxxxxxxxxxxxxxxx
+PRO_UNLOCK_CODE=your-private-friends-code
 ```
 
 Do not commit a private/service-account key. RevenueCat SDK keys are public client keys, but keeping environment-specific values out of git still makes release setup cleaner.
+`PRO_UNLOCK_CODE` is embedded into builds, so set it only for release builds you intentionally share with yourself or friends.
 
 ## RevenueCat dashboard
 
@@ -39,3 +41,9 @@ The app reads `offerings.current.availablePackages` and buys the first package.
 - Training statistics button opens the Pro screen for free users.
 
 Existing local data is never deleted when a user is free. Gates only block creating more items or opening Pro-only features.
+
+## Private access code
+
+The paywall has an `Access code` button. Entering `PRO_UNLOCK_CODE` stores a local unlock flag on that device and enables Pro without a RevenueCat purchase.
+
+This is not a secure licensing system. A determined user can inspect an APK and recover embedded strings. It is good enough for personal/friends access, but not for public promo-code distribution.

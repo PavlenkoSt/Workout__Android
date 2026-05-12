@@ -1,6 +1,7 @@
 package com.stanislav_pav.repstation.viewModel
 
 import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,7 +19,11 @@ class MonetizationViewModel(
     private val billingRepository: RevenueCatBillingRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
-        MonetizationState(isRevenueCatConfigured = billingRepository.isConfigured)
+        MonetizationState(
+            isRevenueCatConfigured = billingRepository.isConfigured,
+            isLocalProUnlocked = billingRepository.isLocalProUnlocked,
+            isPro = billingRepository.isLocalProUnlocked
+        )
     )
     val uiState: StateFlow<MonetizationState> = _uiState
 
@@ -32,7 +37,9 @@ class MonetizationViewModel(
                 it.copy(
                     isLoading = true,
                     message = null,
-                    isRevenueCatConfigured = billingRepository.isConfigured
+                    isRevenueCatConfigured = billingRepository.isConfigured,
+                    isLocalProUnlocked = billingRepository.isLocalProUnlocked,
+                    isPro = billingRepository.isLocalProUnlocked || it.isPro
                 )
             }
 
@@ -43,6 +50,7 @@ class MonetizationViewModel(
                     it.copy(
                         isLoading = false,
                         isPro = billingRepository.isPro(customerInfo),
+                        isLocalProUnlocked = billingRepository.isLocalProUnlocked,
                         packages = packages,
                         isRevenueCatConfigured = billingRepository.isConfigured
                     )
@@ -69,6 +77,7 @@ class MonetizationViewModel(
                     it.copy(
                         isPurchasing = false,
                         isPro = billingRepository.isPro(customerInfo),
+                        isLocalProUnlocked = billingRepository.isLocalProUnlocked,
                         message = if (billingRepository.isPro(customerInfo)) {
                             "Pro unlocked"
                         } else {
@@ -99,6 +108,7 @@ class MonetizationViewModel(
                     it.copy(
                         isRestoring = false,
                         isPro = isPro,
+                        isLocalProUnlocked = billingRepository.isLocalProUnlocked,
                         message = if (isPro) "Purchase restored" else "No Pro purchase found"
                     )
                 }
@@ -121,10 +131,22 @@ class MonetizationViewModel(
         _uiState.update { it.copy(message = message ?: "Something went wrong") }
     }
 
+    fun unlockWithCode(code: String): Boolean {
+        val unlocked = billingRepository.unlockWithCode(code)
+        _uiState.update {
+            it.copy(
+                isPro = billingRepository.isPro(null),
+                isLocalProUnlocked = billingRepository.isLocalProUnlocked,
+                message = if (unlocked) "Pro unlocked" else "Invalid access code"
+            )
+        }
+        return unlocked
+    }
+
     companion object {
-        fun provideFactory(): ViewModelProvider.Factory = viewModelFactory {
+        fun provideFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                MonetizationViewModel(RevenueCatBillingRepository())
+                MonetizationViewModel(RevenueCatBillingRepository(context))
             }
         }
     }

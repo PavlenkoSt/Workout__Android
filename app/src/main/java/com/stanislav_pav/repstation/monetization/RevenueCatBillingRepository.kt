@@ -1,6 +1,8 @@
 package com.stanislav_pav.repstation.monetization
 
 import android.app.Activity
+import android.content.Context
+import com.stanislav_pav.repstation.BuildConfig
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
@@ -12,9 +14,17 @@ import com.revenuecat.purchases.awaitPurchase
 import com.revenuecat.purchases.awaitRestore
 import com.revenuecat.purchases.Package as RevenueCatPackage
 
-class RevenueCatBillingRepository {
+class RevenueCatBillingRepository(context: Context) {
+    private val sharedPreferences = context.applicationContext.getSharedPreferences(
+        "monetization_prefs",
+        Context.MODE_PRIVATE
+    )
+
     val isConfigured: Boolean
         get() = Purchases.isConfigured
+
+    val isLocalProUnlocked: Boolean
+        get() = sharedPreferences.getBoolean(LocalProUnlockedKey, false)
 
     suspend fun getCustomerInfo(): CustomerInfo? {
         if (!isConfigured) return null
@@ -39,10 +49,23 @@ class RevenueCatBillingRepository {
     }
 
     fun isPro(customerInfo: CustomerInfo?): Boolean {
+        if (isLocalProUnlocked) return true
+
         return customerInfo
             ?.entitlements
             ?.get(MonetizationConfig.PRO_ENTITLEMENT_ID)
             ?.isActive == true
+    }
+
+    fun unlockWithCode(code: String): Boolean {
+        val configuredCode = BuildConfig.PRO_UNLOCK_CODE.trim()
+        if (configuredCode.isEmpty()) return false
+        if (code.trim() != configuredCode) return false
+
+        sharedPreferences.edit()
+            .putBoolean(LocalProUnlockedKey, true)
+            .apply()
+        return true
     }
 
     fun errorMessage(throwable: Throwable): String {
@@ -55,5 +78,9 @@ class RevenueCatBillingRepository {
             is PurchasesException -> throwable.error.message
             else -> throwable.message ?: "Billing is unavailable"
         }
+    }
+
+    private companion object {
+        const val LocalProUnlockedKey = "local_pro_unlocked"
     }
 }
