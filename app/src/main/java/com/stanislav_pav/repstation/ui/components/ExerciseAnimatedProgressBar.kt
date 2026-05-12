@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseAnimatedProgressBar(
     targetCount: Int,
@@ -36,6 +38,7 @@ fun ExerciseAnimatedProgressBar(
             trackColor = MaterialTheme.colorScheme.surface,
             color = MaterialTheme.colorScheme.primary,
             strokeCap = StrokeCap.Round,
+            drawStopIndicator = {},
         )
     }
 }
