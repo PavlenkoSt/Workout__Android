@@ -95,7 +95,7 @@ data class ExerciseDefaultUiState(
         name = name.copy(error = FormValidators.validateName(name.value), touched = true),
         reps = reps.copy(error = FormValidators.validatePositiveInt(reps.value), touched = true),
         sets = sets.copy(error = FormValidators.validatePositiveInt(sets.value), touched = true),
-        rest = rest.copy(error = FormValidators.validatePositiveInt(rest.value), touched = true)
+        rest = rest.copy(error = FormValidators.validateNonNegativeInt(rest.value), touched = true)
     )
 
     override fun copyFieldError(

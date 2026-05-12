@@ -35,7 +35,7 @@ fun ExerciseList(
         val adjustedFrom = from.index - 1 // Subtract 1 for header
         val adjustedTo = to.index - 1 // Subtract 1 for header
 
-        if (adjustedFrom in exercisesList.indices && adjustedTo in 0..exercisesList.size) {
+        if (adjustedFrom in exercisesList.indices && adjustedTo in exercisesList.indices) {
             onReorder(exercisesList[adjustedFrom], exercisesList[adjustedTo])
         }
     }

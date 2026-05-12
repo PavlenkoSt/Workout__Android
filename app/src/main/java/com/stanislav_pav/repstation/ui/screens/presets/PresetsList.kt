@@ -30,7 +30,7 @@ fun PresetsList(
         val adjustedFrom = from.index
         val adjustedTo = to.index
 
-        if (adjustedFrom in presets.indices && adjustedTo in 0..presets.size) {
+        if (adjustedFrom in presets.indices && adjustedTo in presets.indices) {
             reorderPresets(presets[adjustedFrom], presets[adjustedTo])
         }
     }

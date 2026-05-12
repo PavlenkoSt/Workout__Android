@@ -22,6 +22,7 @@ interface TrainingDayDao {
         SELECT * FROM training_days WHERE date = :date
     """
     )
+    @Transaction
     fun getDayByDate(date: String): Flow<TrainingDayWithExercises?>
 
     @Query("SELECt date FROM training_days")

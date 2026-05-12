@@ -29,7 +29,7 @@ fun PresetExerciseList(
         val adjustedFrom = from.index
         val adjustedTo = to.index
 
-        if (adjustedFrom in exercises.indices && adjustedTo in 0..exercises.size) {
+        if (adjustedFrom in exercises.indices && adjustedTo in exercises.indices) {
             reorderExercises(exercises[adjustedFrom], exercises[adjustedTo])
         }
     }
