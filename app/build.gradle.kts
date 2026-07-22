@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId = "com.stanislav_pav.repstation"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 4
+        targetSdk = 36
+        versionCode = 5
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
