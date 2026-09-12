@@ -28,7 +28,7 @@ fun TrainingFooter(
                     onClick = onStatisticsLockedClick,
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    Text("Pro statistics")
+                    Text("Statistics")
                 }
             } else {
                 TrainingStatistics(
