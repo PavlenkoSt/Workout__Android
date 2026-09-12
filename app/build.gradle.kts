@@ -14,15 +14,15 @@ android {
         applicationId = "com.stanislav_pav.repstation"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
             "String",
-            "REVENUECAT_API_KEY",
-            "\"${providers.gradleProperty("REVENUECAT_API_KEY").orNull.orEmpty()}\""
+            "PLAY_PRO_PRODUCT_ID",
+            "\"${providers.gradleProperty("PLAY_PRO_PRODUCT_ID").getOrElse("com.stanislav_pav.repstation.pro").trim()}\""
         )
         buildConfigField(
             "String",
@@ -63,8 +63,7 @@ dependencies {
 
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.reorderable)
-    implementation(libs.revenuecat.purchases)
-    implementation(libs.revenuecat.ui)
+    implementation(libs.play.billing)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

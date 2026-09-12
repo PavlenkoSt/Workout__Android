@@ -1,0 +1,38 @@
+<resources>
+    <string name="pro_close">Close</string>
+    <string name="pro_badge">REPSTATION PRO</string>
+    <string name="pro_title">More room to grow.</string>
+    <string name="pro_unlocked_title">Pro is yours.</string>
+    <string name="pro_subtitle">Build your routine. Track your progress.\nMake every workout count.</string>
+    <string name="pro_presets_title">Unlimited presets</string>
+    <string name="pro_presets_detail">Keep a routine for every kind of training day.</string>
+    <string name="pro_goals_title">Unlimited goals</string>
+    <string name="pro_goals_detail">Set your next milestones without limits.</string>
+    <string name="pro_records_title">Unlimited records</string>
+    <string name="pro_records_detail">Save every personal best along the way.</string>
+    <string name="pro_stats_title">Training statistics</string>
+    <string name="pro_stats_detail">See the numbers behind each workout.</string>
+    <string name="pro_lifetime">Lifetime Pro access</string>
+    <string name="pro_loading_price">Loading price…</string>
+    <string name="pro_price_unavailable">Price unavailable</string>
+    <string name="pro_no_subscription">One payment. No subscription.</string>
+    <string name="pro_pending">Waiting for Google Play to confirm your payment.</string>
+    <string name="pro_retry">Retry</string>
+    <string name="pro_continue">Continue with Pro</string>
+    <string name="pro_buy">Unlock Pro</string>
+    <string name="pro_buy_price">Unlock Pro · %1$s</string>
+    <string name="pro_processing">Opening Google Play…</string>
+    <string name="pro_payment_pending">Payment pending</string>
+    <string name="pro_google_play">Purchased through Google Play. Restore with the same Google Play account.</string>
+    <string name="pro_restore">Restore purchases</string>
+    <string name="pro_privacy">Privacy Policy</string>
+    <string name="pro_terms">Terms of Use</string>
+    <string name="pro_privacy_url" translatable="false">https://rep-station.pavlenko-apps.space/privacy</string>
+    <string name="pro_terms_url" translatable="false">https://rep-station.pavlenko-apps.space/terms</string>
+    <string name="pro_restoring">Restoring…</string>
+    <string name="pro_access_code">Access code</string>
+    <string name="pro_code_label">Code</string>
+    <string name="pro_invalid_code">Invalid access code</string>
+    <string name="pro_unlock">Unlock</string>
+    <string name="pro_cancel">Cancel</string>
+</resources>

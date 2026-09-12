@@ -62,7 +62,7 @@ fun TrainingScreen(
     val localStackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
-    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    val shouldGatePro = !monetizationState.isPro
 
     val trainingDayPicked = localNavController.currentBackStackEntry
         ?.savedStateHandle

@@ -12,7 +12,7 @@ lifecycleViewmodelCompose = "2.9.4"
 navigationCompose = "2.9.6"
 reorderable = "3.0.0"
 roomRuntime = "2.8.3"
-revenuecat = "9.23.1"
+playBilling = "9.1.0"
 
 [libraries]
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
@@ -37,8 +37,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
-revenuecat-purchases = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecat" }
-revenuecat-ui = { module = "com.revenuecat.purchases:purchases-ui", version.ref = "revenuecat" }
+play-billing = { module = "com.android.billingclient:billing", version.ref = "playBilling" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

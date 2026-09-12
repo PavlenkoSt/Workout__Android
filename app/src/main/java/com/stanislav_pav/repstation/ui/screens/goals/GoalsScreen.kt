@@ -57,7 +57,7 @@ fun GoalsScreen(
     val localSnackbarHostState = LocalSnackbarHostState.current
     val monetizationState = LocalMonetizationState.current
     val presentPaywall = LocalPresentPaywall.current
-    val shouldGatePro = monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    val shouldGatePro = !monetizationState.isPro
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }

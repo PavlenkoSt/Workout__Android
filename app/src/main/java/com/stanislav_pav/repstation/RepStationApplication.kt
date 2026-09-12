@@ -1,11 +1,8 @@
 package com.stanislav_pav.repstation
 
 import android.app.Application
-import com.stanislav_pav.repstation.monetization.RevenueCatInitializer
+import com.stanislav_pav.repstation.monetization.PlayBillingRepository
 
 class RepStationApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        RevenueCatInitializer.configure(this)
-    }
+    val billingRepository by lazy { PlayBillingRepository(this) }
 }
